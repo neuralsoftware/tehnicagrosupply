@@ -60,24 +60,35 @@ export function RoiCalculator() {
 
         // Save to API (backend)
         try {
+            const leadData = {
+                name: contact,
+                phone,
+                email,
+                county,
+                hectares,
+                crops: selectedCrops,
+                urgency,
+                subsidyIncome,
+                fuelSavings,
+                totalBenefit
+            };
+
             await fetch('/api/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: contact,
-                    phone,
-                    email,
-                    county,
-                    hectares,
-                    crops: selectedCrops,
-                    urgency,
-                    subsidyIncome,
-                    fuelSavings,
-                    totalBenefit
-                })
+                body: JSON.stringify(leadData)
             });
+
+            // Send automatic report email if email exists
+            if (email) {
+                await fetch('/api/send-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(leadData)
+                });
+            }
         } catch (error) {
-            console.error('Error saving lead:', error);
+            console.error('Error in lead submission flow:', error);
         }
 
         setSubmitted(true);
