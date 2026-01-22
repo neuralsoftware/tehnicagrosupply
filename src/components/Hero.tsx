@@ -14,28 +14,40 @@ export function Hero() {
             />
 
             <div className="relative z-20 max-w-5xl mx-auto px-4 text-center space-y-8">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ea-red-900/20 border border-ea-red-500/30 text-ea-red-500 text-[10px] font-black uppercase tracking-[0.2em]"
+                >
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ea-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-ea-red-500"></span>
+                    </span>
+                    Atenție: Deadline depunere cereri APIA PD-04 se apropie
+                </motion.div>
+
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                     className="text-5xl md:text-7xl font-bold uppercase tracking-tight text-white drop-shadow-lg"
                 >
-                    Încasează subvenția <br />
-                    <span className="text-ea-green-500">APIA PD-04</span> (56€/ha) <br />
-                    <span className="text-4xl md:text-6xl text-zinc-300">și uită de arătură.</span>
+                    Eficiență Garantată <br />
+                    <span className="text-ea-green-500">Securizează Subvenția</span> <br />
+                    <span className="text-4xl md:text-6xl text-zinc-300">și Maximizează Profitul.</span>
                 </motion.h1>
 
                 <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.8 }}
-                    className="text-xl md:text-2xl text-zinc-300 max-w-3xl mx-auto font-light"
+                    className="text-xl md:text-2xl text-zinc-300 max-w-4xl mx-auto font-light"
                 >
-                    Soluția 2026 pentru conformare <span className="font-semibold text-white">GAEC 6</span>:
-                    Semănători No-Till <span className="font-semibold text-white">Avers-Agro</span> și
-                    Discuri Conservatoare <span className="font-semibold text-white">Fliegl</span>.
+                    Parteneriatul tău strategic pentru <span className="font-semibold text-white">Performanță Agricolă</span>.
+                    Implementăm tehnologii No-Till <span className="font-semibold text-white">Avers-Agro</span> și
+                    soluții <span className="font-semibold text-white">Fliegl</span> conforme cu <span className="text-ea-green-500 font-bold">GAEC 6 și APIA PD-04</span>.
                     <br />
-                    <span className="text-ea-red-600 font-bold block mt-2">Nu pierde banii din cauza utilajelor vechi.</span>
+                    <span className="text-zinc-400 text-lg block mt-4 italic">„Tehnologia corectă nu este o cheltuială, este cea mai sigură investiție a fermei tale.”</span>
                 </motion.p>
 
                 <motion.div
@@ -45,16 +57,16 @@ export function Hero() {
                     className="flex flex-col sm:flex-row items-center justify-center gap-4"
                 >
                     <Link
-                        href="#oferta"
-                        className="w-full sm:w-auto px-8 py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white text-lg font-bold rounded-md uppercase tracking-wide transition-all shadow-[0_0_20px_rgba(22,101,52,0.5)] hover:shadow-[0_0_30px_rgba(34,197,94,0.6)] text-center"
+                        href="#audit"
+                        className="w-full sm:w-auto px-10 py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white text-lg font-bold rounded-lg uppercase tracking-wide transition-all shadow-[0_0_20px_rgba(22,101,52,0.4)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] text-center flex items-center justify-center gap-2"
                     >
-                        Vreau Subvenția + Oferta
+                        Începe Auditul de Eficiență
                     </Link>
                     <Link
                         href="#contact"
-                        className="w-full sm:w-auto px-8 py-4 border border-zinc-500 hover:bg-zinc-800 text-zinc-100 text-lg font-medium rounded-md uppercase tracking-wide transition-all text-center"
+                        className="w-full sm:w-auto px-10 py-5 border border-zinc-600 hover:bg-zinc-800 text-zinc-100 text-lg font-medium rounded-lg uppercase tracking-wide transition-all text-center"
                     >
-                        Consultă un Expert APIA
+                        Solicită Expertiză Tehnică
                     </Link>
                 </motion.div>
             </div>

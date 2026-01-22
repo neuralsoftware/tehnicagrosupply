@@ -15,9 +15,10 @@ interface ProductProps {
     id?: string;
     badge?: string;
     detailedSpecs?: any; // Structured data for the modal
+    expertVerdict?: string; // High-authority recommendation
 }
 
-export function ProductSection({ title, description, imageSrc, specs, ctaLabel, reversed, id, badge, detailedSpecs }: ProductProps) {
+export function ProductSection({ title, description, imageSrc, specs, ctaLabel, reversed, id, badge, detailedSpecs, expertVerdict }: ProductProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
@@ -100,6 +101,19 @@ export function ProductSection({ title, description, imageSrc, specs, ctaLabel, 
                                 ))}
                             </ul>
                         </div>
+
+                        {expertVerdict && (
+                            <div className="bg-ea-green-900/10 border border-ea-green-500/30 p-6 rounded-xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-24 h-24 bg-ea-green-500/5 blur-3xl rounded-full"></div>
+                                <h4 className="text-ea-green-500 text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-2">
+                                    <Check className="w-3 h-3" />
+                                    Verdict Expert TehnicAgro
+                                </h4>
+                                <p className="text-sm font-bold text-zinc-100 italic leading-relaxed">
+                                    "{expertVerdict}"
+                                </p>
+                            </div>
+                        )}
 
                         <div className="pt-2">
                             <button

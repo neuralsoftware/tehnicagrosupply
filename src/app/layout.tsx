@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { CookieConsent } from '@/components/CookieConsent';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
@@ -27,6 +28,7 @@ export default function RootLayout({
         <html lang="ro" className={`${inter.variable} ${oswald.variable} scroll-smooth`}>
             <body className={inter.className}>
                 {children}
+                <CookieConsent />
                 <GoogleAnalytics gaId="G-KR6928Z45R" />
             </body>
         </html>

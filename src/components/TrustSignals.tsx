@@ -6,23 +6,23 @@ import { Truck, ShieldCheck, Headphones, GraduationCap } from 'lucide-react';
 const signals = [
     {
         icon: <Truck className="w-8 h-8 text-ea-green-500" />,
-        title: "Livrare Rapidă",
-        description: "Utilaje pe stoc, gata de livrare în toată România în 3-5 zile lucrătoare."
+        title: "Livrare la Termen",
+        description: "Proces transparent: Contract, Avans, Comandă și Livrare conform termenelor stabilite."
     },
     {
         icon: <ShieldCheck className="w-8 h-8 text-ea-green-500" />,
-        title: "Garanție 24 Luni",
-        description: "Linie directă pentru suport tehnic și piese de schimb originale."
+        title: "Garanție 12 Luni",
+        description: "Garanție tehnică de 12 luni de la punerea în funcțiune, cu suport complet pentru piese."
     },
     {
         icon: <GraduationCap className="w-8 h-8 text-ea-green-500" />,
-        title: "Consultanță APIA",
-        description: "Specialiștii noștri te ajută cu documentația pentru subvenția PD-04."
+        title: "Expertiză APIA",
+        description: "Consultanță tehnică pentru conformarea utilajelor cu cerințele eco-schemei PD-04."
     },
     {
         icon: <Headphones className="w-8 h-8 text-ea-green-500" />,
         title: "Service Mobil",
-        description: "Intervenții rapide direct în ferma ta, cu ingineri calificați."
+        description: "Echipă tehnică dedicată pentru intervenții și asistență direct în ferma ta."
     }
 ];
 

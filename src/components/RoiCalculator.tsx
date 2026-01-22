@@ -2,223 +2,471 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Banknote, Droplets, Download, Send, CheckCircle2 } from 'lucide-react';
+import { Calculator, Banknote, Droplets, Download, Send, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone } from 'lucide-react';
+
+const COUNTIES = [
+    'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila', 'București',
+    'Buzău', 'Caraș-Severin', 'Călărași', 'Cluj', 'Constanța', 'Covasna', 'Dâmbovița', 'Dolj', 'Galați', 'Giurgiu',
+    'Gorj', 'Harghita', 'Hunedoara', 'Ialomița', 'Iași', 'Ilfov', 'Maramureș', 'Mehedinți', 'Mureș', 'Neamț',
+    'Olt', 'Prahova', 'Satu Mare', 'Sălaj', 'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea', 'Vaslui',
+    'Vâlcea', 'Vrancea'
+];
+
+const CROPS = ['Cereale', 'Oleaginoase', 'Leguminoase', 'Furajere', 'Altele'];
+const URGENCY_OPTIONS = [
+    { id: 'urgent', label: 'Imediat (Campania Actuală)' },
+    { id: 'next_season', label: 'Campania Viitoare' },
+    { id: 'info', label: 'Doar Informativ (Planificare)' }
+];
 
 export function RoiCalculator() {
     const [hectares, setHectares] = useState<number>(100);
     const [showForm, setShowForm] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+
+    // Form State
     const [contact, setContact] = useState('');
+    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
+    const [county, setCounty] = useState('');
+    const [selectedCrops, setSelectedCrops] = useState<string[]>([]);
+    const [urgency, setUrgency] = useState('');
+    const [gdprConsent, setGdprConsent] = useState(false);
 
     // Constants
     const SUBSIDY_EUR = 56.28;
     const FUEL_SAVING_L = 40; // Liters per ha saved
     const FUEL_PRICE_RON = 8.0;
     const EUR_RON_RATE = 5.0;
+    const OVERLAP_REDUCTION_PERCENT = 0.10; // 10% reduction in inputs due to no overlap
+    const INPUT_COST_PER_HA_RON = 1500; // Average input cost
 
     // Calculations
     const subsidyIncome = hectares * SUBSIDY_EUR * EUR_RON_RATE;
     const fuelSavings = hectares * FUEL_SAVING_L * FUEL_PRICE_RON;
-    const totalBenefit = subsidyIncome + fuelSavings;
+    const inputSavings = hectares * INPUT_COST_PER_HA_RON * OVERLAP_REDUCTION_PERCENT;
 
-    const [contactType, setContactType] = useState<'whatsapp' | 'email'>('whatsapp');
+    const totalBenefit = subsidyIncome + fuelSavings + inputSavings;
+    const monthlyBenefit = totalBenefit / 12;
 
-    const handleDownloadReport = (e: React.FormEvent) => {
+    const toggleCrop = (crop: string) => {
+        setSelectedCrops(prev =>
+            prev.includes(crop) ? prev.filter(c => c !== crop) : [...prev, crop]
+        );
+    };
+
+    const handleDownloadReport = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const isEmail = contact.includes('@');
-        setContactType(isEmail ? 'email' : 'whatsapp');
+        // Save to API (backend)
+        try {
+            await fetch('/api/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: contact,
+                    phone,
+                    email,
+                    county,
+                    hectares,
+                    crops: selectedCrops,
+                    urgency,
+                    subsidyIncome,
+                    fuelSavings,
+                    totalBenefit
+                })
+            });
+        } catch (error) {
+            console.error('Error saving lead:', error);
+        }
+
         setSubmitted(true);
-
-        const message = `Buna ziua! Am calculat un beneficiu de ${totalBenefit.toLocaleString('ro-RO')} RON/an pentru ferma mea de ${hectares} ha. Doresc raportul detaliat si oferta personalizata. Contact: ${contact}`;
-
-        // Folosim un timeout scurt pentru a arata loading-ul, apoi deschidem aplicatia
-        setTimeout(() => {
-            if (isEmail) {
-                const subject = `Solicitare Raport ROI - Ferma ${hectares} ha`;
-                const body = `${message}`;
-                window.location.href = `mailto:tehnicagro.supply@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            } else {
-                const encodedMessage = encodeURIComponent(message);
-                window.open(`https://wa.me/40723380022?text=${encodedMessage}`, '_blank');
-            }
-        }, 1000);
     };
 
     const resetCalculator = () => {
         setShowForm(false);
         setSubmitted(false);
-        setContact('');
-        setContactType('whatsapp');
+    };
+
+    const requestCallsBack = async () => {
+        try {
+            await fetch(`/api/leads/${phone}`, { // Assuming phone is unique for this demo or update by ID
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notes: 'SOLICITARE REAPELARE RAPIDĂ' })
+            });
+            alert('Cererea a fost trimisă. Un specialist vă va contacta în cel mai scurt timp.');
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getRegionalAdvice = () => {
+        const droughtProne = ['Constanța', 'Tulcea', 'Ialomița', 'Călărași', 'Brăila', 'Galați', 'Buzău', 'Dolj', 'Olt', 'Mehedinți', 'Vrancea', 'Vaslui'];
+        const mechanicalLoad = ['Timiș', 'Arad', 'Bihor', 'Satu Mare', 'Teleorman', 'Giurgiu'];
+
+        if (droughtProne.includes(county)) {
+            return "Prioritate Secetă: Tehnologia No-Till este vitală pentru conservarea umidității. Reducerea evaporării prin resturi vegetale poate salva cultura în anii extremi.";
+        }
+        if (mechanicalLoad.includes(county)) {
+            return "Soluri Grele: Recomandăm utilaje cu presiune mare pe brăzdar (min 150kg) pentru a asigura penetrarea în solurile compactate specifice zonei.";
+        }
+        return "Optimizare Generală: Structura propusă vizează reducerea costurilor fixe și conformitatea cu noile standarde de subvenționare 2026.";
     };
 
     return (
-        <section className="py-24 bg-zinc-950 relative overflow-hidden">
+        <section id="audit" className="py-24 bg-zinc-950 relative overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ea-green-900 to-transparent" />
 
-            <div className="max-w-4xl mx-auto px-4 relative z-10">
+            <div className="max-w-5xl mx-auto px-4 relative z-10">
                 <div className="text-center mb-12 space-y-4">
-                    <span className="inline-block px-4 py-1 rounded-full bg-ea-green-900/30 border border-ea-green-800 text-ea-green-500 text-sm font-semibold uppercase tracking-wider">
-                        Calculator Profitabilitate
+                    <span className="inline-block px-4 py-1 rounded-full bg-ea-green-900/40 border border-ea-green-700 text-ea-green-400 text-sm font-semibold uppercase tracking-wider">
+                        Instrument Profesional de Diagnoză
                     </span>
-                    <h2 className="text-4xl font-bold uppercase text-white">
-                        Cât pierzi dacă nu te modernizezi?
+                    <h2 className="text-4xl md:text-5xl font-bold uppercase text-white leading-tight">
+                        Audit de Eficiență Tehnologică
                     </h2>
-                    <p className="text-zinc-400 text-lg">
-                        Introdu suprafața fermei tale și vezi impactul financiar al tehnologiei Tehnicagro Supply.
+                    <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+                        Analizăm impactul tehnologiilor No-Till și Conservatoare asupra rentabilității fermei tale în contextul noilor subvenții 2026.
                     </p>
                 </div>
 
-                <div className="bg-zinc-900 rounded-2xl border border-zinc-800 shadow-2xl p-8 md:p-12">
+                <div className="bg-zinc-900 rounded-3xl border border-zinc-800 shadow-2xl p-6 md:p-12">
                     {/* Input Slider */}
-                    <div className="mb-12">
-                        <label className="flex justify-between items-center mb-4">
-                            <span className="text-zinc-300 font-medium text-lg">Suprafața Fermei (Hectare):</span>
-                            <span className="text-3xl font-bold text-white bg-zinc-800 px-4 py-2 rounded-lg border border-zinc-700">
+                    <div className="mb-12 max-w-3xl mx-auto">
+                        <label className="flex justify-between items-center mb-6">
+                            <span className="text-zinc-300 font-medium text-lg">Suprafață de Lucru (Hectare):</span>
+                            <span className="text-4xl font-black text-white bg-zinc-800 px-6 py-3 rounded-2xl border border-zinc-700 shadow-inner">
                                 {hectares} ha
                             </span>
                         </label>
                         <input
                             type="range"
                             min="10"
-                            max="2000"
+                            max="3000"
                             step="10"
                             value={hectares}
                             onChange={(e) => setHectares(Number(e.target.value))}
-                            className="w-full h-3 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-ea-green-500"
+                            className="w-full h-4 bg-zinc-800 rounded-xl appearance-none cursor-pointer accent-ea-green-500"
                         />
-                        <div className="flex justify-between text-xs text-zinc-500 mt-2">
+                        <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-600 mt-3 px-1 tracking-widest">
                             <span>10 ha</span>
-                            <span>2000 ha</span>
+                            <span>Model Standard</span>
+                            <span>Exploatație Comercială</span>
+                            <span>Aria Mare</span>
+                            <span>3000 ha</span>
                         </div>
                     </div>
 
-                    {/* Results Grid */}
-                    <div className="grid md:grid-cols-3 gap-6">
-
-                        {/* Box 1: Subsidies */}
-                        <div className="bg-zinc-950 p-6 rounded-xl border border-zinc-800 flex flex-col items-center text-center group hover:border-ea-green-600/50 transition-colors">
-                            <Banknote className="w-10 h-10 text-ea-green-500 mb-4 group-hover:scale-110 transition-transform" />
-                            <span className="text-zinc-400 text-sm uppercase tracking-wider mb-2">Venit Extra APIA (PD-04)</span>
-                            <span className="text-3xl font-bold text-white">
-                                {subsidyIncome.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-zinc-500">RON</span>
-                            </span>
+                    {!submitted && (
+                        <div className="grid md:grid-cols-3 gap-8 mb-12">
+                            <div className="bg-zinc-950/50 p-6 rounded-2xl border border-zinc-800/50 flex flex-col items-center text-center group hover:border-ea-green-900/50 transition-colors">
+                                <Banknote className="w-10 h-10 text-ea-green-500 mb-4 group-hover:scale-110 transition-transform" />
+                                <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Venit Securizat APIA</span>
+                                <span className="text-3xl font-bold text-white">
+                                    {subsidyIncome.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-zinc-500">RON</span>
+                                </span>
+                            </div>
+                            <div className="bg-zinc-950/50 p-6 rounded-2xl border border-zinc-800/50 flex flex-col items-center text-center group hover:border-blue-900/50 transition-colors">
+                                <Droplets className="w-10 h-10 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
+                                <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Optimizare Costuri Input</span>
+                                <span className="text-3xl font-bold text-white">
+                                    {(fuelSavings + inputSavings).toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-zinc-500">RON</span>
+                                </span>
+                            </div>
+                            <div className="bg-ea-green-950/20 p-6 rounded-2xl border border-ea-green-500/30 flex flex-col items-center text-center group border-dashed">
+                                <TrendingUp className="w-10 h-10 text-ea-green-400 mb-4 group-hover:scale-110 transition-transform" />
+                                <span className="text-ea-green-500/80 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Impact Profit Net / An</span>
+                                <span className="text-4xl font-black text-ea-green-400">
+                                    {totalBenefit.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-ea-green-700">RON</span>
+                                </span>
+                            </div>
                         </div>
+                    )}
 
-                        {/* Box 2: Fuel */}
-                        <div className="bg-zinc-950 p-6 rounded-xl border border-zinc-800 flex flex-col items-center text-center group hover:border-blue-600/50 transition-colors">
-                            <Droplets className="w-10 h-10 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
-                            <span className="text-zinc-400 text-sm uppercase tracking-wider mb-2">Economie Motorină</span>
-                            <span className="text-3xl font-bold text-white">
-                                {fuelSavings.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-zinc-500">RON</span>
-                            </span>
-                        </div>
 
-                        {/* Box 3: Total */}
-                        <div className="bg-gradient-to-br from-ea-green-900 to-zinc-900 p-6 rounded-xl border border-ea-green-500 flex flex-col items-center text-center shadow-[0_0_30px_rgba(22,101,52,0.2)]">
-                            <Calculator className="w-10 h-10 text-white mb-4" />
-                            <span className="text-ea-green-200 text-sm uppercase tracking-wider mb-2 font-bold">Beneficiu Total / An</span>
-                            <span className="text-4xl font-bold text-white">
-                                {totalBenefit.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-lg font-normal text-ea-green-200">RON</span>
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Lead Magnet Action */}
-                    <div className="mt-12 pt-8 border-t border-zinc-800 flex flex-col items-center">
+                    {/* Action Area */}
+                    <div className="border-t border-zinc-800/50 pt-10">
                         {!showForm ? (
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={() => setShowForm(true)}
-                                className="inline-flex items-center gap-2 px-10 py-5 bg-white text-zinc-950 font-black rounded-lg uppercase tracking-tight shadow-xl hover:bg-zinc-100 transition-colors"
-                            >
-                                <Download className="w-5 h-5" />
-                                Descarcă Planul de Profit de {totalBenefit.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} RON
-                            </motion.button>
+                            <div className="text-center">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setShowForm(true)}
+                                    className="group relative inline-flex items-center gap-3 px-12 py-6 bg-white text-zinc-950 font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-zinc-100 transition-all overflow-hidden"
+                                >
+                                    <div className="absolute inset-0 bg-ea-green-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                                    <Download className="w-6 h-6 text-ea-green-600" />
+                                    <span>Solicită Raport Tehnic Complet</span>
+                                </motion.button>
+                                <p className="mt-6 text-zinc-500 text-sm font-medium">
+                                    Parametrii calculați conform normativelor APIA PD-04 și GAEC 6.
+                                </p>
+                            </div>
                         ) : (
                             <AnimatePresence mode="wait">
                                 {!submitted ? (
                                     <motion.form
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
+                                        initial={{ opacity: 0, scale: 0.98 }}
+                                        animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.95 }}
                                         onSubmit={handleDownloadReport}
-                                        className="w-full max-w-md space-y-4"
+                                        className="max-w-4xl mx-auto"
                                     >
-                                        <div className="text-center space-y-2 mb-4">
-                                            <h3 className="text-xl font-bold text-white uppercase italic">Ultimul pas: Unde trimitem raportul?</h3>
-                                            <p className="text-zinc-400 text-sm">Vei primi fișa tehnică și calculul detaliat pe WhatsApp/Email.</p>
-                                        </div>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                required
-                                                placeholder="Telefon sau Email"
-                                                value={contact}
-                                                onChange={(e) => setContact(e.target.value)}
-                                                className="w-full bg-zinc-950 border border-zinc-700 rounded-lg p-4 text-white focus:ring-2 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-700"
-                                            />
+                                        <div className="bg-zinc-950/50 p-8 rounded-3xl border border-zinc-800">
+                                            <div className="grid md:grid-cols-2 gap-8 mb-8">
+                                                <div className="space-y-6">
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Identificare Fermă / Contact</label>
+                                                        <input
+                                                            type="text"
+                                                            required
+                                                            value={contact}
+                                                            onChange={(e) => setContact(e.target.value)}
+                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            placeholder="Nume Fermă sau Persoană de Contact"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Locație (Județ)</label>
+                                                        <select
+                                                            required
+                                                            value={county}
+                                                            onChange={(e) => setCounty(e.target.value)}
+                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
+                                                        >
+                                                            <option value="">Selectați Județul</option>
+                                                            {COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Culturile din Afectare</label>
+                                                        <div className="flex flex-wrap gap-2 mt-2">
+                                                            {CROPS.map(crop => (
+                                                                <button
+                                                                    key={crop}
+                                                                    type="button"
+                                                                    onClick={() => toggleCrop(crop)}
+                                                                    className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all ${selectedCrops.includes(crop)
+                                                                        ? 'bg-ea-green-600 border-ea-green-500 text-white shadow-lg'
+                                                                        : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                                                                        }`}
+                                                                >
+                                                                    {crop}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-6">
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Telefon (WhatsApp pentru raport)</label>
+                                                        <input
+                                                            type="tel"
+                                                            required
+                                                            value={phone}
+                                                            onChange={(e) => setPhone(e.target.value)}
+                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            placeholder="07xx xxx xxx"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Orizont Investiție</label>
+                                                        <select
+                                                            required
+                                                            value={urgency}
+                                                            onChange={(e) => setUrgency(e.target.value)}
+                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
+                                                        >
+                                                            <option value="">Alegeți perioada vizată</option>
+                                                            {URGENCY_OPTIONS.map(opt => <option key={opt.id} value={opt.label}>{opt.label}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Adresă Email (Opțional pentru PDF)</label>
+                                                        <input
+                                                            type="email"
+                                                            value={email}
+                                                            onChange={(e) => setEmail(e.target.value)}
+                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            placeholder="nume@ferma.ro"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-start gap-3 mb-6 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
+                                                <input
+                                                    type="checkbox"
+                                                    id="gdpr-audit"
+                                                    required
+                                                    checked={gdprConsent}
+                                                    onChange={(e) => setGdprConsent(e.target.checked)}
+                                                    className="mt-1 w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-ea-green-600 focus:ring-ea-green-500 cursor-pointer"
+                                                />
+                                                <label htmlFor="gdpr-audit" className="text-[11px] text-zinc-400 leading-snug cursor-pointer">
+                                                    Sunt de acord cu prelucrarea datelor cu caracter personal în scopul realizării auditului de eficiență și contactării ulterioare pentru asistență tehnică, conform{' '}
+                                                    <a href="/privacy-policy" target="_blank" className="text-ea-green-500 hover:underline font-bold">
+                                                        Politicii de Confidențialitate
+                                                    </a>.
+                                                </label>
+                                            </div>
+
                                             <button
                                                 type="submit"
-                                                className="absolute right-2 top-2 bottom-2 px-4 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-md transition-colors"
+                                                className="w-full py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl transition-all hover:translate-y-[-2px]"
                                             >
-                                                <Send className="w-5 h-5" />
+                                                Generează Expertiza Tehnică
                                             </button>
+                                            <p className="text-[10px] text-zinc-600 text-center mt-6 uppercase tracking-wider font-bold">
+                                                🔒 Datele sunt stocate în siguranță conform normelor GDPR TehnicAgro Supply 2026.
+                                            </p>
                                         </div>
                                     </motion.form>
                                 ) : (
                                     <motion.div
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        className="flex flex-col items-center space-y-4 text-center p-4"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="max-w-4xl mx-auto bg-zinc-50 text-zinc-900 rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-white"
                                     >
-                                        <div className="w-16 h-16 bg-ea-green-600 rounded-full flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(22,197,94,0.4)]">
-                                            <CheckCircle2 className="w-8 h-8 text-white" />
+                                        {/* Header Raport - Professional Look */}
+                                        <div className="bg-zinc-900 p-10 flex justify-between items-start text-white border-b-8 border-ea-green-600">
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <AlertCircle className="w-5 h-5 text-ea-green-500" />
+                                                    <span className="text-[10px] uppercase font-black tracking-widest text-ea-green-500">Document Tehnic Confidențial</span>
+                                                </div>
+                                                <h3 className="text-3xl font-black uppercase tracking-tight">Expertiză Eficiență Tehnologică</h3>
+                                                <p className="text-zinc-500 text-sm font-bold">Analiză personalizată pentru {contact} • {county}</p>
+                                            </div>
+                                            <div className="text-right flex flex-col items-end">
+                                                <div className="bg-ea-green-600 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase mb-4">Validat 2026</div>
+                                                <span className="text-4xl font-black text-white">{hectares} <span className="text-lg opacity-50">HA</span></span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-white">Am generat raportul!</h3>
-                                            <p className="text-zinc-400 text-sm mt-1">
-                                                {contactType === 'email'
-                                                    ? 'Verifică aplicația de email pentru a trimite solicitarea.'
-                                                    : 'Dacă WhatsApp nu s-a deschis automat, apasă butonul de mai jos.'
-                                                }
-                                            </p>
+
+                                        <div className="p-10">
+                                            <div className="grid md:grid-cols-2 gap-12">
+                                                <div className="space-y-8">
+                                                    <div>
+                                                        <h4 className="text-zinc-400 text-[10px] font-black uppercase mb-4 tracking-widest border-b border-zinc-200 pb-2">Analiză Randament Financiar</h4>
+                                                        <div className="space-y-4">
+                                                            <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-zinc-100">
+                                                                <span className="text-sm font-bold text-zinc-600 uppercase">Subvenție APIA PD-04</span>
+                                                                <span className="font-black text-xl text-ea-green-600">+{subsidyIncome.toLocaleString('ro-RO')} <span className="text-xs">RON</span></span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-zinc-100">
+                                                                <span className="text-sm font-bold text-zinc-600 uppercase">Economie Motorină (Est.)</span>
+                                                                <span className="font-black text-xl text-blue-600">+{fuelSavings.toLocaleString('ro-RO')} <span className="text-xs">RON</span></span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-zinc-100">
+                                                                <span className="text-sm font-bold text-zinc-600 uppercase">Economie Inputuri (No-Overlap)</span>
+                                                                <span className="font-black text-xl text-teal-600">+{inputSavings.toLocaleString('ro-RO')} <span className="text-xs">RON</span></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="bg-zinc-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
+                                                        <div className="absolute top-0 right-0 w-32 h-32 bg-ea-green-500 opacity-5 blur-3xl -mr-10 -mt-10"></div>
+                                                        <span className="block text-zinc-500 text-[10px] uppercase font-black tracking-widest mb-2">Total Beneficiu Suplimentar Anual</span>
+                                                        <span className="block text-5xl font-black text-ea-green-400 mb-2">{totalBenefit.toLocaleString('ro-RO')} <span className="text-lg text-ea-green-800">RON</span></span>
+                                                        <p className="text-xs text-zinc-500 font-medium">Acest profit acoperă plata ratelor pentru utilajele achiziționate în proporție de peste 80%.</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-8 flex flex-col justify-between">
+                                                    <div>
+                                                        <h4 className="text-zinc-400 text-[10px] font-black uppercase mb-4 tracking-widest border-b border-zinc-200 pb-2">Verdict Expert Tehnicagro</h4>
+                                                        <ul className="space-y-4">
+                                                            <li className="flex gap-4 p-4 bg-zinc-100 rounded-2xl group hover:bg-white transition-colors">
+                                                                <div className="w-10 h-10 bg-ea-green-600/10 rounded-full flex items-center justify-center shrink-0">
+                                                                    <CheckCircle2 className="w-6 h-6 text-ea-green-600" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs font-black uppercase text-zinc-400 mb-1">Eco-Schema PD-04 / GAEC 6</p>
+                                                                    <p className="text-sm font-bold text-zinc-700 leading-snug">
+                                                                        Configurația propusă respectă cerința de tehnologie conservativă pe min. 50% din suprafață și asigură acoperirea solului (15 iunie - 15 oct), eliminând riscul penalizărilor.
+                                                                    </p>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex gap-4 p-4 bg-zinc-100 rounded-2xl group hover:bg-white transition-colors">
+                                                                <div className="w-10 h-10 bg-blue-600/10 rounded-full flex items-center justify-center shrink-0">
+                                                                    <Clock className="w-6 h-6 text-blue-600" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs font-black uppercase text-zinc-400 mb-1">Timp Amortizare</p>
+                                                                    <p className="text-sm font-bold text-zinc-700 leading-snug">Investiția este autosustentabilă în <span className="text-ea-green-600">8-12 luni</span> din economii directe.</p>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex gap-4 p-4 bg-zinc-100 rounded-2xl group hover:bg-white transition-colors">
+                                                                <div className="w-10 h-10 bg-orange-600/10 rounded-full flex items-center justify-center shrink-0">
+                                                                    <MapPin className="w-6 h-6 text-orange-600" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs font-black uppercase text-zinc-400 mb-1">Context Regional ({county})</p>
+                                                                    <p className="text-sm font-bold text-zinc-700 leading-snug">{getRegionalAdvice()}</p>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex gap-4 p-4 bg-orange-600/10 rounded-2xl border border-orange-500/20 group hover:bg-white transition-colors">
+                                                                <div className="w-10 h-10 bg-orange-600/10 rounded-full flex items-center justify-center shrink-0">
+                                                                    <FileText className="w-6 h-6 text-orange-600" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs font-black uppercase text-zinc-400 mb-1">Resurse Utile APIA</p>
+                                                                    <p className="text-xs font-bold text-zinc-600 leading-snug">
+                                                                        Consultă <a href="https://apia.org.ro/wp-content/uploads/2023/04/Ghid-informativ-PD-04.pdf" target="_blank" className="text-ea-green-600 underline">Ghidul Solicitantului</a> și
+                                                                        asigură-te că deții <a href="https://apia.org.ro/categorii-documente/modele-caiete-pentru-eco-schemele-din-sectorul-vegetal/" target="_blank" className="text-ea-green-600 underline">Modelele de Caiete</a> necesare pentru audit.
+                                                                    </p>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+
+                                                    <div className="pt-4 border-t border-zinc-200">
+                                                        <div className="bg-ea-green-50 p-4 rounded-xl border border-ea-green-100">
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <Clock className="w-4 h-4 text-ea-green-600" />
+                                                                <span className="text-[10px] uppercase font-black tracking-widest text-ea-green-800">Următorii Pași</span>
+                                                            </div>
+                                                            <p className="text-[11px] text-zinc-600 leading-normal">
+                                                                Acest raport digital este o diagnoză preliminară. Pentru a primi **oferta tehnică oficială** și validarea 100% a conformității APIA, aprobă raportul mai jos. Un specialist TehnicAgro te va contacta în cel mai scurt timp.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="pt-8 border-t border-zinc-200">
+                                                        <div className="flex flex-col gap-4">
+                                                            <div className="bg-ea-green-600 text-white p-6 rounded-2xl text-center shadow-xl shadow-ea-green-900/20">
+                                                                <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
+                                                                <p className="font-bold uppercase tracking-tight text-sm">Auditul a fost salvat și trimis!</p>
+                                                                <p className="text-[11px] opacity-90 mt-1">
+                                                                    {email ? `Am trimis raportul complet pe ${email}.` : 'Datele tale au fost preluate de departamentul tehnic.'}
+                                                                </p>
+                                                            </div>
+
+                                                            <button
+                                                                onClick={requestCallsBack}
+                                                                className="w-full py-4 bg-zinc-900 hover:bg-black text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-lg"
+                                                            >
+                                                                <Phone className="w-5 h-5" />
+                                                                Solicită Apel Specialist (Gratuit)
+                                                            </button>
+
+                                                            <button
+                                                                onClick={resetCalculator}
+                                                                className="w-full py-3 border border-zinc-200 text-zinc-500 hover:bg-white rounded-xl font-bold text-xs uppercase tracking-tight transition-all"
+                                                            >
+                                                                Refă Analiza pentru altă suprafață
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-
-                                        <button
-                                            onClick={() => {
-                                                const message = `Buna ziua! Am calculat un beneficiu de ${totalBenefit.toLocaleString('ro-RO')} RON/an pentru ferma mea de ${hectares} ha. Doresc raportul detaliat si oferta personalizata. Contact: ${contact}`;
-
-                                                if (contactType === 'email') {
-                                                    const subject = `Solicitare Raport ROI - Ferma ${hectares} ha`;
-                                                    const body = `${message}`;
-                                                    window.location.href = `mailto:tehnicagro.supply@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                                                } else {
-                                                    const encodedMessage = encodeURIComponent(message);
-                                                    window.open(`https://wa.me/40723380022?text=${encodedMessage}`, '_blank');
-                                                }
-                                            }}
-                                            className="px-6 py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-lg font-bold uppercase tracking-wide flex items-center gap-2 transition-colors shadow-lg"
-                                        >
-                                            <Send className="w-4 h-4" />
-                                            {contactType === 'email' ? 'Deschide Email' : 'Deschide WhatsApp Manual'}
-                                        </button>
-
-                                        <button
-                                            onClick={resetCalculator}
-                                            className="mt-4 text-zinc-500 hover:text-zinc-300 text-sm underline transition-colors"
-                                        >
-                                            Calculează din nou
-                                        </button>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
                         )}
-
-                        <p className="mt-6 text-zinc-600 text-xs italic">
-                            *Raportul include costurile de exploatare, amortizarea utilajului și calculul subvenției APIA PD-04.
-                        </p>
                     </div>
                 </div>
             </div>

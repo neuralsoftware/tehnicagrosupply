@@ -4,6 +4,7 @@ import { Contact } from '@/components/Contact';
 import { LegalProof } from '@/components/LegalProof';
 import { RoiCalculator } from '@/components/RoiCalculator';
 import { TrustSignals } from '@/components/TrustSignals';
+import { ExpertAuthority } from '@/components/ExpertAuthority';
 
 export default function Home() {
     return (
@@ -54,6 +55,7 @@ export default function Home() {
                             'Roată tasare': 'Reglabilă, 3 poziții unghi atac'
                         }
                     }}
+                    expertVerdict="O soluție tehnică remarcabilă care menține adâncimea de semănat constantă chiar și în soluri extrem de compactate, asigurând răsărirea uniformă esențială pentru conformarea cu eco-schema PD-04."
                 />
             </div>
 
@@ -91,7 +93,10 @@ export default function Home() {
                         'Frânare': 'Sistem pneumatic inclus'
                     }
                 }}
+                expertVerdict="Esențială pentru fermierii care vor să respecte GAEC 6 fără să investească în utilaje complexe de prelucrare. Chain Disc-ul Fliegl transformă resturile vegetale într-o barieră termică pentru sol, păstrând umiditatea critică."
             />
+
+            <ExpertAuthority />
 
             <Contact />
 
