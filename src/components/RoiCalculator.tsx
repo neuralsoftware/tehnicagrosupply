@@ -21,17 +21,35 @@ export function RoiCalculator() {
     const fuelSavings = hectares * FUEL_SAVING_L * FUEL_PRICE_RON;
     const totalBenefit = subsidyIncome + fuelSavings;
 
+    const [contactType, setContactType] = useState<'whatsapp' | 'email'>('whatsapp');
+
     const handleDownloadReport = (e: React.FormEvent) => {
         e.preventDefault();
-        // Here we would normally send to a backend/spreadsheet
-        // For now, we simulate success and redirect to WhatsApp
-        const message = `Buna ziua! Am calculat un beneficiu de ${totalBenefit.toLocaleString('ro-RO')} RON/an pentru ferma mea de ${hectares} ha. Doresc raportul detaliat si oferta personalizata. Contact: ${contact}`;
-        const encodedMessage = encodeURIComponent(message);
 
+        const isEmail = contact.includes('@');
+        setContactType(isEmail ? 'email' : 'whatsapp');
         setSubmitted(true);
+
+        const message = `Buna ziua! Am calculat un beneficiu de ${totalBenefit.toLocaleString('ro-RO')} RON/an pentru ferma mea de ${hectares} ha. Doresc raportul detaliat si oferta personalizata. Contact: ${contact}`;
+
+        // Folosim un timeout scurt pentru a arata loading-ul, apoi deschidem aplicatia
         setTimeout(() => {
-            window.open(`https://wa.me/40723380022?text=${encodedMessage}`, '_blank');
-        }, 1500);
+            if (isEmail) {
+                const subject = `Solicitare Raport ROI - Ferma ${hectares} ha`;
+                const body = `${message}`;
+                window.location.href = `mailto:tehnicagro.supply@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            } else {
+                const encodedMessage = encodeURIComponent(message);
+                window.open(`https://wa.me/40723380022?text=${encodedMessage}`, '_blank');
+            }
+        }, 1000);
+    };
+
+    const resetCalculator = () => {
+        setShowForm(false);
+        setSubmitted(false);
+        setContact('');
+        setContactType('whatsapp');
     };
 
     return (
@@ -153,13 +171,46 @@ export function RoiCalculator() {
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        className="flex flex-col items-center space-y-3 text-center"
+                                        className="flex flex-col items-center space-y-4 text-center p-4"
                                     >
-                                        <div className="w-16 h-16 bg-ea-green-600 rounded-full flex items-center justify-center mb-2">
-                                            <CheckCircle2 className="w-10 h-10 text-white" />
+                                        <div className="w-16 h-16 bg-ea-green-600 rounded-full flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(22,197,94,0.4)]">
+                                            <CheckCircle2 className="w-8 h-8 text-white" />
                                         </div>
-                                        <h3 className="text-2xl font-bold text-white">Se generează raportul...</h3>
-                                        <p className="text-zinc-400">Te redirecționăm acum pe WhatsApp pentru validare.</p>
+                                        <div>
+                                            <h3 className="text-xl font-bold text-white">Am generat raportul!</h3>
+                                            <p className="text-zinc-400 text-sm mt-1">
+                                                {contactType === 'email'
+                                                    ? 'Verifică aplicația de email pentru a trimite solicitarea.'
+                                                    : 'Dacă WhatsApp nu s-a deschis automat, apasă butonul de mai jos.'
+                                                }
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            onClick={() => {
+                                                const message = `Buna ziua! Am calculat un beneficiu de ${totalBenefit.toLocaleString('ro-RO')} RON/an pentru ferma mea de ${hectares} ha. Doresc raportul detaliat si oferta personalizata. Contact: ${contact}`;
+
+                                                if (contactType === 'email') {
+                                                    const subject = `Solicitare Raport ROI - Ferma ${hectares} ha`;
+                                                    const body = `${message}`;
+                                                    window.location.href = `mailto:tehnicagro.supply@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                                                } else {
+                                                    const encodedMessage = encodeURIComponent(message);
+                                                    window.open(`https://wa.me/40723380022?text=${encodedMessage}`, '_blank');
+                                                }
+                                            }}
+                                            className="px-6 py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-lg font-bold uppercase tracking-wide flex items-center gap-2 transition-colors shadow-lg"
+                                        >
+                                            <Send className="w-4 h-4" />
+                                            {contactType === 'email' ? 'Deschide Email' : 'Deschide WhatsApp Manual'}
+                                        </button>
+
+                                        <button
+                                            onClick={resetCalculator}
+                                            className="mt-4 text-zinc-500 hover:text-zinc-300 text-sm underline transition-colors"
+                                        >
+                                            Calculează din nou
+                                        </button>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
