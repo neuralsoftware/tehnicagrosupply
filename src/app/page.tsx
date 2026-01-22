@@ -7,8 +7,54 @@ import { TrustSignals } from '@/components/TrustSignals';
 import { ExpertAuthority } from '@/components/ExpertAuthority';
 
 export default function Home() {
+    // Schema.org JSON-LD for SEO Rich Results
+    const organizationSchema = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "TehnicAgro Supply",
+        "url": "https://tehnic-agro-funnel.vercel.app",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+40-723-380-022",
+            "contactType": "Sales",
+            "areaServed": "RO",
+            "availableLanguage": "Romanian"
+        },
+        "description": "Furnizor de utilaje agricole No-Till și soluții pentru agricultura conservativă în România."
+    };
+
+    const productSchema = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "Avers-Agro Green Plains ADS",
+        "description": "Semănătoare directă No-Till pentru agricultura conservativă, eligibilă pentru subvenții APIA PD-04",
+        "brand": {
+            "@type": "Brand",
+            "name": "Avers-Agro"
+        },
+        "offers": {
+            "@type": "Offer",
+            "priceCurrency": "RON",
+            "availability": "https://schema.org/InStock",
+            "seller": {
+                "@type": "Organization",
+                "name": "TehnicAgro Supply"
+            }
+        }
+    };
+
     return (
         <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-ea-green-500 selection:text-white">
+            {/* Schema.org JSON-LD for SEO */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+            />
+
             <Hero />
 
             {/* Strategie Nouă: Validare Legală înainte de Produs */}

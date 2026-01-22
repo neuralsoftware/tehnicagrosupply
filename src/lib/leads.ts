@@ -16,8 +16,32 @@ export interface Lead {
     lastContacted?: string;
 }
 
+// Simple in-memory rate limiting
+const requestCounts = new Map<string, { count: number; resetAt: number }>();
+
+export function simpleRateLimit(
+    identifier: string,
+    limit: number = 5,
+    windowMs: number = 900000 // 15 minutes
+): boolean {
+    const now = Date.now();
+    const record = requestCounts.get(identifier);
+
+    if (!record || now > record.resetAt) {
+        requestCounts.set(identifier, { count: 1, resetAt: now + windowMs });
+        return true;
+    }
+
+    if (record.count >= limit) {
+        return false;
+    }
+
+    record.count++;
+    return true;
+}
+
 // In-memory store for demonstration purposes
-// In production, this will be replaced by Supabase
+// TODO: Replace with Supabase in Phase 1
 let leadsStore: Lead[] = [];
 
 export const LeadsService = {
@@ -28,7 +52,7 @@ export const LeadsService = {
             createdAt: new Date().toISOString(),
             status: 'new',
         };
-        leadsStore.unshift(newLead); // Add to beginning
+        leadsStore.unshift(newLead);
         return newLead;
     },
 
@@ -54,9 +78,9 @@ export const LeadsService = {
     },
 
     async deleteLead(id: string) {
-        const leadIndex = leadsStore.findIndex(l => l.id === id);
-        if (leadIndex !== -1) {
-            leadsStore.splice(leadIndex, 1);
+        const index = leadsStore.findIndex(l => l.id === id);
+        if (index !== -1) {
+            leadsStore.splice(index, 1);
             return true;
         }
         return false;

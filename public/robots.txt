@@ -1,0 +1,11 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+# Host
+Host: https://tehnic-agro-funnel.vercel.app
+
+# Sitemaps
+Sitemap: https://tehnic-agro-funnel.vercel.app/sitemap.xml

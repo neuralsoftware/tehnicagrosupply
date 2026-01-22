@@ -1,8 +1,20 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { simpleRateLimit } from '@/lib/leads';
 
 export async function POST(request: Request) {
     try {
+        // Rate limiting for email sending (3 reports per hour per IP)
+        const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+        const allowed = simpleRateLimit(`send-report:${ip}`, 3, 3600000); // 3 per hour
+
+        if (!allowed) {
+            return NextResponse.json(
+                { error: 'Prea multe rapoarte solicitate. Încearcă din nou peste o oră.' },
+                { status: 429 }
+            );
+        }
+
         const lead = await request.json();
 
         if (!lead.email) {
