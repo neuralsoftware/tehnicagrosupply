@@ -122,12 +122,7 @@ export function WhatsAppButton() {
                     className="relative w-16 h-16 bg-[#25D366] hover:bg-[#20BD5A] rounded-full shadow-lg shadow-[#25D366]/30 flex items-center justify-center transition-colors"
                 >
                     {showPulse && (
-                        <>
-                            <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-30"></span>
-                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-ea-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white">
-                                1
-                            </span>
-                        </>
+                        <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-30"></span>
                     )}
                     <MessageCircle className="w-7 h-7 text-white" />
                 </motion.button>
