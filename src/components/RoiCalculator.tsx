@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Banknote, Droplets, Download, Send, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone } from 'lucide-react';
+import { Calculator, Banknote, Droplets, Download, Send, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone, Scale } from 'lucide-react';
 
 const COUNTIES = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila', 'București',
@@ -57,6 +57,22 @@ export function RoiCalculator() {
 
     const handleDownloadReport = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Track Lead Event
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+            (window as any).fbq('track', 'Lead', {
+                content_name: 'Audit Eficienta Tehnicagro',
+                value: totalBenefit,
+                currency: 'RON'
+            });
+        }
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'generate_lead', {
+                event_category: 'engagement',
+                event_label: 'Audit ROI',
+                value: totalBenefit
+            });
+        }
 
         // Save to API (backend)
         try {
@@ -203,7 +219,13 @@ export function RoiCalculator() {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    onClick={() => setShowForm(true)}
+                                    onClick={() => {
+                                        setShowForm(true);
+                                        // Track view start
+                                        if (typeof window !== 'undefined' && (window as any).fbq) {
+                                            (window as any).fbq('trackCustom', 'AuditStart');
+                                        }
+                                    }}
                                     className="group relative inline-flex items-center gap-3 px-12 py-6 bg-white text-zinc-950 font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-zinc-100 transition-all overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-ea-green-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
@@ -416,6 +438,17 @@ export function RoiCalculator() {
                                                                 <div>
                                                                     <p className="text-xs font-black uppercase text-zinc-400 mb-1">Context Regional ({county})</p>
                                                                     <p className="text-sm font-bold text-zinc-700 leading-snug">{getRegionalAdvice()}</p>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex gap-4 p-4 bg-ea-green-500/10 border border-ea-green-500/20 rounded-2xl group hover:bg-white transition-colors">
+                                                                <div className="w-10 h-10 bg-ea-green-600/10 rounded-full flex items-center justify-center shrink-0">
+                                                                    <Scale className="w-6 h-6 text-ea-green-600" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs font-black uppercase text-ea-green-600 mb-1">Oportunitate Finanțare 2026</p>
+                                                                    <p className="text-sm font-bold text-zinc-700 leading-snug">
+                                                                        Sesiunea <span className="text-ea-green-600">DR-12 (200.000€)</span> se deschide în curând. Configurația selectată este eligibilă pentru finanțare nerambursabilă de până la 80%.
+                                                                    </p>
                                                                 </div>
                                                             </li>
                                                             <li className="flex gap-4 p-4 bg-orange-600/10 rounded-2xl border border-orange-500/20 group hover:bg-white transition-colors">

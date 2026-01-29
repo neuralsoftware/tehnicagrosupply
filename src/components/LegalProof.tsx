@@ -10,7 +10,7 @@ export function LegalProof() {
                 <div className="text-center mb-12">
                     <h2 className="text-3xl font-bold uppercase text-white flex items-center justify-center gap-3">
                         <Scale className="w-8 h-8 text-ea-green-500" />
-                        Contextul Legislativ 2026
+                        Fonduri & Context Legislativ 2026
                     </h2>
                     <p className="text-zinc-400 mt-2">De ce arătura clasică te costă subvenția.</p>
                 </div>
@@ -57,28 +57,50 @@ export function LegalProof() {
                         </div>
                     </motion.div>
 
-                    {/* Card 3: Soluția */}
+                    {/* Card 3: DR-12 Funding */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.4 }}
-                        className="bg-gradient-to-br from-zinc-900 to-ea-green-900/20 p-6 rounded-lg border border-zinc-700"
+                        className="bg-zinc-950 p-6 rounded-lg border border-ea-green-500/30 relative"
                     >
-                        <h3 className="text-xl font-bold text-white mb-3">Matematica T.S.S.</h3>
-                        <div className="text-zinc-300 text-sm space-y-4">
-                            <p>Tehnicagro Supply Solution:</p>
-                            <ul className="list-disc list-inside space-y-1 text-zinc-400">
-                                <li>Semănat Direct (Avers) = <span className="text-green-400">Eligibil PD-04</span></li>
-                                <li>Discuit Superficial (Fliegl) = <span className="text-green-400">Eligibil GAEC 6</span></li>
-                            </ul>
-                            <div className="bg-zinc-800 p-3 rounded text-center">
-                                <span className="block text-xs text-zinc-500">Rezultat Net</span>
-                                <span className="block text-lg font-bold text-white">Conformitate 100%</span>
-                            </div>
+                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                            <Scale className="w-24 h-24 text-ea-green-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-ea-green-500 mb-3">Fonduri EU DR-12</h3>
+                        <div className="text-zinc-300 text-sm space-y-2">
+                            <p><strong>Sprijin:</strong> <span className="text-white text-lg font-bold">200.000 EUR / proiect</span></p>
+                            <p className="italic border-l-2 border-zinc-700 pl-3 my-2">
+                                "Achiziția de utilaje agricole performante pentru tineri fermieri și fermieri recent instalați."
+                            </p>
+                            <p className="text-ea-green-500 font-semibold text-xs mt-2">Intensitate: Până la 80% fonduri nerambursabile.</p>
                         </div>
                     </motion.div>
                 </div>
+
+                {/* Bonus Section: Solution Summary */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    className="mt-12 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 p-6 rounded-xl border border-zinc-800 text-center"
+                >
+                    <p className="text-zinc-400 text-sm uppercase tracking-widest mb-4">Strategia Tehnicagro Supply</p>
+                    <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+                        <div className="space-y-1">
+                            <span className="block text-ea-green-500 font-bold text-xl leading-none">PD-04</span>
+                            <span className="block text-zinc-500 text-[10px] uppercase">Eco-Schema</span>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="block text-ea-red-500 font-bold text-xl leading-none">GAEC 6</span>
+                            <span className="block text-zinc-500 text-[10px] uppercase">Protecția Solului</span>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="block text-ea-green-500 font-bold text-xl leading-none">DR-12</span>
+                            <span className="block text-zinc-500 text-[10px] uppercase">Finanțare Utilaje</span>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
         </section>
     );

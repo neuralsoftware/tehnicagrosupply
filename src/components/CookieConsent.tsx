@@ -10,11 +10,29 @@ export function CookieConsent() {
         const consent = localStorage.getItem('cookie-consent');
         if (!consent) {
             setIsVisible(true);
+        } else if (consent === 'accepted') {
+            // Signal GA if already accepted in previous session
+            if (typeof window !== 'undefined' && (window as any).gtag) {
+                (window as any).gtag('consent', 'update', {
+                    'ad_storage': 'granted',
+                    'analytics_storage': 'granted',
+                    'ad_user_data': 'granted',
+                    'ad_personalization': 'granted'
+                });
+            }
         }
     }, []);
 
     const handleAccept = () => {
         localStorage.setItem('cookie-consent', 'accepted');
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('consent', 'update', {
+                'ad_storage': 'granted',
+                'analytics_storage': 'granted',
+                'ad_user_data': 'granted',
+                'ad_personalization': 'granted'
+            });
+        }
         setIsVisible(false);
     };
 
