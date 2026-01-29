@@ -6,6 +6,8 @@ import { RoiCalculator } from '@/components/RoiCalculator';
 import { TrustSignals } from '@/components/TrustSignals';
 import { ExpertAuthority } from '@/components/ExpertAuthority';
 import { VideoGallery } from '@/components/VideoGallery';
+import { WhatsAppButton } from '@/components/WhatsAppButton';
+import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 import Image from 'next/image';
 
 export default function Home() {
@@ -299,6 +301,10 @@ export default function Home() {
                     </div>
                 </div>
             </footer>
+
+            {/* Client-facing UI Components - only on main page, not admin */}
+            <WhatsAppButton />
+            <ExitIntentPopup />
         </main>
     );
 }

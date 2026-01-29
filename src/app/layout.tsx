@@ -3,8 +3,6 @@ import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { CookieConsent } from '@/components/CookieConsent';
-import { WhatsAppButton } from '@/components/WhatsAppButton';
-import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
@@ -114,9 +112,7 @@ export default function RootLayout({
 
                 {children}
 
-                {/* Global UI Components */}
-                <WhatsAppButton />
-                <ExitIntentPopup />
+                {/* Global UI Components - CookieConsent only (WhatsApp & ExitPopup moved to page.tsx) */}
                 <CookieConsent />
 
                 <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-KR6928Z45R"} />
