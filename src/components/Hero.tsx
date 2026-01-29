@@ -88,14 +88,9 @@ function HeroContent() {
             <header className="absolute top-0 left-0 right-0 z-30 py-4 px-6">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 group">
-                        <Image
-                            src="/logos/tehnicagro_wide_v2_1769156124608.png"
-                            alt="TehnicAgro Supply"
-                            width={200}
-                            height={50}
-                            className="h-10 w-auto brightness-0 invert group-hover:brightness-100 group-hover:invert-0 transition-all duration-300"
-                            priority
-                        />
+                        <span className="text-xl font-black text-white uppercase tracking-wide">
+                            Tehnic<span className="text-ea-green-500">Agro</span>
+                        </span>
                     </Link>
                     <div className="hidden md:flex items-center gap-6">
                         <Link href="#audit" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">
