@@ -35,7 +35,7 @@ export function VideoGallery() {
                 {/* Videos Grid */}
                 <div className="grid md:grid-cols-2 gap-8">
                     <VideoShowcase
-                        title="Avers-Agro Green Plains ADS"
+                        title="Avers-Agro MULTISEM ADS"
                         videoSrc="/downloads/video ADS 2026.mp4"
                         badge="Semănătoare No-Till"
                         ctaText="Solicită Ofertă ADS"
