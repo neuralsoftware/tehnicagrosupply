@@ -6,38 +6,48 @@ import Link from 'next/link';
 export function CookieConsent() {
     const [isVisible, setIsVisible] = useState(false);
 
+    // Helper to safely call gtag
+    const updateConsent = (granted: boolean) => {
+        const state = granted ? 'granted' : 'denied';
+
+        // Ensure dataLayer exists
+        // @ts-ignore
+        window.dataLayer = window.dataLayer || [];
+        // @ts-ignore
+        function gtag() { dataLayer.push(arguments); }
+
+        gtag('consent', 'update', {
+            'ad_storage': state,
+            'analytics_storage': state,
+            'ad_user_data': state,
+            'ad_personalization': state
+        });
+
+        // Force a pageview event to wake up realtime view if granted
+        if (granted) {
+            gtag('event', 'page_view');
+        }
+    };
+
     useEffect(() => {
         const consent = localStorage.getItem('cookie-consent');
         if (!consent) {
             setIsVisible(true);
         } else if (consent === 'accepted') {
-            // Signal GA if already accepted in previous session
-            if (typeof window !== 'undefined' && (window as any).gtag) {
-                (window as any).gtag('consent', 'update', {
-                    'ad_storage': 'granted',
-                    'analytics_storage': 'granted',
-                    'ad_user_data': 'granted',
-                    'ad_personalization': 'granted'
-                });
-            }
+            // Already accepted in previous session
+            updateConsent(true);
         }
     }, []);
 
     const handleAccept = () => {
         localStorage.setItem('cookie-consent', 'accepted');
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-            (window as any).gtag('consent', 'update', {
-                'ad_storage': 'granted',
-                'analytics_storage': 'granted',
-                'ad_user_data': 'granted',
-                'ad_personalization': 'granted'
-            });
-        }
+        updateConsent(true);
         setIsVisible(false);
     };
 
     const handleDecline = () => {
         localStorage.setItem('cookie-consent', 'declined');
+        updateConsent(false);
         setIsVisible(false);
     };
 
