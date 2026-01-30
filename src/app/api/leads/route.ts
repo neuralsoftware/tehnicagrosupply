@@ -4,7 +4,11 @@ import { z } from 'zod';
 
 const leadSchema = z.object({
     name: z.string().min(2, 'Nume prea scurt').max(100, 'Nume prea lung'),
-    phone: z.string().regex(/^07\d{8}$/, 'Telefon invalid (format: 07xxxxxxxx)'),
+    phone: z.string()
+        .transform((val) => val.replace(/[^\d]/g, '')) // Remove non-digits
+        .refine((val) => /^07\d{8}$/.test(val), {
+            message: 'Telefon invalid (trebuie să fie număr de mobil RO cu 10 cifre)'
+        }),
     email: z.string().email('Email invalid').optional().or(z.literal('')),
     county: z.string().min(2, 'Județ invalid'),
     hectares: z.number().min(1, 'Min 1 ha').max(10000, 'Max 10000 ha'),

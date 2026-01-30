@@ -30,6 +30,27 @@ export function WhatsAppButton() {
     };
 
     const openWhatsApp = (customMessage?: string) => {
+        // Track conversion events
+        if (typeof window !== 'undefined') {
+            // Facebook Pixel
+            // @ts-ignore
+            if (window.fbq) {
+                // @ts-ignore
+                window.fbq('track', 'Contact');
+                console.log('FB Pixel Contact event sent');
+            }
+
+            // Google Analytics
+            // @ts-ignore
+            if (window.gtag) {
+                // @ts-ignore
+                window.gtag('event', 'whatsapp_click', {
+                    'event_category': 'Contact',
+                    'event_label': 'WhatsApp Button'
+                });
+            }
+        }
+
         const message = encodeURIComponent(customMessage || DEFAULT_MESSAGE);
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
     };
