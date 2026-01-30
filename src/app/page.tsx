@@ -289,6 +289,15 @@ export default function Home() {
                             <a href="tel:+40723380022" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">
                                 +40 723 380 022
                             </a>
+                            <a
+                                href="https://www.facebook.com/profile.php?id=61587048754775"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:text-blue-400 text-sm font-medium transition-colors flex items-center gap-1"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg>
+                                Urmărește-ne
+                            </a>
                         </div>
                     </div>
                     <div className="border-t border-zinc-900 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
