@@ -16,6 +16,7 @@ export function CookieConsent() {
         // @ts-ignore
         function gtag() { dataLayer.push(arguments); }
 
+        // @ts-ignore
         gtag('consent', 'update', {
             'ad_storage': state,
             'analytics_storage': state,
@@ -25,6 +26,7 @@ export function CookieConsent() {
 
         // Force a pageview event to wake up realtime view if granted
         if (granted) {
+            // @ts-ignore
             gtag('event', 'page_view');
         }
     };
