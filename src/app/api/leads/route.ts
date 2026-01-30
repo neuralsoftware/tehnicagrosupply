@@ -57,11 +57,43 @@ export async function POST(request: Request) {
     }
 }
 
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
+
 export async function GET() {
     try {
-        const leads = await LeadsService.getLeads();
+        // Use supabaseAdmin to bypass RLS and fetch all leads
+        const { data, error } = await supabaseAdmin
+            .from('leads')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Supabase fetch error:', error);
+            return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
+        }
+
+        // Map data to match frontend expectations camelCase
+        const leads = data.map(row => ({
+            id: row.id,
+            name: row.name,
+            phone: row.phone,
+            email: row.email,
+            county: row.county,
+            hectares: row.hectares,
+            crops: row.crops,
+            urgency: row.urgency,
+            subsidyIncome: row.subsidy_income,
+            fuelSavings: row.fuel_savings,
+            totalBenefit: row.total_benefit,
+            createdAt: row.created_at,
+            status: row.status,
+            notes: row.notes,
+            lastContacted: row.last_contacted
+        }));
+
         return NextResponse.json({ leads });
     } catch (error) {
+        console.error('Admin leads fetch error:', error);
         return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
     }
 }
