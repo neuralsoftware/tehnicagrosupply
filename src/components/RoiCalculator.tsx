@@ -58,19 +58,17 @@ export function RoiCalculator() {
     const handleDownloadReport = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Track Lead Event
-        if (typeof window !== 'undefined' && (window as any).fbq) {
-            (window as any).fbq('track', 'Lead', {
-                content_name: 'Audit Eficienta Tehnicagro',
-                value: totalBenefit,
-                currency: 'RON'
-            });
-        }
+        // GA4 Enhanced Lead Conversion Tracking
         if (typeof window !== 'undefined' && (window as any).gtag) {
             (window as any).gtag('event', 'generate_lead', {
-                event_category: 'engagement',
-                event_label: 'Audit ROI',
-                value: totalBenefit
+                value: totalBenefit,
+                currency: 'RON',
+                event_category: 'Lead Generation',
+                event_label: `${county} - ${hectares}ha - ${selectedCrops.join(', ')}`,
+                hectares: hectares,
+                county: county,
+                crops_count: selectedCrops.length,
+                urgency: urgency
             });
         }
 

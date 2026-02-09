@@ -71,42 +71,28 @@ export default function RootLayout({
                 />
             </head>
             <body className={inter.className}>
-                {/* Meta Pixel (Facebook) */}
-                <noscript>
-                    <img
-                        height="1"
-                        width="1"
-                        style={{ display: 'none' }}
-                        src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || 'FACEBOOK_PIXEL_ID'}&ev=PageView&noscript=1`}
-                        alt=""
-                    />
-                </noscript>
+                {/* Schema.org Organization Structured Data */}
                 <script
+                    type="application/ld+json"
                     dangerouslySetInnerHTML={{
-                        __html: `
-                            window.dataLayer = window.dataLayer || [];
-                            function gtag(){dataLayer.push(arguments);}
-                            
-                            // Initialize Consent Mode (Default Denied)
-                            gtag('consent', 'default', {
-                                'ad_storage': 'denied',
-                                'analytics_storage': 'denied',
-                                'ad_user_data': 'denied',
-                                'ad_personalization': 'denied',
-                                'wait_for_update': 500
-                            });
-
-                            !function(f,b,e,v,n,t,s)
-                            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                            n.queue=[];t=b.createElement(e);t.async=!0;
-                            t.src=v;s=b.getElementsByTagName(e)[0];
-                            s.parentNode.insertBefore(t,s)}(window, document,'script',
-                            'https://connect.facebook.net/en_US/fbevents.js');
-                            fbq('init', '${process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || 'FACEBOOK_PIXEL_ID'}');
-                            fbq('track', 'PageView');
-                        `,
+                        __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "Organization",
+                            "name": "TehnicAgro Supply",
+                            "url": "https://tehnic-agro-funnel.vercel.app",
+                            "logo": "https://tehnic-agro-funnel.vercel.app/logos/tehnicagro_logo_v1_1769155922952.png",
+                            "description": "Soluții complete pentru agricultura conservativă. Utilaje No-Till, Avers-Agro Green Plains \u0026 Fliegl KSE 680. Eligibil APIA PD-04 și GAEC 6.",
+                            "contactPoint": {
+                                "@type": "ContactPoint",
+                                "telephone": "+40723380022",
+                                "contactType": "sales",
+                                "areaServed": "RO",
+                                "availableLanguage": ["Romanian"]
+                            },
+                            "sameAs": [
+                                "https://www.facebook.com/tehnicagrosupply"
+                            ]
+                        })
                     }}
                 />
 

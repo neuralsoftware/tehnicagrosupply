@@ -30,25 +30,13 @@ export function WhatsAppButton() {
     };
 
     const openWhatsApp = (customMessage?: string) => {
-        // Track conversion events
-        if (typeof window !== 'undefined') {
-            // Facebook Pixel
-            // @ts-ignore
-            if (window.fbq) {
-                // @ts-ignore
-                window.fbq('track', 'Contact');
-                console.log('FB Pixel Contact event sent');
-            }
-
-            // Google Analytics
-            // @ts-ignore
-            if (window.gtag) {
-                // @ts-ignore
-                window.gtag('event', 'whatsapp_click', {
-                    'event_category': 'Contact',
-                    'event_label': 'WhatsApp Button'
-                });
-            }
+        // GA4 WhatsApp Contact Tracking
+        if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'contact', {
+                method: 'whatsapp',
+                event_category: 'Contact',
+                event_label: customMessage ? 'Quick Message' : 'Direct Message'
+            });
         }
 
         const message = encodeURIComponent(customMessage || DEFAULT_MESSAGE);
