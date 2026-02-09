@@ -96,6 +96,46 @@ export default function RootLayout({
                     }}
                 />
 
+                {/* Facebook Pixel - Consent Mode Compliant */}
+                <noscript>
+                    <img
+                        height="1"
+                        width="1"
+                        style={{ display: 'none' }}
+                        src={`https://www.facebook.com/tr?id=${process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID}&ev=PageView&noscript=1`}
+                        alt=""
+                    />
+                </noscript>
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            
+                            // Initialize Consent Mode (Default Denied - GDPR)
+                            gtag('consent', 'default', {
+                                'ad_storage': 'denied',
+                                'analytics_storage': 'denied',
+                                'ad_user_data': 'denied',
+                                'ad_personalization': 'denied',
+                                'wait_for_update': 500
+                            });
+
+                            // Facebook Pixel
+                            !function(f,b,e,v,n,t,s)
+                            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                            n.queue=[];t=b.createElement(e);t.async=!0;
+                            t.src=v;s=b.getElementsByTagName(e)[0];
+                            s.parentNode.insertBefore(t,s)}(window, document,'script',
+                            'https://connect.facebook.net/en_US/fbevents.js');
+                            fbq('init', '${process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || '928787952822638'}');
+                            fbq('track', 'PageView');
+                        `,
+                    }}
+                />
+
                 {children}
 
                 {/* Global UI Components - CookieConsent only (WhatsApp & ExitPopup moved to page.tsx) */}

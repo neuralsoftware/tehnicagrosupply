@@ -58,18 +58,31 @@ export function RoiCalculator() {
     const handleDownloadReport = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // GA4 Enhanced Lead Conversion Tracking
-        if (typeof window !== 'undefined' && (window as any).gtag) {
-            (window as any).gtag('event', 'generate_lead', {
-                value: totalBenefit,
-                currency: 'RON',
-                event_category: 'Lead Generation',
-                event_label: `${county} - ${hectares}ha - ${selectedCrops.join(', ')}`,
-                hectares: hectares,
-                county: county,
-                crops_count: selectedCrops.length,
-                urgency: urgency
-            });
+        // Dual Tracking: GA4 + Facebook Pixel
+        if (typeof window !== 'undefined') {
+            // GA4 Enhanced Lead Conversion
+            if ((window as any).gtag) {
+                (window as any).gtag('event', 'generate_lead', {
+                    value: totalBenefit,
+                    currency: 'RON',
+                    event_category: 'Lead Generation',
+                    event_label: `${county} - ${hectares}ha - ${selectedCrops.join(', ')}`,
+                    hectares: hectares,
+                    county: county,
+                    crops_count: selectedCrops.length,
+                    urgency: urgency
+                });
+            }
+
+            // Facebook Pixel Lead Event
+            if ((window as any).fbq) {
+                (window as any).fbq('track', 'Lead', {
+                    content_name: 'ROI Calculator TehnicAgro',
+                    value: totalBenefit,
+                    currency: 'RON',
+                    content_category: 'Lead Generation'
+                });
+            }
         }
 
         // Save to API (backend)
