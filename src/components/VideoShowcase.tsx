@@ -22,6 +22,13 @@ export function VideoShowcase({ title, videoSrc, badge, ctaText, ctaHref }: Vide
                 video.pause();
             } else {
                 video.play();
+                // Track Video Play
+                if (typeof window !== 'undefined' && (window as any).fbq) {
+                    (window as any).fbq('trackCustom', 'VideoPlay', {
+                        content_name: title,
+                        video_title: title
+                    });
+                }
             }
             setIsPlaying(!isPlaying);
         }

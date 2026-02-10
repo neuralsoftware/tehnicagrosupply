@@ -31,7 +31,17 @@ export function ProductSection({ title, description, imageSrc, specs, ctaLabel, 
                     <motion.div
                         initial={{ opacity: 0, x: reversed ? 50 : -50 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.5 }}
+                        onViewportEnter={() => {
+                            if (typeof window !== 'undefined' && (window as any).fbq) {
+                                (window as any).fbq('track', 'ViewContent', {
+                                    content_name: title,
+                                    content_category: 'Agricultural Machinery',
+                                    content_ids: [id || title.replace(/\s/g, '_')],
+                                    content_type: 'product'
+                                });
+                            }
+                        }}
                         transition={{ duration: 0.8 }}
                         className="w-full lg:w-1/2 relative group"
                     >
@@ -117,7 +127,15 @@ export function ProductSection({ title, description, imageSrc, specs, ctaLabel, 
 
                         <div className="pt-2">
                             <button
-                                onClick={() => setIsModalOpen(true)}
+                                onClick={() => {
+                                    setIsModalOpen(true);
+                                    if (typeof window !== 'undefined' && (window as any).fbq) {
+                                        (window as any).fbq('track', 'InitiateCheckout', {
+                                            content_name: title,
+                                            content_category: 'Agricultural Machinery'
+                                        });
+                                    }
+                                }}
                                 className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-zinc-200 text-zinc-900 font-bold rounded shadow-lg hover:shadow-xl transition-all uppercase tracking-wide text-sm"
                             >
                                 <FileText className="w-4 h-4" />

@@ -14,6 +14,27 @@ export function Contact() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSending(true);
+
+        // Dual Tracking: GA4 + Facebook Pixel
+        if (typeof window !== 'undefined') {
+            // GA4 Lead Event
+            if ((window as any).gtag) {
+                (window as any).gtag('event', 'generate_lead', {
+                    event_category: 'Contact',
+                    event_label: 'General Inquiry',
+                    transport_type: 'beacon'
+                });
+            }
+
+            // Facebook Pixel Lead Event
+            if ((window as any).fbq) {
+                (window as any).fbq('track', 'Lead', {
+                    content_name: 'General Contact Form',
+                    content_category: 'Lead Generation'
+                });
+            }
+        }
+
         try {
             const res = await fetch('/api/leads', {
                 method: 'POST',
