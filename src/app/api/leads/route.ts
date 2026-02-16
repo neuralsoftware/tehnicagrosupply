@@ -10,10 +10,10 @@ const leadSchema = z.object({
             message: 'Telefon invalid (trebuie să fie număr de mobil RO cu 10 cifre)'
         }),
     email: z.string().email('Email invalid').optional().or(z.literal('')),
-    county: z.string().min(2, 'Județ invalid'),
-    hectares: z.number().min(0, 'Suprafață invalidă').max(10000, 'Max 10000 ha'),
-    crops: z.array(z.string()).max(10, 'Max 10 culturi'),
-    urgency: z.string().max(100),
+    county: z.string().max(100).optional().default(''),
+    hectares: z.number().min(0, 'Suprafață invalidă').max(10000, 'Max 10000 ha').optional().default(0),
+    crops: z.array(z.string()).max(10, 'Max 10 culturi').optional().default([]),
+    urgency: z.string().max(100).optional().default(''),
     subsidyIncome: z.number().optional(),
     fuelSavings: z.number().optional(),
     totalBenefit: z.number().optional()
