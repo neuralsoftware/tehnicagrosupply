@@ -43,21 +43,26 @@ export function Contact() {
                     name: farmName,
                     phone: phone,
                     email: email || '',
-                    county: 'Nespecificat',
+                    county: 'Contact General',
                     hectares: 0,
                     totalBenefit: 0,
-                    crops: [],
-                    urgency: 'wait',
+                    crops: ['Formular Contact'],
+                    urgency: 'Discuție',
                     status: 'new'
                 })
             });
             if (res.ok) {
                 setIsSubmitted(true);
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('tehnicagro_lead_submitted', 'true');
+                }
             } else {
-                alert('Eroare la trimitere. Vă rugăm să ne contactați telefonic.');
+                const errorData = await res.json().catch(() => ({ error: 'Eroare necunoscută' }));
+                alert(`Eroare server: ${errorData.error || res.statusText}. Cod: ${res.status}`);
             }
         } catch (err) {
             console.error(err);
+            alert('Eroare conexiune: ' + (err instanceof Error ? err.message : String(err)));
         } finally {
             setIsSending(false);
         }

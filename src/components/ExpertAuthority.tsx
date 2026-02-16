@@ -54,11 +54,11 @@ export function ExpertAuthority() {
                             De Ce TehnicAgro?
                         </span>
                         <h2 className="text-4xl md:text-5xl font-black uppercase text-white leading-tight">
-                            Partener Nou.<br />
+                            Soluții Validate.<br />
                             <span className="text-ea-green-500">Rezultate Imediate.</span>
                         </h2>
                         <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-                            Nu avem un istoric de 15 ani. Avem ceva mai bun: <span className="text-white font-semibold">utilaje de ultimă generație</span>,
+                            Combinăm <span className="text-white font-semibold">utilaje de ultimă generație</span> cu
                             prețuri competitive și determinarea de a demonstra valoare din prima colaborare.
                         </p>
                     </motion.div>
@@ -131,13 +131,15 @@ export function ExpertAuthority() {
                                     <span className="block text-sm text-zinc-500 uppercase tracking-wider font-bold">Economie Motorină / Hectar</span>
                                 </div>
                             </div>
-                            <Link
-                                href="#audit"
-                                className="block w-full py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center font-black rounded-xl uppercase tracking-wide transition-all shadow-lg shadow-ea-green-900/30 flex items-center justify-center gap-2"
+                            <button
+                                onClick={() => {
+                                    document.getElementById('audit')?.scrollIntoView({ behavior: 'smooth' });
+                                }}
+                                className="w-full py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center font-black rounded-xl uppercase tracking-wide transition-all shadow-lg shadow-ea-green-900/30 flex items-center justify-center gap-2"
                             >
                                 Calculează-ți Beneficiul
                                 <ArrowRight className="w-5 h-5" />
-                            </Link>
+                            </button>
                         </div>
                     </div>
                 </motion.div>

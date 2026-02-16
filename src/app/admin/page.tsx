@@ -357,7 +357,7 @@ export default function AdminPage() {
                                                     {lead.email && <div className="text-[10px] text-zinc-500 flex items-center gap-1"><Mail className="w-3 h-3" /> {lead.email}</div>}
                                                     <div className="flex flex-wrap gap-1 mt-1">
                                                         {lead.crops?.map((crop, idx) => (
-                                                            <span key={idx} className="bg-zinc-950 text-zinc-400 px-1.5 py-0.5 rounded text-[8px] border border-zinc-800 uppercase font-black tracking-tighter">
+                                                            <span key={idx} className={`px-1.5 py-0.5 rounded text-[8px] border uppercase font-black tracking-tighter ${crop === 'Formular Contact' ? 'bg-blue-500/20 text-blue-400 border-blue-500/50' : 'bg-zinc-950 text-zinc-400 border-zinc-800'}`}>
                                                                 {crop}
                                                             </span>
                                                         )) || <span className="text-zinc-600 italic text-[9px]">nespecificat</span>}
@@ -365,12 +365,15 @@ export default function AdminPage() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-6">
-                                                <span className={`inline-block px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest ${lead.urgency === 'urgent' ? 'bg-red-900/30 text-red-500 border border-red-800' :
-                                                    lead.urgency === 'soon' ? 'bg-yellow-900/20 text-yellow-500 border border-yellow-800' :
-                                                        'bg-zinc-800 text-zinc-500'
+                                                <span className={`inline-block px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest ${['urgent', 'URGENT: APEL'].includes(lead.urgency) ? 'bg-red-900/40 text-red-400 border border-red-800' :
+                                                        lead.urgency === 'next_season' ? 'bg-yellow-900/20 text-yellow-500 border border-yellow-800' :
+                                                            lead.urgency === 'Discuție' ? 'bg-blue-900/20 text-blue-400 border border-blue-800' :
+                                                                'bg-zinc-800 text-zinc-500'
                                                     }`}>
-                                                    {lead.urgency === 'urgent' ? 'Imediat' :
-                                                        lead.urgency === 'soon' ? 'În Curând' : 'Observator'}
+                                                    {['urgent', 'URGENT: APEL'].includes(lead.urgency) ? 'URGENT' :
+                                                        lead.urgency === 'next_season' ? 'SEZON VIITOR' :
+                                                            lead.urgency === 'Discuție' ? 'DISCUȚIE' :
+                                                                'OBSERVATOR'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-6">
@@ -387,14 +390,23 @@ export default function AdminPage() {
                                                         <MapPin className="w-3 h-3 text-ea-green-500" />
                                                         <span className="text-xs font-bold text-white uppercase">{lead.county}</span>
                                                     </div>
-                                                    <div className="text-xs font-black text-zinc-400 border-t border-zinc-800 pt-2 flex justify-between">
-                                                        <span>DIMENSIUNE:</span>
-                                                        <span className="text-white">{lead.hectares} HA</span>
-                                                    </div>
-                                                    <div className="text-xs font-black text-ea-green-500 flex justify-between">
-                                                        <span>EST. ROI:</span>
-                                                        <span>{lead.totalBenefit.toLocaleString('ro-RO')} LEI</span>
-                                                    </div>
+                                                    {lead.hectares > 0 ? (
+                                                        <>
+                                                            <div className="text-xs font-black text-zinc-400 border-t border-zinc-800 pt-2 flex justify-between">
+                                                                <span>DIMENSIUNE:</span>
+                                                                <span className="text-white">{lead.hectares} HA</span>
+                                                            </div>
+                                                            <div className="text-xs font-black text-ea-green-500 flex justify-between">
+                                                                <span>EST. ROI:</span>
+                                                                <span>{lead.totalBenefit.toLocaleString('ro-RO')} LEI</span>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <div className="text-[10px] font-black text-blue-400/80 border-t border-zinc-800 pt-2 text-center uppercase tracking-wider flex items-center justify-center gap-1">
+                                                            <MessageSquare className="w-3 h-3" />
+                                                            Solicitare Contact
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-6">

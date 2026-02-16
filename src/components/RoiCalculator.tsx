@@ -24,6 +24,8 @@ export function RoiCalculator() {
     const [showForm, setShowForm] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
+    const [leadId, setLeadId] = useState<string | null>(null);
+
     // Form State
     const [contact, setContact] = useState('');
     const [phone, setPhone] = useState('');
@@ -100,11 +102,16 @@ export function RoiCalculator() {
                 totalBenefit
             };
 
-            await fetch('/api/leads', {
+            const res = await fetch('/api/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(leadData)
             });
+
+            const data = await res.json();
+            if (data.success && data.lead?.id) {
+                setLeadId(data.lead.id);
+            }
 
             // Send automatic report email if email exists
             if (email) {
@@ -114,6 +121,12 @@ export function RoiCalculator() {
                     body: JSON.stringify(leadData)
                 });
             }
+
+            // Mark as converted to prevent Exit Intent
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('tehnicagro_lead_submitted', 'true');
+            }
+
         } catch (error) {
             console.error('Error in lead submission flow:', error);
         }
@@ -126,14 +139,21 @@ export function RoiCalculator() {
         setSubmitted(false);
     };
 
+    const [callRequested, setCallRequested] = useState(false);
+
     const requestCallsBack = async () => {
+        if (!leadId) return; // Should not happen if flow is correct
+
         try {
-            await fetch(`/api/leads/${phone}`, { // Assuming phone is unique for this demo or update by ID
+            await fetch(`/api/leads/${leadId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ notes: 'SOLICITARE REAPELARE RAPIDĂ' })
+                body: JSON.stringify({
+                    notes: 'SOLICITARE REAPELARE RAPIDĂ (Urgent)',
+                    urgency: 'URGENT: APEL'
+                })
             });
-            alert('Cererea a fost trimisă. Un specialist vă va contacta în cel mai scurt timp.');
+            setCallRequested(true);
         } catch (err) {
             console.error(err);
         }
@@ -240,10 +260,13 @@ export function RoiCalculator() {
                                     className="group relative inline-flex items-center gap-3 px-12 py-6 bg-white text-zinc-950 font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-zinc-100 transition-all overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-ea-green-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                                    <Download className="w-6 h-6 text-ea-green-600" />
-                                    <span>Solicită Raport Tehnic Complet</span>
+                                    <Send className="w-6 h-6 text-ea-green-600" />
+                                    <span>Primește Raportul Gratuit</span>
                                 </motion.button>
-                                <p className="mt-6 text-zinc-500 text-sm font-medium">
+                                <p className="mt-4 text-zinc-500 text-xs font-medium">
+                                    ✔ Doar 2 câmpuri • Fără obligații • Rezultat instant
+                                </p>
+                                <p className="mt-2 text-zinc-600 text-xs">
                                     Parametrii calculați conform normativelor APIA PD-04 și GAEC 6.
                                 </p>
                             </div>
@@ -258,23 +281,44 @@ export function RoiCalculator() {
                                         className="max-w-4xl mx-auto"
                                     >
                                         <div className="bg-zinc-950/50 p-8 rounded-3xl border border-zinc-800">
-                                            <div className="grid md:grid-cols-2 gap-8 mb-8">
-                                                <div className="space-y-6">
+                                            {/* ESSENTIAL FIELDS - Just 2 required */}
+                                            <div className="space-y-6 mb-8">
+                                                <div className="grid md:grid-cols-2 gap-6">
                                                     <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Identificare Fermă / Contact</label>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Nume / Fermă *</label>
                                                         <input
                                                             type="text"
                                                             required
                                                             value={contact}
                                                             onChange={(e) => setContact(e.target.value)}
                                                             className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
-                                                            placeholder="Nume Fermă sau Persoană de Contact"
+                                                            placeholder="Nume sau Fermă"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Locație (Județ)</label>
-                                                        <select
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Telefon (WhatsApp) *</label>
+                                                        <input
+                                                            type="tel"
                                                             required
+                                                            value={phone}
+                                                            onChange={(e) => setPhone(e.target.value)}
+                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            placeholder="07xx xxx xxx"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* OPTIONAL DETAILS - Collapsible */}
+                                            <details className="mb-8 group">
+                                                <summary className="cursor-pointer text-zinc-500 text-xs font-bold uppercase tracking-wider hover:text-zinc-300 transition-colors flex items-center gap-2">
+                                                    <span className="group-open:rotate-90 transition-transform">▶</span>
+                                                    Adaugă detalii suplimentare (opțional)
+                                                </summary>
+                                                <div className="mt-4 grid md:grid-cols-2 gap-6 pl-4 border-l-2 border-zinc-800">
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Județ</label>
+                                                        <select
                                                             value={county}
                                                             onChange={(e) => setCounty(e.target.value)}
                                                             className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
@@ -284,8 +328,18 @@ export function RoiCalculator() {
                                                         </select>
                                                     </div>
                                                     <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Culturile din Afectare</label>
-                                                        <div className="flex flex-wrap gap-2 mt-2">
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Email (pentru raport PDF)</label>
+                                                        <input
+                                                            type="email"
+                                                            value={email}
+                                                            onChange={(e) => setEmail(e.target.value)}
+                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            placeholder="nume@ferma.ro"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Culturi</label>
+                                                        <div className="flex flex-wrap gap-2">
                                                             {CROPS.map(crop => (
                                                                 <button
                                                                     key={crop}
@@ -301,43 +355,19 @@ export function RoiCalculator() {
                                                             ))}
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div className="space-y-6">
-                                                    <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Telefon (WhatsApp pentru raport)</label>
-                                                        <input
-                                                            type="tel"
-                                                            required
-                                                            value={phone}
-                                                            onChange={(e) => setPhone(e.target.value)}
-                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
-                                                            placeholder="07xx xxx xxx"
-                                                        />
-                                                    </div>
                                                     <div>
                                                         <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Orizont Investiție</label>
                                                         <select
-                                                            required
                                                             value={urgency}
                                                             onChange={(e) => setUrgency(e.target.value)}
                                                             className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
                                                         >
                                                             <option value="">Alegeți perioada vizată</option>
-                                                            {URGENCY_OPTIONS.map(opt => <option key={opt.id} value={opt.label}>{opt.label}</option>)}
+                                                            {URGENCY_OPTIONS.map(opt => <option key={opt.id} value={opt.id}>{opt.label}</option>)}
                                                         </select>
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Adresă Email (Opțional pentru PDF)</label>
-                                                        <input
-                                                            type="email"
-                                                            value={email}
-                                                            onChange={(e) => setEmail(e.target.value)}
-                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
-                                                            placeholder="nume@ferma.ro"
-                                                        />
-                                                    </div>
                                                 </div>
-                                            </div>
+                                            </details>
 
                                             <div className="flex items-start gap-3 mb-6 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
                                                 <input
@@ -349,7 +379,7 @@ export function RoiCalculator() {
                                                     className="mt-1 w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-ea-green-600 focus:ring-ea-green-500 cursor-pointer"
                                                 />
                                                 <label htmlFor="gdpr-audit" className="text-[11px] text-zinc-400 leading-snug cursor-pointer">
-                                                    Sunt de acord cu prelucrarea datelor cu caracter personal în scopul realizării auditului de eficiență și contactării ulterioare pentru asistență tehnică, conform{' '}
+                                                    Sunt de acord cu prelucrarea datelor conform{' '}
                                                     <a href="/privacy-policy" target="_blank" className="text-ea-green-500 hover:underline font-bold">
                                                         Politicii de Confidențialitate
                                                     </a>.
@@ -360,10 +390,10 @@ export function RoiCalculator() {
                                                 type="submit"
                                                 className="w-full py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl transition-all hover:translate-y-[-2px]"
                                             >
-                                                Generează Expertiza Tehnică
+                                                Primește Raportul Tehnic Gratuit
                                             </button>
-                                            <p className="text-[10px] text-zinc-600 text-center mt-6 uppercase tracking-wider font-bold">
-                                                🔒 Datele sunt stocate în siguranță conform normelor GDPR TehnicAgro Supply 2026.
+                                            <p className="text-[10px] text-zinc-600 text-center mt-4 uppercase tracking-wider font-bold">
+                                                🔒 Date securizate GDPR • Fără spam • Fără obligații
                                             </p>
                                         </div>
                                     </motion.form>
@@ -493,18 +523,33 @@ export function RoiCalculator() {
                                                         <div className="flex flex-col gap-4">
                                                             <div className="bg-ea-green-600 text-white p-6 rounded-2xl text-center shadow-xl shadow-ea-green-900/20">
                                                                 <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
-                                                                <p className="font-bold uppercase tracking-tight text-sm">Auditul a fost salvat și trimis!</p>
+                                                                <p className="font-bold uppercase tracking-tight text-sm">
+                                                                    {email ? 'Auditul a fost salvat și trimis!' : 'Cerere Înregistrată cu Succes!'}
+                                                                </p>
                                                                 <p className="text-[11px] opacity-90 mt-1">
-                                                                    {email ? `Am trimis raportul complet pe ${email}.` : 'Datele tale au fost preluate de departamentul tehnic.'}
+                                                                    {email ? `Am trimis raportul complet pe ${email}.` : 'Un specialist TehnicAgro te va contacta telefonic pentru prezentarea raportului.'}
                                                                 </p>
                                                             </div>
 
                                                             <button
                                                                 onClick={requestCallsBack}
-                                                                className="w-full py-4 bg-zinc-900 hover:bg-black text-white rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-lg"
+                                                                disabled={callRequested}
+                                                                className={`w-full py-4 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-lg ${callRequested
+                                                                    ? 'bg-green-100 text-green-700 border border-green-200'
+                                                                    : 'bg-zinc-900 hover:bg-black text-white'
+                                                                    }`}
                                                             >
-                                                                <Phone className="w-5 h-5" />
-                                                                Solicită Apel Specialist (Gratuit)
+                                                                {callRequested ? (
+                                                                    <>
+                                                                        <CheckCircle2 className="w-5 h-5" />
+                                                                        Solicitare Apel Înregistrată!
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Phone className="w-5 h-5" />
+                                                                        Solicită Apel Specialist (Gratuit)
+                                                                    </>
+                                                                )}
                                                             </button>
 
                                                             <button

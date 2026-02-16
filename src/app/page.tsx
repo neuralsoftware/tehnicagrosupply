@@ -8,6 +8,8 @@ import { ExpertAuthority } from '@/components/ExpertAuthority';
 import { VideoGallery } from '@/components/VideoGallery';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { ExitIntentPopup } from '@/components/ExitIntentPopup';
+import { SocialProof } from '@/components/SocialProof';
+import { InlineCTA } from '@/components/InlineCTA';
 import Image from 'next/image';
 
 export default function Home() {
@@ -167,13 +169,22 @@ export default function Home() {
 
             <Hero />
 
-            {/* Strategie Nouă: Validare Legală înainte de Produs */}
+            {/* Social Proof - Immediate trust & activity */}
+            <SocialProof />
+
+            {/* ROI Calculator - Main conversion hook, now directly after hero + proof */}
+            <RoiCalculator />
+
+            {/* CTA break - Push hesitant users to WhatsApp */}
+            <InlineCTA variant="contact" />
+
+            {/* Legal context - Why this matters now */}
             <LegalProof />
 
             <TrustSignals />
 
-            {/* Calculatorul trebuie să fie "Hook-ul" principal */}
-            <RoiCalculator />
+            {/* CTA break - Push to calculator for those who scrolled past */}
+            <InlineCTA variant="calculator" />
 
             {/* Video Demo - Dovezi Reale */}
             <VideoGallery />

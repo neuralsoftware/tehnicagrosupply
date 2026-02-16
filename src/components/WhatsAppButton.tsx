@@ -12,16 +12,13 @@ export function WhatsAppButton() {
     const [showPulse, setShowPulse] = useState(true);
     const [hasInteracted, setHasInteracted] = useState(false);
 
-    // Show popup hint after 10 seconds if user hasn't interacted
+    // Auto-hide the tooltip hint after 3 seconds 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (!hasInteracted) {
-                setIsOpen(true);
-                setTimeout(() => setIsOpen(false), 5000);
-            }
-        }, 10000);
+            setShowPulse(false);
+        }, 3000);
         return () => clearTimeout(timer);
-    }, [hasInteracted]);
+    }, []);
 
     const handleClick = () => {
         setHasInteracted(true);

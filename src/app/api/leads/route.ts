@@ -11,7 +11,7 @@ const leadSchema = z.object({
         }),
     email: z.string().email('Email invalid').optional().or(z.literal('')),
     county: z.string().min(2, 'Județ invalid'),
-    hectares: z.number().min(1, 'Min 1 ha').max(10000, 'Max 10000 ha'),
+    hectares: z.number().min(0, 'Suprafață invalidă').max(10000, 'Max 10000 ha'),
     crops: z.array(z.string()).max(10, 'Max 10 culturi'),
     urgency: z.string().max(100),
     subsidyIncome: z.number().optional(),
