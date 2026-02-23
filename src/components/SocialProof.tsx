@@ -119,8 +119,8 @@ export function SocialProof() {
                             className="text-center p-6 bg-zinc-950/50 rounded-2xl border border-zinc-800"
                         >
                             <Users className="w-8 h-8 text-ea-green-500 mx-auto mb-3" />
-                            <AnimatedCounter target={127} suffix="+" />
-                            <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Fermieri Au Calculat</p>
+                            <AnimatedCounter target={142} suffix="+" />
+                            <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Rapoarte Generat</p>
                         </motion.div>
 
                         <motion.div
@@ -131,7 +131,7 @@ export function SocialProof() {
                             className="text-center p-6 bg-zinc-950/50 rounded-2xl border border-zinc-800"
                         >
                             <TrendingUp className="w-8 h-8 text-blue-500 mx-auto mb-3" />
-                            <AnimatedCounter target={54000} suffix="" />
+                            <AnimatedCounter target={68500} suffix="" />
                             <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Hectare Analizate</p>
                         </motion.div>
 
@@ -143,8 +143,8 @@ export function SocialProof() {
                             className="text-center p-6 bg-ea-green-950/20 rounded-2xl border border-ea-green-700/30"
                         >
                             <MapPin className="w-8 h-8 text-ea-green-500 mx-auto mb-3" />
-                            <AnimatedCounter target={29} suffix="" />
-                            <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Județe Acoperite</p>
+                            <AnimatedCounter target={34} suffix="" />
+                            <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Județe Active</p>
                         </motion.div>
                     </div>
                 </div>

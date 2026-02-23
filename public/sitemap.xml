@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://tehnic-agro-funnel.vercel.app</loc><lastmod>2026-02-10T13:33:59.823Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
-<url><loc>https://tehnic-agro-funnel.vercel.app/privacy-policy</loc><lastmod>2026-02-10T13:33:59.824Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/blog/subventia-apia-pd-04-ghid-complet</loc><lastmod>2026-02-23T13:22:03.822Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/blog</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/piese-schimb</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/privacy-policy</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/utilaje/pregatire-sol/chain-disc-kse-680</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/utilaje/semanat-fertilizat/green-plains-ads</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/utilaje/pregatire-sol</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/utilaje/protectia-plantelor</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/utilaje/recoltare-logistica</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+<url><loc>https://tehnic-agro-funnel.vercel.app/utilaje/semanat-fertilizat</loc><lastmod>2026-02-23T13:22:03.823Z</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>

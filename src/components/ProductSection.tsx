@@ -61,7 +61,8 @@ export function ProductSection({ title, description, imageSrc, specs, ctaLabel, 
                             <div className="w-full h-full relative">
                                 <img
                                     src={imageSrc}
-                                    alt={title}
+                                    alt={`${title} - Utilaje Agricole TehnicAgro Supply`}
+                                    title={`${title} - Soluții No-Till & GAEC 6`}
                                     className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500"
                                     onError={(e) => {
                                         e.currentTarget.style.display = 'none';
