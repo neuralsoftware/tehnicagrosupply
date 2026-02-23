@@ -30,6 +30,7 @@ export function Navbar() {
             children: [
                 { name: 'Pregătire Sol', href: '/utilaje/pregatire-sol' },
                 { name: 'Semănat & Fertilizat', href: '/utilaje/semanat-fertilizat' },
+                { name: 'Recoltare & Logistică', href: '/utilaje/recoltare-logistica' },
                 { name: 'Piese de Schimb', href: '/piese-schimb' },
             ]
         },
