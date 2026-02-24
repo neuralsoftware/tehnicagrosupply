@@ -1,0 +1,36 @@
+{
+    "id": "k-factor-powerbank",
+    "slug": "powerbank",
+    "category": "recoltare-logistica",
+    "name": "K-Factor POWERBANK",
+    "brand": "K-Factor",
+    "badge": "Eficiență Maximă",
+    "description": "Remorcă de transbordare de mare capacitate cu două axe, concepută pentru a elimina timpii morți ai combinelor. Permite descărcarea completă a 24 tone de cereale în mai puțin de 3 minute.",
+    "imageSrc": "/products/k-factor-powerbank.png",
+    "specs": [
+        "Volum util: 30 m³",
+        "Capacitate: 24 tone",
+        "Viteză descărcare: 8 m³/min",
+        "Putere tractor: 180 - 220 CP"
+    ],
+    "detailedSpecs": {
+        "Performanță": {
+            "Volum util": "30 m³",
+            "Capacitate încărcare": "24.000 kg",
+            "Viteză descărcare": "8 m³/min",
+            "Timp descărcare": "Sub 3 minute"
+        },
+        "Tehnic": {
+            "Masa proprie": "6.150 kg",
+            "Viteză maximă": "40 km/h",
+            "Diametru șnec": "410 mm",
+            "Înălțime descărcare": "4.200 mm"
+        },
+        "Avantaje": {
+            "Presiune sol": "Sub 1.4 kg/cm²",
+            "Sistem axe": "Dublă axă pentru stabilitate",
+            "Mentenanță": "Trapă mare pentru curățare rapidă"
+        }
+    },
+    "expertVerdict": "Un \"cal de povară\" indispensabil pentru fermele mari. Stabilitatea celor două axe și viteza de descărcare fac din Powerbank soluția ideală pentru a păstra combinele în mișcare continuă."
+}

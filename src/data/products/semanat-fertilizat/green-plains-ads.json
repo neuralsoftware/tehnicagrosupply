@@ -1,0 +1,56 @@
+{
+    "id": "avers-agro-green-plains-ads",
+    "slug": "green-plains-ads",
+    "category": "semanat-fertilizat",
+    "name": "Avers-Agro Green Plains ADS",
+    "brand": "Avers-Agro",
+    "badge": "ELIGIBIL APIA PD-04",
+    "description": "Sistemul de suspensie paralelogram asigură o copiere perfectă a solului, iar presiunea de 190 kg/brăzdar garantează penetrarea în orice miriște. Singura soluție reală pentru încasarea subvenției de 56 EUR/ha fără compromisuri la răsărire.",
+    "imageSrc": "/products/avers-green-plains.jpg",
+    "specs": [
+        "Presiune Brăzdar: 190 kg (reglabilă)",
+        "Adâncime: 1 - 9 cm (precizie 0.5 cm)",
+        "Sistem Suspensie: Paralelogram Independent",
+        "Disc Despicător: Oțel rezistent, unghi 10°"
+    ],
+    "detailedSpecs": {
+        "Generale": {
+            "Model": "Multisem ADS",
+            "Tip": "Semănătoare Directă Mecanică",
+            "Tehnologie": "No-Till / Mini-Till / Convențional",
+            "Distanță rânduri": "18.75 cm",
+            "Adâncime semănat": "1 - 9 cm (ajustabilă 0.5 cm)",
+            "Viteză lucru": "8 - 12 km/h"
+        },
+        "Performanta_si_Dimensiuni": [
+            {
+                "Model": "ADS 3",
+                "Latime": "3.0 m",
+                "Buncar": "2400 L",
+                "Brăzdare": "16",
+                "Putere": "90-110 CP"
+            },
+            {
+                "Model": "ADS 4",
+                "Latime": "4.1 m",
+                "Buncar": "2400 L",
+                "Brăzdare": "22",
+                "Putere": "150-170 CP"
+            },
+            {
+                "Model": "ADS 6",
+                "Latime": "6.3 m",
+                "Buncar": "4000 L",
+                "Brăzdare": "36",
+                "Putere": "180-200 CP"
+            }
+        ],
+        "Sistem_Semant": {
+            "Brăzdar": "Dublu disc decalat",
+            "Presiune": "Până la 190 kg",
+            "Suspensie": "Paralelogram Independent",
+            "Roată tasare": "Reglabilă, 3 poziții unghi atac"
+        }
+    },
+    "expertVerdict": "O soluție tehnică remarcabilă care menține adâncimea de semănat constantă chiar și în soluri extrem de compactate, asigurând răsărirea uniformă esențială pentru conformarea cu eco-schema PD-04."
+}

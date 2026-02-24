@@ -96,62 +96,59 @@ function LiveActivityFeed() {
 
 export function SocialProof() {
     return (
-        <>
-            <section className="py-16 bg-zinc-900/50 border-y border-zinc-800">
-                <div className="max-w-5xl mx-auto px-4">
+        <section className="py-16 bg-zinc-900/50 border-y border-zinc-800">
+            <div className="max-w-5xl mx-auto px-4">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="text-center mb-10"
+                >
+                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ea-green-900/30 border border-ea-green-800 text-ea-green-400 text-xs font-black uppercase tracking-[0.2em]">
+                        <Zap className="w-3 h-3" />
+                        De Ce Ne Aleg Fermierii
+                    </span>
+                </motion.div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center mb-10"
+                        className="text-center p-6 bg-zinc-950/50 rounded-2xl border border-zinc-800"
                     >
-                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ea-green-900/30 border border-ea-green-800 text-ea-green-400 text-xs font-black uppercase tracking-[0.2em]">
-                            <Zap className="w-3 h-3" />
-                            Rezultate în Timp Real
-                        </span>
+                        <Users className="w-8 h-8 text-ea-green-500 mx-auto mb-3" />
+                        <span className="text-4xl font-black text-ea-green-400">56</span>
+                        <span className="text-xl font-black text-ea-green-600"> EUR/ha</span>
+                        <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Subvenție APIA PD-04</p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            className="text-center p-6 bg-zinc-950/50 rounded-2xl border border-zinc-800"
-                        >
-                            <Users className="w-8 h-8 text-ea-green-500 mx-auto mb-3" />
-                            <AnimatedCounter target={142} suffix="+" />
-                            <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Rapoarte Generat</p>
-                        </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="text-center p-6 bg-zinc-950/50 rounded-2xl border border-zinc-800"
+                    >
+                        <TrendingUp className="w-8 h-8 text-blue-500 mx-auto mb-3" />
+                        <span className="text-4xl font-black text-blue-400">-40L</span>
+                        <span className="text-xl font-black text-blue-600"> /ha</span>
+                        <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Economie Motorină</p>
+                    </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.1 }}
-                            className="text-center p-6 bg-zinc-950/50 rounded-2xl border border-zinc-800"
-                        >
-                            <TrendingUp className="w-8 h-8 text-blue-500 mx-auto mb-3" />
-                            <AnimatedCounter target={68500} suffix="" />
-                            <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Hectare Analizate</p>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.2 }}
-                            className="text-center p-6 bg-ea-green-950/20 rounded-2xl border border-ea-green-700/30"
-                        >
-                            <MapPin className="w-8 h-8 text-ea-green-500 mx-auto mb-3" />
-                            <AnimatedCounter target={34} suffix="" />
-                            <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Județe Active</p>
-                        </motion.div>
-                    </div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="text-center p-6 bg-ea-green-950/20 rounded-2xl border border-ea-green-700/30"
+                    >
+                        <MapPin className="w-8 h-8 text-ea-green-500 mx-auto mb-3" />
+                        <span className="text-4xl font-black text-ea-green-400">100%</span>
+                        <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Eligibil GAEC 6</p>
+                    </motion.div>
                 </div>
-            </section>
-
-            {/* Live Activity Notification */}
-            <LiveActivityFeed />
-        </>
+            </div>
+        </section>
     );
 }

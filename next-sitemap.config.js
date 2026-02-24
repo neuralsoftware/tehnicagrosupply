@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-    siteUrl: 'https://tehnic-agro-funnel.vercel.app',
+    siteUrl: 'https://tehnicagrosupply.ro',
     generateRobotsTxt: true,
     generateIndexSitemap: false,
     robotsTxtOptions: {

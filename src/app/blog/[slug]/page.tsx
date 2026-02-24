@@ -3,6 +3,32 @@ import { notFound } from 'next/navigation';
 import { Contact } from '@/components/Contact';
 import { ChevronLeft, Calendar, User, Tag } from 'lucide-react';
 import Link from 'next/link';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
+    const post = BLOG_POSTS.find(p => p.slug === slug);
+
+    if (!post) return {};
+
+    return {
+        title: `${post.title} | Blog TehnicAgro`,
+        description: post.excerpt,
+        openGraph: {
+            title: post.title,
+            description: post.excerpt,
+            images: [post.imageSrc],
+            type: 'article',
+            publishedTime: post.date,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: post.title,
+            description: post.excerpt,
+            images: [post.imageSrc],
+        }
+    };
+}
 
 interface PageProps {
     params: Promise<{
@@ -24,8 +50,25 @@ export default async function BlogPostPage({ params }: PageProps) {
         notFound();
     }
 
+    const articleSchema = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": post.title,
+        "description": post.excerpt,
+        "image": `https://tehnicagrosupply.ro${post.imageSrc}`,
+        "datePublished": post.date,
+        "author": {
+            "@type": "Organization",
+            "name": "TehnicAgro Supply"
+        }
+    };
+
     return (
         <main className="min-h-screen bg-zinc-950 text-zinc-100 pt-32 pb-24">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+            />
             <div className="max-w-4xl mx-auto px-4">
                 {/* Navigation */}
                 <Link

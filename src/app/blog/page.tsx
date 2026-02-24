@@ -1,6 +1,12 @@
 import { BLOG_POSTS } from '@/data/blog';
 import Link from 'next/link';
 import { Calendar, ArrowRight } from 'lucide-react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: "Blog & Resurse Tehnice Agricole | TehnicAgro Supply",
+    description: "Ghiduri despre subvenții APIA, reglementări GAEC 6, tehnologia No-Till și bune practici pentru fermieri.",
+};
 
 export default function BlogPage() {
     return (

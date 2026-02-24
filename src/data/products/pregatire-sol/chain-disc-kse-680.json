@@ -1,0 +1,38 @@
+{
+    "id": "fliegl-chain-disc-kse-680",
+    "slug": "chain-disc-kse-680",
+    "category": "pregatire-sol",
+    "name": "Fliegl Chain Disc KSE 680",
+    "brand": "Fliegl",
+    "badge": "SOLUȚIE GAEC 6 - 2026",
+    "description": "Grapa cu lanțuri (6.8m) care nu îngroapă resturile vegetale, ci le presează plat, formând stratul de protecție obligatoriu prin GAEC 6. Viteza de 18 km/h îți permite să lucrezi 100ha într-o singură zi cu un consum minim.",
+    "imageSrc": "/products/fliegl-kse-680.jpg",
+    "specs": [
+        "Lățime de lucru: 6.8 m",
+        "Randament: ~12 ha/oră (Viteză 10-18 km/h)",
+        "Greutate Variabilă: 120 - 148 kg/m",
+        "Efect: Mărunțire agresivă fără îngropare"
+    ],
+    "detailedSpecs": {
+        "Date_Tehnice": {
+            "Lățime de lucru": "aprox. 6.8 m",
+            "Randament": "până la 12 ha/oră",
+            "Viteză de lucru": "10 - 18 km/h",
+            "Putere necesară": "150 - 250 CP",
+            "Greutate": "5700 kg",
+            "Lungime": "10.8 m"
+        },
+        "Constructie": {
+            "Diametru discuri": "350 mm (Oțel călit)",
+            "Distanță discuri": "130 mm",
+            "Cadru": "Cruce, 4 părți deschise",
+            "Pliere": "Hidraulică"
+        },
+        "Echipare_Standard": {
+            "Prindere": "Tirant inferior Cat II / III",
+            "Hidraulică": "3 conexiuni dublu efect",
+            "Frânare": "Sistem pneumatic inclus"
+        }
+    },
+    "expertVerdict": "Esențială pentru fermierii care vor să respecte GAEC 6 fără să investească în utilaje complexe de prelucrare. Chain Disc-ul Fliegl transformă resturile vegetale într-o barieră termică pentru sol, păstrând umiditatea critică."
+}

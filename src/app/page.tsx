@@ -13,25 +13,6 @@ import { InlineCTA } from '@/components/InlineCTA';
 
 export default function Home() {
     // Schema.org JSON-LD for SEO Rich Results
-    const organizationSchema = {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "TehnicAgro Supply",
-        "url": "https://tehnic-agro-funnel.vercel.app",
-        "logo": "https://tehnic-agro-funnel.vercel.app/logos/tehnicagro_logo_v1_1769155922952.png",
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+40-723-380-022",
-            "contactType": "Sales",
-            "areaServed": "RO",
-            "availableLanguage": "Romanian"
-        },
-        "description": "Furnizor de utilaje agricole No-Till și soluții pentru agricultura conservativă în România.",
-        "sameAs": [
-            "https://wa.me/40723380022"
-        ]
-    };
-
     const faqSchema = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -67,10 +48,6 @@ export default function Home() {
         <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-ea-green-500 selection:text-white pt-16">
             <script
                 type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-            />
-            <script
-                type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
             />
 
@@ -102,26 +79,17 @@ export default function Home() {
             <section className="py-12 bg-zinc-950 border-y border-zinc-900">
                 <div className="max-w-5xl mx-auto px-4">
                     <p className="text-center text-zinc-600 text-sm uppercase tracking-widest font-bold mb-8">
-                        Parteneri Tehnologici de Încredere
+                        Producători Reprezentați
                     </p>
-                    <div className="flex items-center justify-center gap-12 flex-wrap opacity-60 hover:opacity-100 transition-opacity">
-                        <div className="text-2xl font-black text-zinc-400 uppercase tracking-tight">Avers-Agro</div>
-                        <div className="text-2xl font-black text-zinc-400 uppercase tracking-tight">Fliegl</div>
-                        <div className="text-2xl font-black text-zinc-400 uppercase tracking-tight">APIA RO</div>
+                    <div className="flex items-center justify-center gap-16 flex-wrap opacity-80 hover:opacity-100 transition-opacity">
+                        <img src="/logos/brands/avers-agro.png" alt="Avers-Agro" className="h-12 object-contain invert brightness-90 hover:invert-0 hover:brightness-100 transition-all duration-300" />
+                        <img src="/logos/brands/fliegl.svg" alt="Fliegl Agrartechnik" className="h-9 object-contain invert brightness-90 hover:invert-0 hover:brightness-100 transition-all duration-300" />
+                        <img src="/logos/brands/k-factor.webp" alt="K-Factor Trailers" className="h-9 object-contain opacity-90 hover:opacity-100 transition-all duration-300" />
                     </div>
                 </div>
             </section>
 
             <Contact />
-
-            <footer className="py-12 bg-black border-t border-zinc-900">
-                <div className="max-w-5xl mx-auto px-4 text-center">
-                    <h3 className="text-xl font-black text-white uppercase tracking-wide">
-                        Tehnic<span className="text-ea-green-500">Agro</span> Supply
-                    </h3>
-                    <p className="text-zinc-500 text-xs mt-4">&copy; 2026 TehnicAgro Supply. Toate drepturile rezervate.</p>
-                </div>
-            </footer>
 
             <WhatsAppButton />
             <ExitIntentPopup />

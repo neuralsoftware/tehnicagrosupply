@@ -32,12 +32,7 @@ export function ExitIntentPopup() {
             if (e.clientY <= 0) showPopup();
         };
 
-        // MOBILE: Tab visibility change (user switches app)
-        const handleVisibilityChange = () => {
-            if (document.hidden) return;
-            // User came back — show popup when they return
-            showPopup();
-        };
+        // REMOVED: visibilitychange handler was too aggressive on mobile
 
         // MOBILE: Rapid scroll-up (back behavior)
         let lastScrollY = window.scrollY;
@@ -53,19 +48,17 @@ export function ExitIntentPopup() {
             lastScrollY = currentY;
         };
 
-        // Timer: show after 30s on mobile, 45s on desktop
+        // Timer: show after 60s on mobile, 45s on desktop
         const isMobile = window.innerWidth < 768;
         const timer = setTimeout(() => {
             showPopup();
-        }, isMobile ? 30000 : 45000);
+        }, isMobile ? 60000 : 45000);
 
         document.addEventListener('mouseleave', handleMouseLeave);
-        document.addEventListener('visibilitychange', handleVisibilityChange);
         window.addEventListener('scroll', handleScroll, { passive: true });
 
         return () => {
             document.removeEventListener('mouseleave', handleMouseLeave);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('scroll', handleScroll);
             clearTimeout(timer);
         };

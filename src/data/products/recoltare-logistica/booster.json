@@ -1,0 +1,35 @@
+{
+    "id": "k-factor-booster",
+    "slug": "booster",
+    "category": "recoltare-logistica",
+    "name": "K-Factor BOOSTER",
+    "brand": "K-Factor",
+    "badge": "Protecție Sol & Tehnologie",
+    "description": "Inovație pe o singură axă cu ecartament variabil hidraulic (3.0m - 3.5m). Ideală pentru fermele No-Till care pun preț pe manevrabilitate și reducerea tasării solului.",
+    "imageSrc": "/products/k-factor-booster.png",
+    "specs": [
+        "Volum util: 31 m³",
+        "Capacitate: 22.5 tone",
+        "Ecartament Variabil: 3.0 - 3.5 m",
+        "Transfer blând: Șnec 520 mm"
+    ],
+    "detailedSpecs": {
+        "Performanță": {
+            "Volum util": "31 m³",
+            "Capacitate încărcare": "22.500 kg",
+            "Viteză descărcare": "11.5 tone/min",
+            "Sistem axe": "O singură axă (Manevrabilitate)"
+        },
+        "Inovație": {
+            "Ecartament variabil": "3.0 m - 3.5 m (Hidraulic)",
+            "Diametru șnec": "520 mm (Protecție semințe)",
+            "Dimensiuni": "8.250 x 2.990 x 3.995 mm"
+        },
+        "Expert": {
+            "Protecție sol": "Reducere maximă a tasării",
+            "Manevrare": "Ideală pentru spații strâmte",
+            "Utilizare": "Cereale, Leguminoase, Semințe delicate"
+        }
+    },
+    "expertVerdict": "Booster este mai mult decât o remorcă; este un instrument de precizie. Ecartamentul variabil protejează stratul de sol, iar șnecul supradimensionat asigură un transfer extrem de blând al semințelor."
+}

@@ -4,11 +4,13 @@ import './globals.css';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { CookieConsent } from '@/components/CookieConsent';
 import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
 
 export const metadata: Metadata = {
+    metadataBase: new URL('https://tehnicagrosupply.ro'),
     title: "Tehnicagro Supply | Utilaje Agricole No-Till & Subvenții APIA 2026",
     description: "Soluții complete pentru agricultura conservativă. Avers-Agro Green Plains & Fliegl KSE 680. Eligibil APIA PD-04 și GAEC 6. Reducere costuri motorină.",
     keywords: ["utilaje agricole", "no-till", "avers-agro", "fliegl", "subventii apia 2026", "pd-04", "gaec 6", "semanatoare directa", "grapa cu lanturi"],
@@ -24,11 +26,11 @@ export const metadata: Metadata = {
         description: "Descoperă utilajele care îți aduc 56 EUR/ha subvenție și economisesc 320 RON/ha la motorină.",
         type: "website",
         locale: "ro_RO",
-        url: "https://tehnic-agro-funnel.vercel.app",
+        url: "https://tehnicagrosupply.ro",
         siteName: "TehnicAgro Supply",
         images: [
             {
-                url: '/logos/tehnicagro_wide_v2_1769156124608.png',
+                url: '/api/og',
                 width: 1200,
                 height: 630,
                 alt: 'TehnicAgro Supply - Utilaje Agricole No-Till',
@@ -39,10 +41,10 @@ export const metadata: Metadata = {
         card: 'summary_large_image',
         title: "Tehnicagro Supply | Utilaje Agricole No-Till",
         description: "56 EUR/ha subvenție APIA + 320 RON/ha economie motorină. Calculează beneficiul fermei tale!",
-        images: ['/logos/tehnicagro_wide_v2_1769156124608.png'],
+        images: ['/api/og'],
     },
     alternates: {
-        canonical: 'https://tehnic-agro-funnel.vercel.app',
+        canonical: 'https://tehnicagrosupply.ro',
     },
     robots: {
         index: true,
@@ -58,6 +60,9 @@ export default function RootLayout({
     return (
         <html lang="ro" className={`${inter.variable} ${oswald.variable} scroll-smooth`}>
             <head>
+                {/* Facebook Domain Verification */}
+                <meta name="facebook-domain-verification" content="6oeyh29v3v848nr6qv4bsvovm2irfd" />
+
                 {/* Microsoft Clarity for Heatmaps */}
                 {process.env.NEXT_PUBLIC_CLARITY_ID && (
                     <script
@@ -82,8 +87,8 @@ export default function RootLayout({
                             "@context": "https://schema.org",
                             "@type": "Organization",
                             "name": "TehnicAgro Supply",
-                            "url": "https://tehnic-agro-funnel.vercel.app",
-                            "logo": "https://tehnic-agro-funnel.vercel.app/logos/tehnicagro_logo_v1_1769155922952.png",
+                            "url": "https://tehnicagrosupply.ro",
+                            "logo": "https://tehnicagrosupply.ro/logos/tehnicagro_logo_v1_1769155922952.png",
                             "description": "Soluții complete pentru agricultura conservativă. Utilaje No-Till, Avers-Agro Green Plains \u0026 Fliegl KSE 680. Eligibil APIA PD-04 și GAEC 6.",
                             "contactPoint": {
                                 "@type": "ContactPoint",
@@ -141,6 +146,7 @@ export default function RootLayout({
 
                 <Navbar />
                 {children}
+                <Footer />
 
                 {/* Global UI Components - CookieConsent only (WhatsApp & ExitPopup moved to page.tsx) */}
                 <CookieConsent />

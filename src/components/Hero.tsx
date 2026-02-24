@@ -4,18 +4,38 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Suspense, useState, useEffect } from 'react';
-import { Phone, Menu, X } from 'lucide-react';
+
+// APIA PD-04 Official Deadlines 2026
+const APIA_SESSION_OPEN = new Date('2026-03-16T00:00:00');
+const APIA_DEADLINE = new Date('2026-06-05T23:59:59');
+
+type ApiaPhase = 'pre-session' | 'active-session' | 'session-closed';
+
+function getApiaPhase(): ApiaPhase {
+    const now = new Date();
+    if (now < APIA_SESSION_OPEN) return 'pre-session';
+    if (now <= APIA_DEADLINE) return 'active-session';
+    return 'session-closed';
+}
 
 // LIVE Countdown Component - updates every second
 function CountdownTimer() {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    const [phase, setPhase] = useState<ApiaPhase>(getApiaPhase());
 
     useEffect(() => {
-        const deadline = new Date('2026-03-15T23:59:59');
-
         const update = () => {
+            const currentPhase = getApiaPhase();
+            setPhase(currentPhase);
+
+            if (currentPhase === 'session-closed') {
+                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+                return;
+            }
+
+            const target = currentPhase === 'pre-session' ? APIA_SESSION_OPEN : APIA_DEADLINE;
             const now = new Date();
-            const diff = deadline.getTime() - now.getTime();
+            const diff = target.getTime() - now.getTime();
 
             if (diff <= 0) {
                 setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -34,6 +54,9 @@ function CountdownTimer() {
         const interval = setInterval(update, 1000);
         return () => clearInterval(interval);
     }, []);
+
+    // Phase 3: No timer at all
+    if (phase === 'session-closed') return null;
 
     const units = [
         { value: timeLeft.days, label: 'Zile' },
@@ -54,89 +77,6 @@ function CountdownTimer() {
                 </div>
             ))}
         </div>
-    );
-}
-
-// Sticky Navigation - appears on scroll
-function StickyNav() {
-    const [visible, setVisible] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setVisible(window.scrollY > 200);
-        };
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    if (!visible) return null;
-
-    return (
-        <motion.header
-            initial={{ y: -80 }}
-            animate={{ y: 0 }}
-            className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800 shadow-xl"
-        >
-            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-                <Link href="/" className="text-lg font-black text-white uppercase tracking-wide">
-                    Tehnic<span className="text-ea-green-500">Agro</span>
-                </Link>
-
-                {/* Desktop */}
-                <div className="hidden md:flex items-center gap-4">
-                    <Link href="#audit" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">
-                        Calculator ROI
-                    </Link>
-                    <Link href="#oferta" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">
-                        Produse
-                    </Link>
-                    <a href="tel:+40723380022" className="flex items-center gap-2 text-zinc-300 hover:text-white text-sm font-medium transition-colors">
-                        <Phone className="w-4 h-4" />
-                        0723 380 022
-                    </a>
-                    <Link
-                        href="#contact"
-                        className="px-5 py-2.5 bg-ea-green-600 hover:bg-ea-green-500 text-white text-sm font-bold rounded-lg transition-all shadow-lg shadow-ea-green-900/30 animate-pulse hover:animate-none"
-                    >
-                        Solicită Ofertă Acum
-                    </Link>
-                </div>
-
-                {/* Mobile */}
-                <div className="flex md:hidden items-center gap-3">
-                    <a href="tel:+40723380022" className="p-2 bg-ea-green-600 rounded-lg text-white">
-                        <Phone className="w-5 h-5" />
-                    </a>
-                    <button onClick={() => setMobileOpen(!mobileOpen)} className="p-2 text-zinc-400">
-                        {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                    </button>
-                </div>
-            </div>
-
-            {/* Mobile Menu */}
-            {mobileOpen && (
-                <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="md:hidden bg-zinc-900 border-t border-zinc-800 px-4 py-4 space-y-3"
-                >
-                    <Link href="#audit" onClick={() => setMobileOpen(false)} className="block text-zinc-300 text-sm font-medium py-2">
-                        Calculator ROI
-                    </Link>
-                    <Link href="#oferta" onClick={() => setMobileOpen(false)} className="block text-zinc-300 text-sm font-medium py-2">
-                        Produse
-                    </Link>
-                    <Link
-                        href="#contact"
-                        onClick={() => setMobileOpen(false)}
-                        className="block text-center py-3 bg-ea-green-600 text-white font-bold rounded-lg"
-                    >
-                        Solicită Ofertă Acum
-                    </Link>
-                </motion.div>
-            )}
-        </motion.header>
     );
 }
 
@@ -182,12 +122,20 @@ function HeroContent() {
         );
     }
 
-    const badgeText = ref === 'dr12'
-        ? "Sesiune DR-12 estimată în Februarie - Pregătește proiectul"
-        : "Atenție: Deadline depunere cereri APIA PD-04 se apropie";
+    const phase = getApiaPhase();
+    let badgeText: string;
+    if (ref === 'dr12') {
+        badgeText = "Sesiune DR-12 — Pregătește proiectul acum";
+    } else if (phase === 'pre-session') {
+        badgeText = "Sesiunea APIA PD-04 se deschide pe 16 Martie 2026";
+    } else if (phase === 'active-session') {
+        badgeText = "Atenție: Termen limită depunere APIA — 5 Iunie 2026";
+    } else {
+        badgeText = "Campanie APIA 2026 — Pregătește-te pentru campania următoare";
+    }
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center bg-zinc-950 overflow-hidden">
+        <section className="relative min-h-screen flex items-center justify-center bg-zinc-950 overflow-hidden pt-20">
             {/* Background Image Placeholder or Overlay */}
             <div className="absolute inset-0 bg-black/60 z-10" />
             <div
@@ -195,29 +143,7 @@ function HeroContent() {
                 style={{ backgroundImage: 'radial-gradient(circle at center, #166534 0%, transparent 70%)', opacity: 0.2 }}
             />
 
-            {/* LOGO - Initial Header (hidden when sticky takes over) */}
-            <header className="absolute top-0 left-0 right-0 z-30 py-4 px-6">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-3 group">
-                        <span className="text-xl font-black text-white uppercase tracking-wide">
-                            Tehnic<span className="text-ea-green-500">Agro</span>
-                        </span>
-                    </Link>
-                    <div className="hidden md:flex items-center gap-6">
-                        <Link href="#audit" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">
-                            Calculator ROI
-                        </Link>
-                        <Link href="#oferta" className="text-zinc-400 hover:text-white text-sm font-medium transition-colors">
-                            Produse
-                        </Link>
-                        <Link href="#contact" className="px-4 py-2 bg-ea-green-600 hover:bg-ea-green-500 text-white text-sm font-bold rounded-lg transition-all">
-                            Contact
-                        </Link>
-                    </div>
-                </div>
-            </header>
-
-            <div className="relative z-20 max-w-5xl mx-auto px-4 text-center space-y-8 pt-20">
+            <div className="relative z-20 max-w-5xl mx-auto px-4 text-center space-y-8">
                 {/* Urgency Badge with LIVE Countdown */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
@@ -267,7 +193,7 @@ function HeroContent() {
                         href="#audit"
                         className="w-full sm:w-auto px-10 py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white text-lg font-bold rounded-lg uppercase tracking-wide transition-all shadow-[0_0_20px_rgba(22,101,52,0.4)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] text-center flex items-center justify-center gap-2"
                     >
-                        Calculează Beneficiul în 30 Secunde
+                        Calculează Beneficiul Fermei Tale
                     </Link>
                     <Link
                         href="#contact"
@@ -300,9 +226,6 @@ function HeroContent() {
                     </div>
                 </motion.div>
             </div>
-
-            {/* Sticky Nav - separate component */}
-            <StickyNav />
         </section>
     );
 }

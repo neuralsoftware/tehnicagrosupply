@@ -4,6 +4,30 @@ import { ProductSection } from '@/components/ProductSection';
 import { Contact } from '@/components/Contact';
 import { TrustSignals } from '@/components/TrustSignals';
 import { ExpertAuthority } from '@/components/ExpertAuthority';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { category, slug } = await params;
+    const product = PRODUCTS.find(p => p.slug === slug && p.category === category);
+
+    if (!product) return {};
+
+    return {
+        title: `${product.brand} ${product.name} | TehnicAgro Supply`,
+        description: product.description,
+        openGraph: {
+            title: `${product.brand} ${product.name} - Eficiență în Fermă`,
+            description: product.description,
+            images: [product.imageSrc],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: product.name,
+            description: product.description,
+            images: [product.imageSrc],
+        }
+    };
+}
 
 interface PageProps {
     params: Promise<{
@@ -33,7 +57,7 @@ export default async function ProductPage({ params }: PageProps) {
         "@type": "Product",
         "name": product.name,
         "description": product.description,
-        "image": `https://tehnic-agro-funnel.vercel.app${product.imageSrc}`,
+        "image": `https://tehnicagrosupply.ro${product.imageSrc}`,
         "brand": {
             "@type": "Brand",
             "name": product.brand
@@ -64,7 +88,7 @@ export default async function ProductPage({ params }: PageProps) {
                 specs={product.specs}
                 detailedSpecs={product.detailedSpecs}
                 expertVerdict={product.expertVerdict}
-                ctaLabel="Descarcă Fișa Tehnică"
+                ctaLabel="Solicită Ofertă Tehnică"
             />
 
             <div className="max-w-7xl mx-auto px-4 py-16">
@@ -83,12 +107,6 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
 
             <ExpertAuthority />
-
-            <footer className="py-12 bg-black border-t border-zinc-900">
-                <div className="max-w-5xl mx-auto px-4 text-center">
-                    <p className="text-zinc-700 text-xs">&copy; 2026 TehnicAgro Supply. Toate drepturile rezervate.</p>
-                </div>
-            </footer>
         </main>
     );
 }

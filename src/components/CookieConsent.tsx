@@ -65,6 +65,10 @@ export function CookieConsent() {
                         Citește mai multe în{' '}
                         <Link href="/privacy-policy" className="text-green-500 hover:underline">
                             Politica de Confidențialitate
+                        </Link>{' '}
+                        și{' '}
+                        <Link href="/politica-cookie" className="text-green-500 hover:underline">
+                            Politica de Cookie-uri
                         </Link>.
                     </p>
                 </div>
