@@ -69,11 +69,11 @@ function CountdownTimer() {
         <div className="flex items-center gap-2">
             {units.map((unit, i) => (
                 <div key={unit.label} className="flex items-center gap-1">
-                    <div className="bg-ea-red-900/40 border border-ea-red-500/30 rounded-lg px-2 py-1 min-w-[40px] text-center">
-                        <span className="text-xl font-black text-ea-red-400 tabular-nums">{String(unit.value).padStart(2, '0')}</span>
+                    <div className="bg-zinc-900 rounded-lg px-2 py-1 min-w-[36px] text-center">
+                        <span className="text-lg sm:text-xl font-black text-white tabular-nums">{String(unit.value).padStart(2, '0')}</span>
                     </div>
-                    <span className="text-[8px] uppercase text-ea-red-500/70 font-bold">{unit.label}</span>
-                    {i < units.length - 1 && <span className="text-ea-red-600 font-bold mx-0.5">:</span>}
+                    <span className="text-[8px] uppercase text-zinc-500 font-bold">{unit.label}</span>
+                    {i < units.length - 1 && <span className="text-zinc-400 font-bold mx-0.5">:</span>}
                 </div>
             ))}
         </div>
@@ -86,38 +86,37 @@ function HeroContent() {
 
     let headline = (
         <>
-            Eficiență Garantată <br />
-            <span className="text-ea-green-500">Securizează Subvenția</span> <br />
-            <span className="text-4xl md:text-6xl text-zinc-300">și Maximizează Profitul.</span>
+            Eficiență Garantată. <span className="text-ea-green-600">Securizează Subvenția</span><br />
+            <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">și Maximizează Profitul.</span>
         </>
     );
 
     if (ref === 'subventie') {
         headline = (
             <>
-                Maximizați <span className="text-ea-green-500">Subvenția APIA</span> <br />
-                <span className="text-4xl md:text-6xl text-zinc-300">cu Tehnologia TehnicAgro.</span>
+                Maximizați <span className="text-ea-green-600">Subvenția APIA</span><br />
+                <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">cu Tehnologia TehnicAgro.</span>
             </>
         );
     } else if (ref === 'roi') {
         headline = (
             <>
-                Calculați <span className="text-ea-green-500">ROI-ul Fermei</span> <br />
-                <span className="text-4xl md:text-6xl text-zinc-300">și Reduceți Costurile.</span>
+                Calculați <span className="text-ea-green-600">ROI-ul Fermei</span><br />
+                <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">și Reduceți Costurile.</span>
             </>
         );
     } else if (ref === 'avers') {
         headline = (
             <>
-                Puterea <span className="text-ea-green-500">Avers-Agro</span> <br />
-                <span className="text-4xl md:text-6xl text-zinc-300">Performanță No-Till Reală.</span>
+                Puterea <span className="text-ea-green-600">Avers-Agro</span><br />
+                <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">Performanță No-Till Reală.</span>
             </>
         );
     } else if (ref === 'dr12') {
         headline = (
             <>
-                Proiecte <span className="text-ea-green-500">DR-12: 200.000€</span> <br />
-                <span className="text-4xl md:text-6xl text-zinc-300">Finanțare 80% pt. Utilaje.</span>
+                Proiecte <span className="text-ea-green-600">DR-12: 200.000€</span><br />
+                <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">Finanțare 80% pt. Utilaje.</span>
             </>
         );
     }
@@ -135,29 +134,27 @@ function HeroContent() {
     }
 
     return (
-        <section className="relative min-h-screen flex items-center justify-center bg-zinc-950 overflow-hidden pt-20">
-            {/* Background Image Placeholder or Overlay */}
-            <div className="absolute inset-0 bg-black/60 z-10" />
-            <div
-                className="absolute inset-0 bg-zinc-900 opacity-40 grayscale"
-                style={{ backgroundImage: 'radial-gradient(circle at center, #166534 0%, transparent 70%)', opacity: 0.2 }}
+        <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-50 via-white to-ea-green-50 overflow-hidden pt-20">
+            {/* Subtle decorative background */}
+            <div className="absolute inset-0 opacity-30"
+                style={{ backgroundImage: 'radial-gradient(circle at 70% 30%, rgba(22,101,52,0.08), transparent 50%), radial-gradient(circle at 30% 80%, rgba(22,101,52,0.05), transparent 50%)' }}
             />
 
-            <div className="relative z-20 max-w-5xl mx-auto px-4 text-center space-y-8">
+            <div className="relative z-20 max-w-5xl mx-auto px-6 text-center space-y-6 sm:space-y-8">
                 {/* Urgency Badge with LIVE Countdown */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="inline-flex flex-col sm:flex-row items-center gap-4 px-6 py-3 rounded-2xl bg-ea-red-900/20 border border-ea-red-500/30"
+                    className="inline-flex flex-col sm:flex-row items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 rounded-2xl bg-zinc-900 border-2 border-red-500/60"
                 >
-                    <div className="flex items-center gap-2 text-ea-red-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                    <div className="flex items-center gap-2 text-red-400 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em]">
                         <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ea-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-ea-red-500"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                         </span>
                         {badgeText}
                     </div>
-                    <div className="hidden sm:block w-px h-6 bg-ea-red-500/30"></div>
+                    <div className="hidden sm:block w-px h-6 bg-zinc-700"></div>
                     <CountdownTimer />
                 </motion.div>
 
@@ -165,7 +162,7 @@ function HeroContent() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="text-5xl md:text-7xl font-bold uppercase tracking-tight text-white drop-shadow-lg"
+                    className="text-3xl sm:text-4xl md:text-6xl font-bold uppercase tracking-tight text-zinc-900 px-2"
                 >
                     {headline}
                 </motion.h1>
@@ -174,13 +171,13 @@ function HeroContent() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.8 }}
-                    className="text-xl md:text-2xl text-zinc-300 max-w-4xl mx-auto font-light"
+                    className="text-base sm:text-lg md:text-xl text-zinc-500 max-w-3xl mx-auto font-light px-2"
                 >
-                    Parteneriatul tău strategic pentru <span className="font-semibold text-white">Performanță Agricolă</span>.
-                    Implementăm tehnologii No-Till <span className="font-semibold text-white">Avers-Agro</span> și
-                    soluții <span className="font-semibold text-white">Fliegl</span> conforme cu <span className="text-ea-green-500 font-bold">GAEC 6 și APIA PD-04</span>.
+                    Parteneriatul tău strategic pentru <span className="font-semibold text-zinc-900">Performanță Agricolă</span>.
+                    Implementăm tehnologii No-Till <span className="font-semibold text-zinc-900">Avers-Agro</span> și
+                    soluții <span className="font-semibold text-zinc-900">Fliegl</span> conforme cu <span className="text-ea-green-600 font-bold">GAEC 6 și APIA PD-04</span>.
                     <br />
-                    <span className="text-zinc-400 text-lg block mt-4 italic">„Tehnologia corectă nu este o cheltuială, este cea mai sigură investiție a fermei tale."</span>
+                    <span className="text-zinc-400 text-sm sm:text-base block mt-4 italic">„Tehnologia corectă nu este o cheltuială, este cea mai sigură investiție a fermei tale."</span>
                 </motion.p>
 
                 <motion.div
@@ -191,13 +188,13 @@ function HeroContent() {
                 >
                     <Link
                         href="#audit"
-                        className="w-full sm:w-auto px-10 py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white text-lg font-bold rounded-lg uppercase tracking-wide transition-all shadow-[0_0_20px_rgba(22,101,52,0.4)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] text-center flex items-center justify-center gap-2"
+                        className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white text-base sm:text-lg font-bold rounded-lg uppercase tracking-wide transition-all shadow-lg shadow-ea-green-600/20 hover:shadow-xl hover:shadow-ea-green-500/30 text-center flex items-center justify-center gap-2"
                     >
                         Calculează Beneficiul Fermei Tale
                     </Link>
                     <Link
                         href="#contact"
-                        className="w-full sm:w-auto px-10 py-5 border border-zinc-600 hover:bg-zinc-800 text-zinc-100 text-lg font-medium rounded-lg uppercase tracking-wide transition-all text-center"
+                        className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-zinc-800 hover:bg-zinc-700 text-white text-base sm:text-lg font-bold rounded-lg uppercase tracking-wide transition-all text-center"
                     >
                         Solicită Expertiză Tehnică
                     </Link>
@@ -208,21 +205,21 @@ function HeroContent() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.8 }}
-                    className="pt-8 flex items-center justify-center gap-8 text-zinc-500"
+                    className="pt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-zinc-400"
                 >
                     <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-ea-green-500">56€</span>
-                        <span className="text-xs uppercase tracking-wider">Subvenție/ha</span>
+                        <span className="text-xl sm:text-2xl font-black text-ea-green-600">56€</span>
+                        <span className="text-[10px] sm:text-xs uppercase tracking-wider">Subvenție/ha</span>
                     </div>
-                    <div className="w-px h-6 bg-zinc-800"></div>
+                    <div className="hidden sm:block w-px h-6 bg-zinc-200"></div>
                     <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-ea-green-500">-40L</span>
-                        <span className="text-xs uppercase tracking-wider">Motorină/ha</span>
+                        <span className="text-xl sm:text-2xl font-black text-ea-green-600">-40L</span>
+                        <span className="text-[10px] sm:text-xs uppercase tracking-wider">Motorină/ha</span>
                     </div>
-                    <div className="w-px h-6 bg-zinc-800"></div>
+                    <div className="hidden sm:block w-px h-6 bg-zinc-200"></div>
                     <div className="flex items-center gap-2">
-                        <span className="text-2xl font-black text-ea-green-500">100%</span>
-                        <span className="text-xs uppercase tracking-wider">Eligibil APIA</span>
+                        <span className="text-xl sm:text-2xl font-black text-ea-green-600">100%</span>
+                        <span className="text-[10px] sm:text-xs uppercase tracking-wider">Eligibil APIA</span>
                     </div>
                 </motion.div>
             </div>
@@ -232,7 +229,7 @@ function HeroContent() {
 
 export function Hero() {
     return (
-        <Suspense fallback={<div className="h-screen bg-zinc-950" />}>
+        <Suspense fallback={<div className="h-screen bg-white" />}>
             <HeroContent />
         </Suspense>
     );

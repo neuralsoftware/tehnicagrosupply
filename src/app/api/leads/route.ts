@@ -16,7 +16,8 @@ const leadSchema = z.object({
     urgency: z.string().max(100).optional().default(''),
     subsidyIncome: z.number().optional(),
     fuelSavings: z.number().optional(),
-    totalBenefit: z.number().optional()
+    totalBenefit: z.number().optional(),
+    message: z.string().max(1000, 'Mesaj prea lung').optional().default(''),
 });
 
 export async function POST(request: Request) {
@@ -43,7 +44,8 @@ export async function POST(request: Request) {
             email: validatedData.email || '',
             subsidyIncome: validatedData.subsidyIncome || 0,
             fuelSavings: validatedData.fuelSavings || 0,
-            totalBenefit: validatedData.totalBenefit || 0
+            totalBenefit: validatedData.totalBenefit || 0,
+            notes: validatedData.message || '',
         };
 
         const lead = await LeadsService.addLead(leadData);

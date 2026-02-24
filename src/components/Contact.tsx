@@ -3,10 +3,21 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
+const JUDETE = [
+    'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brăila',
+    'Brașov', 'București', 'Buzău', 'Călărași', 'Caraș-Severin', 'Cluj', 'Constanța',
+    'Covasna', 'Dâmbovița', 'Dolj', 'Galați', 'Giurgiu', 'Gorj', 'Harghita', 'Hunedoara',
+    'Ialomița', 'Iași', 'Ilfov', 'Maramureș', 'Mehedinți', 'Mureș', 'Neamț', 'Olt',
+    'Prahova', 'Sălaj', 'Satu Mare', 'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea',
+    'Vâlcea', 'Vaslui', 'Vrancea',
+];
+
 export function Contact() {
     const [farmName, setFarmName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [county, setCounty] = useState('');
+    const [message, setMessage] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [gdprConsent, setGdprConsent] = useState(false);
@@ -43,12 +54,13 @@ export function Contact() {
                     name: farmName,
                     phone: phone,
                     email: email || '',
-                    county: 'Contact General',
+                    county: county || 'Nespecificat',
                     hectares: 0,
                     totalBenefit: 0,
                     crops: ['Formular Contact'],
                     urgency: 'Discuție',
-                    status: 'new'
+                    status: 'new',
+                    message: message || '',
                 })
             });
             if (res.ok) {
@@ -69,7 +81,7 @@ export function Contact() {
     };
 
     return (
-        <section id="contact" className="py-24 bg-green-900/10 relative overflow-hidden">
+        <section id="contact" className="py-24 bg-ea-green-50 relative overflow-hidden">
 
             <div className="max-w-4xl mx-auto px-4 relative z-10 text-center space-y-8">
                 <motion.div
@@ -77,10 +89,10 @@ export function Contact() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-4xl font-bold uppercase tracking-wide text-white">
+                    <h2 className="text-4xl font-bold uppercase tracking-wide text-zinc-900">
                         Nu mai pierde timp.
                     </h2>
-                    <p className="text-xl text-zinc-300 mt-4">
+                    <p className="text-xl text-zinc-600 mt-4">
                         Utilajele se vând rapid. Asigură-ți tehnologia pentru campania de primăvară.
                     </p>
                 </motion.div>
@@ -90,23 +102,26 @@ export function Contact() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
-                    className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 shadow-2xl max-w-lg mx-auto relative overflow-hidden"
+                    className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-xl max-w-xl mx-auto relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-ea-green-500 opacity-5 blur-3xl -mr-10 -mt-10"></div>
 
                     {!isSubmitted ? (
                         <form className="space-y-4 text-left relative z-10" onSubmit={handleSubmit}>
+                            {/* Nume */}
                             <div>
                                 <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Nume Fermă / Proprietar</label>
                                 <input
                                     type="text"
                                     value={farmName}
                                     onChange={(e) => setFarmName(e.target.value)}
-                                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-600 text-sm"
+                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-400 text-sm"
                                     placeholder="Ex: Agromec SRL"
                                     required
                                 />
                             </div>
+
+                            {/* Telefon + Email */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Telefon</label>
@@ -114,30 +129,61 @@ export function Contact() {
                                         type="tel"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
-                                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-600 text-sm"
+                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-400 text-sm"
                                         placeholder="07xx xxx xxx"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Email (Opțional)</label>
+                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Email</label>
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-600 text-sm"
+                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-400 text-sm"
                                         placeholder="nume@ferma.ro"
+                                        required
                                     />
                                 </div>
                             </div>
-                            <div className="flex items-start gap-3 mt-4">
+
+                            {/* Județ */}
+                            <div>
+                                <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Județ</label>
+                                <select
+                                    value={county}
+                                    onChange={(e) => setCounty(e.target.value)}
+                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all text-sm appearance-none"
+                                    required
+                                >
+                                    <option value="" disabled>Selectează județul</option>
+                                    {JUDETE.map((j) => (
+                                        <option key={j} value={j}>{j}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Mesaj */}
+                            <div>
+                                <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Mesaj (Opțional)</label>
+                                <textarea
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-400 text-sm resize-none"
+                                    placeholder="Descrie ce utilaje te interesează, suprafața fermei, sau alte detalii relevante..."
+                                    rows={3}
+                                />
+                            </div>
+
+                            {/* GDPR */}
+                            <div className="flex items-start gap-3 mt-2">
                                 <input
                                     type="checkbox"
                                     id="gdpr-contact"
                                     required
                                     checked={gdprConsent}
                                     onChange={(e) => setGdprConsent(e.target.checked)}
-                                    className="mt-1 w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-ea-green-600 focus:ring-ea-green-500"
+                                    className="mt-1 w-4 h-4 rounded border-zinc-300 bg-zinc-50 text-ea-green-600 focus:ring-ea-green-500"
                                 />
                                 <label htmlFor="gdpr-contact" className="text-[10px] text-zinc-400 leading-tight">
                                     Sunt de acord cu prelucrarea datelor în scopul primirii ofertei personalizate, conform{' '}
@@ -146,6 +192,8 @@ export function Contact() {
                                     </a>.
                                 </label>
                             </div>
+
+                            {/* Submit */}
                             <button
                                 type="submit"
                                 disabled={isSending}
@@ -164,8 +212,8 @@ export function Contact() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                                 </svg>
                             </div>
-                            <h3 className="text-xl font-bold text-white uppercase tracking-tighter">Cerere Recepționată!</h3>
-                            <p className="text-sm text-zinc-400">Un specialist TehnicAgro analizează solicitarea ta și te va contacta în cel mai scurt timp.</p>
+                            <h3 className="text-xl font-bold text-zinc-900 uppercase tracking-tighter">Cerere Recepționată!</h3>
+                            <p className="text-sm text-zinc-500">Un specialist TehnicAgro analizează solicitarea ta și te va contacta în cel mai scurt timp.</p>
                             <button
                                 onClick={() => setIsSubmitted(false)}
                                 className="text-[10px] uppercase font-black text-zinc-600 hover:text-zinc-400 tracking-widest transition-colors"

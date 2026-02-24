@@ -51,7 +51,7 @@ export default function PieseSchimbPage() {
     };
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 pt-32 pb-24">
+        <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(sparePartsSchema) }}
@@ -68,48 +68,48 @@ export default function PieseSchimbPage() {
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-8 mb-24">
-                    <div className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 space-y-4">
+                    <div className="bg-white p-8 rounded-3xl border border-zinc-200 space-y-4 shadow-sm">
                         <Settings className="w-12 h-12 text-ea-green-500" />
-                        <h3 className="text-xl font-bold text-white uppercase tracking-tight">Piese Originale & Aftermarket</h3>
+                        <h3 className="text-xl font-bold text-zinc-900 uppercase tracking-tight">Piese Originale & Aftermarket</h3>
                         <p className="text-zinc-500 text-sm">
-                            Oferim componente <strong className="text-zinc-300">Originale (OEM)</strong> pentru utilajele noastre și piese <strong className="text-zinc-300">Aftermarket</strong> de înaltă calitate pentru o gamă vastă de mărci internaționale.
+                            Oferim componente <strong className="text-zinc-900">Originale (OEM)</strong> pentru utilajele noastre și piese <strong className="text-zinc-900">Aftermarket</strong> de înaltă calitate pentru o gamă vastă de mărci internaționale.
                         </p>
                     </div>
-                    <div className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 space-y-4">
+                    <div className="bg-white p-8 rounded-3xl border border-zinc-200 space-y-4 shadow-sm">
                         <Wrench className="w-12 h-12 text-ea-green-500" />
-                        <h3 className="text-xl font-bold text-white uppercase tracking-tight">Suport Tehnic Multimarcă</h3>
+                        <h3 className="text-xl font-bold text-zinc-900 uppercase tracking-tight">Suport Tehnic Multimarcă</h3>
                         <p className="text-zinc-500 text-sm">
                             Consultanță tehnică și diagnostic pentru majoritatea utilajelor agricole (John Deere, Case IH, Fendt, New Holland, Claas).
                         </p>
                     </div>
-                    <div className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 space-y-4">
+                    <div className="bg-white p-8 rounded-3xl border border-zinc-200 space-y-4 shadow-sm">
                         <ShieldCheck className="w-12 h-12 text-ea-green-500" />
-                        <h3 className="text-xl font-bold text-white uppercase tracking-tight">Livrare Rapidă</h3>
+                        <h3 className="text-xl font-bold text-zinc-900 uppercase tracking-tight">Livrare Rapidă</h3>
                         <p className="text-zinc-500 text-sm">
-                            Colaborăm cu lideri europeni precum <strong className="text-zinc-300">Kramp</strong> pentru livrarea rapidă din stoc a peste 500.000 de articole.
+                            Colaborăm cu lideri europeni precum <strong className="text-zinc-900">Kramp</strong> pentru livrarea rapidă din stoc a peste 500.000 de articole.
                         </p>
                     </div>
                 </div>
 
                 {/* Multibrand Section */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-12 mb-24">
+                <div className="bg-zinc-50 border border-zinc-200 rounded-3xl p-12 mb-24">
                     <div className="max-w-4xl mx-auto space-y-8 text-center">
-                        <h2 className="text-3xl font-black text-white uppercase tracking-tight">
-                            Soluții Complete pentru <span className="text-ea-green-500">Toate Brandurile</span>
+                        <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-tight">
+                            Soluții Complete pentru <span className="text-ea-green-600">Toate Brandurile</span>
                         </h2>
-                        <p className="text-zinc-400">
-                            Pe lângă piesele dedicate utilajelor din portofoliul nostru (<strong className="text-zinc-300">Avers-Agro, Fliegl, K-Factor</strong>), suntem parteneri de încredere pentru soluții multimarcă. Putem aduce la comandă piese pentru:
+                        <p className="text-zinc-500">
+                            Pe lângă piesele dedicate utilajelor din portofoliul nostru (<strong className="text-zinc-900">Avers-Agro, Fliegl, K-Factor</strong>), suntem parteneri de încredere pentru soluții multimarcă. Putem aduce la comandă piese pentru:
                         </p>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs font-bold uppercase tracking-widest text-zinc-500">
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Amazone</span>
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Lemken</span>
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Väderstad</span>
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Pöttinger</span>
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Gaspardo</span>
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Vogel & Noot</span>
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Horsch</span>
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Moresil</span>
-                            <span className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">Capello</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Amazone</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Lemken</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Väderstad</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Pöttinger</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Gaspardo</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Vogel & Noot</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Horsch</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Moresil</span>
+                            <span className="bg-white p-3 rounded-xl border border-zinc-200 shadow-sm">Capello</span>
                         </div>
                     </div>
                 </div>
@@ -117,17 +117,17 @@ export default function PieseSchimbPage() {
                 {/* Contact Section */}
                 <div className="grid md:grid-cols-2 gap-16 items-center">
                     <div className="space-y-8">
-                        <h2 className="text-4xl font-black text-white uppercase tracking-tighter">
-                            Ai nevoie de o <span className="text-ea-green-500">piesă specifică?</span>
+                        <h2 className="text-4xl font-black text-zinc-900 uppercase tracking-tighter">
+                            Ai nevoie de o <span className="text-ea-green-600">piesă specifică?</span>
                         </h2>
-                        <p className="text-zinc-400 text-lg">
+                        <p className="text-zinc-500 text-lg">
                             Dacă nu găsești brandul sau piesa dorită printre serviciile prezentate mai sus, completează formularul cu modelul utilajului și piesa necesară. Te vom contacta în maxim 2 ore cu o ofertă de preț și termen de livrare.
                         </p>
                         <div className="pt-8">
                             <TrustSignals />
                         </div>
                     </div>
-                    <div className="bg-zinc-900 p-2 rounded-3xl border border-zinc-800">
+                    <div className="bg-zinc-50 p-2 rounded-3xl border border-zinc-200">
                         <Contact />
                     </div>
                 </div>

@@ -17,12 +17,12 @@ export function InlineCTA({ variant = 'calculator' }: InlineCTAProps) {
                 viewport={{ once: true }}
                 className="py-8 px-4"
             >
-                <div className="max-w-3xl mx-auto bg-gradient-to-r from-ea-green-900/30 via-ea-green-800/20 to-ea-green-900/30 rounded-2xl border border-ea-green-700/30 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="max-w-3xl mx-auto bg-ea-green-50 rounded-2xl border border-ea-green-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                        <Phone className="w-6 h-6 text-ea-green-500 shrink-0" />
+                        <Phone className="w-6 h-6 text-ea-green-600 shrink-0" />
                         <div>
-                            <p className="text-white font-bold text-sm">Ai întrebări? Vorbim direct.</p>
-                            <p className="text-zinc-400 text-xs">Specialist disponibil pe WhatsApp</p>
+                            <p className="text-zinc-900 font-bold text-sm">Ai întrebări? Vorbim direct.</p>
+                            <p className="text-zinc-500 text-xs">Specialist disponibil pe WhatsApp</p>
                         </div>
                     </div>
                     <a
@@ -46,17 +46,17 @@ export function InlineCTA({ variant = 'calculator' }: InlineCTAProps) {
             viewport={{ once: true }}
             className="py-8 px-4"
         >
-            <div className="max-w-3xl mx-auto bg-zinc-900 rounded-2xl border border-zinc-800 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                 <div className="flex items-center gap-3">
-                    <Calculator className="w-6 h-6 text-ea-green-500 shrink-0" />
+                    <Calculator className="w-6 h-6 text-ea-green-600 shrink-0" />
                     <div>
-                        <p className="text-white font-bold text-sm">Calculează economiile fermei tale</p>
-                        <p className="text-zinc-400 text-xs">Rezultat instant, fără obligații</p>
+                        <p className="text-zinc-900 font-bold text-sm">Calculează economiile fermei tale</p>
+                        <p className="text-zinc-500 text-xs">Rezultat instant, fără obligații</p>
                     </div>
                 </div>
                 <Link
                     href="#audit"
-                    className="px-6 py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white font-bold text-sm rounded-xl transition-all flex items-center gap-2 whitespace-nowrap shadow-lg shadow-ea-green-900/30"
+                    className="px-6 py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white font-bold text-sm rounded-xl transition-all flex items-center gap-2 whitespace-nowrap shadow-lg shadow-ea-green-600/20"
                 >
                     Calculează Acum
                     <ArrowRight className="w-4 h-4" />

@@ -3,13 +3,20 @@
 @theme {
   --color-zinc-950: #09090b;
   --color-zinc-900: #18181b;
+  --color-ea-green-700: #15803d;
   --color-ea-green-600: #166534;
   --color-ea-green-500: #22c55e;
+  --color-ea-green-50: #f0fdf4;
   --color-ea-red-600: #dc2626;
 }
 
-/* Base Styles */
+/* Base Styles - Light Theme */
 body {
-  background-color: var(--color-zinc-950);
-  color: #fafafa;
+  background-color: #ffffff;
+  color: #18181b;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }

@@ -10,14 +10,14 @@ export const metadata: Metadata = {
 
 export default function BlogPage() {
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 pt-32 pb-24">
+        <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
             <div className="max-w-7xl mx-auto px-4">
                 {/* Header */}
                 <div className="text-center mb-16 space-y-4">
-                    <h1 className="text-5xl md:text-6xl font-black text-white uppercase tracking-tighter">
-                        Blog & <span className="text-ea-green-500">Resurse</span>
+                    <h1 className="text-5xl md:text-6xl font-black text-zinc-900 uppercase tracking-tighter">
+                        Blog & <span className="text-ea-green-600">Resurse</span>
                     </h1>
-                    <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
+                    <p className="text-zinc-500 max-w-2xl mx-auto text-lg">
                         Ghiduri tehnice, noutăți despre subvenții și strategii pentru creșterea eficienței în ferma ta.
                     </p>
                 </div>
@@ -28,7 +28,7 @@ export default function BlogPage() {
                         <Link
                             key={post.id}
                             href={`/blog/${post.slug}`}
-                            className="group bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 hover:border-ea-green-500/50 transition-all flex flex-col"
+                            className="group bg-white rounded-3xl overflow-hidden border border-zinc-200 hover:border-ea-green-300 transition-all flex flex-col shadow-sm hover:shadow-lg"
                         >
                             {/* Image */}
                             <div className="aspect-[16/9] overflow-hidden relative">
@@ -50,7 +50,7 @@ export default function BlogPage() {
                                     <Calendar className="w-3 h-3" />
                                     {new Date(post.date).toLocaleDateString('ro-RO')}
                                 </div>
-                                <h2 className="text-xl font-black text-white uppercase tracking-tight group-hover:text-ea-green-500 transition-colors">
+                                <h2 className="text-xl font-black text-zinc-900 uppercase tracking-tight group-hover:text-ea-green-600 transition-colors">
                                     {post.title}
                                 </h2>
                                 <p className="text-zinc-500 text-sm line-clamp-3">

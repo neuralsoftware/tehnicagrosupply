@@ -74,7 +74,7 @@ export default async function ProductPage({ params }: PageProps) {
     };
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 pt-20">
+        <main className="min-h-screen bg-white text-zinc-900 pt-20">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
@@ -94,10 +94,10 @@ export default async function ProductPage({ params }: PageProps) {
             <div className="max-w-7xl mx-auto px-4 py-16">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6">
-                        <h3 className="text-3xl font-black uppercase tracking-tight text-white">
-                            Solicită o ofertă pentru <span className="text-ea-green-500">{product.name}</span>
+                        <h3 className="text-3xl font-black uppercase tracking-tight text-zinc-900">
+                            Solicită o ofertă pentru <span className="text-ea-green-600">{product.name}</span>
                         </h3>
-                        <p className="text-zinc-400">
+                        <p className="text-zinc-500">
                             Completează formularul și un consultant TehnicAgro te va contacta pentru a discuta configurația ideală pentru ferma ta și opțiunile de finanțare disponibile.
                         </p>
                         <TrustSignals />

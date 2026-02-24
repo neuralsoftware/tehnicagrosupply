@@ -173,28 +173,28 @@ export function RoiCalculator() {
     };
 
     return (
-        <section id="audit" className="py-24 bg-zinc-950 relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ea-green-900 to-transparent" />
+        <section id="audit" className="py-24 bg-white relative overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ea-green-200 to-transparent" />
 
             <div className="max-w-5xl mx-auto px-4 relative z-10">
                 <div className="text-center mb-12 space-y-4">
-                    <span className="inline-block px-4 py-1 rounded-full bg-ea-green-900/40 border border-ea-green-700 text-ea-green-400 text-sm font-semibold uppercase tracking-wider">
+                    <span className="inline-block px-4 py-1 rounded-full bg-ea-green-50 border border-ea-green-200 text-ea-green-600 text-sm font-semibold uppercase tracking-wider">
                         Instrument Profesional de Diagnoză
                     </span>
-                    <h2 className="text-4xl md:text-5xl font-bold uppercase text-white leading-tight">
+                    <h2 className="text-4xl md:text-5xl font-bold uppercase text-zinc-900 leading-tight">
                         Audit de Eficiență Tehnologică
                     </h2>
-                    <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+                    <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
                         Analizăm impactul tehnologiilor No-Till și Conservatoare asupra rentabilității fermei tale în contextul noilor subvenții 2026.
                     </p>
                 </div>
 
-                <div className="bg-zinc-900 rounded-3xl border border-zinc-800 shadow-2xl p-6 md:p-12">
+                <div className="bg-zinc-50 rounded-3xl border border-zinc-200 shadow-xl p-6 md:p-12">
                     {/* Input Slider */}
                     <div className="mb-12 max-w-3xl mx-auto">
                         <label className="flex justify-between items-center mb-6">
-                            <span className="text-zinc-300 font-medium text-lg">Suprafață de Lucru (Hectare):</span>
-                            <span className="text-4xl font-black text-white bg-zinc-800 px-6 py-3 rounded-2xl border border-zinc-700 shadow-inner">
+                            <span className="text-zinc-700 font-medium text-lg">Suprafață de Lucru (Hectare):</span>
+                            <span className="text-4xl font-black text-zinc-900 bg-white px-6 py-3 rounded-2xl border border-zinc-200 shadow-sm">
                                 {hectares} ha
                             </span>
                         </label>
@@ -205,7 +205,7 @@ export function RoiCalculator() {
                             step="10"
                             value={hectares}
                             onChange={(e) => setHectares(Number(e.target.value))}
-                            className="w-full h-4 bg-zinc-800 rounded-xl appearance-none cursor-pointer accent-ea-green-500"
+                            className="w-full h-4 bg-zinc-200 rounded-xl appearance-none cursor-pointer accent-ea-green-600"
                         />
                         <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-600 mt-3 px-1 tracking-widest">
                             <span>10 ha</span>
@@ -218,24 +218,24 @@ export function RoiCalculator() {
 
                     {!submitted && (
                         <div className="grid md:grid-cols-3 gap-8 mb-12">
-                            <div className="bg-zinc-950/50 p-6 rounded-2xl border border-zinc-800/50 flex flex-col items-center text-center group hover:border-ea-green-900/50 transition-colors">
-                                <Banknote className="w-10 h-10 text-ea-green-500 mb-4 group-hover:scale-110 transition-transform" />
+                            <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center group hover:border-ea-green-300 transition-colors shadow-sm">
+                                <Banknote className="w-10 h-10 text-ea-green-600 mb-4 group-hover:scale-110 transition-transform" />
                                 <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Venit Securizat APIA</span>
-                                <span className="text-3xl font-bold text-white">
+                                <span className="text-3xl font-bold text-zinc-900">
                                     {subsidyIncome.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-zinc-500">RON</span>
                                 </span>
                             </div>
-                            <div className="bg-zinc-950/50 p-6 rounded-2xl border border-zinc-800/50 flex flex-col items-center text-center group hover:border-blue-900/50 transition-colors">
-                                <Droplets className="w-10 h-10 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
+                            <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center group hover:border-blue-300 transition-colors shadow-sm">
+                                <Droplets className="w-10 h-10 text-blue-600 mb-4 group-hover:scale-110 transition-transform" />
                                 <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Optimizare Costuri Input</span>
-                                <span className="text-3xl font-bold text-white">
+                                <span className="text-3xl font-bold text-zinc-900">
                                     {(fuelSavings + inputSavings).toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-zinc-500">RON</span>
                                 </span>
                             </div>
-                            <div className="bg-ea-green-950/20 p-6 rounded-2xl border border-ea-green-500/30 flex flex-col items-center text-center group border-dashed">
-                                <TrendingUp className="w-10 h-10 text-ea-green-400 mb-4 group-hover:scale-110 transition-transform" />
-                                <span className="text-ea-green-500/80 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Impact Profit Net / An</span>
-                                <span className="text-4xl font-black text-ea-green-400">
+                            <div className="bg-ea-green-50 p-6 rounded-2xl border border-ea-green-300 flex flex-col items-center text-center group border-dashed shadow-sm">
+                                <TrendingUp className="w-10 h-10 text-ea-green-600 mb-4 group-hover:scale-110 transition-transform" />
+                                <span className="text-ea-green-600 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Impact Profit Net / An</span>
+                                <span className="text-4xl font-black text-ea-green-600">
                                     {totalBenefit.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-ea-green-700">RON</span>
                                 </span>
                             </div>
@@ -244,7 +244,7 @@ export function RoiCalculator() {
 
 
                     {/* Action Area */}
-                    <div className="border-t border-zinc-800/50 pt-10">
+                    <div className="border-t border-zinc-200 pt-10">
                         {!showForm ? (
                             <div className="text-center">
                                 <motion.button
@@ -257,10 +257,10 @@ export function RoiCalculator() {
                                             (window as any).fbq('trackCustom', 'AuditStart');
                                         }
                                     }}
-                                    className="group relative inline-flex items-center gap-3 px-12 py-6 bg-white text-zinc-950 font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-zinc-100 transition-all overflow-hidden"
+                                    className="group relative inline-flex items-center gap-3 px-12 py-6 bg-ea-green-600 text-white font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-ea-green-500 transition-all overflow-hidden"
                                 >
-                                    <div className="absolute inset-0 bg-ea-green-500 opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                                    <Send className="w-6 h-6 text-ea-green-600" />
+                                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                                    <Send className="w-6 h-6 text-white" />
                                     <span>Primește Raportul Gratuit</span>
                                 </motion.button>
                                 <p className="mt-4 text-zinc-500 text-xs font-medium">
@@ -280,7 +280,7 @@ export function RoiCalculator() {
                                         onSubmit={handleDownloadReport}
                                         className="max-w-4xl mx-auto"
                                     >
-                                        <div className="bg-zinc-950/50 p-8 rounded-3xl border border-zinc-800">
+                                        <div className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
                                             {/* ESSENTIAL FIELDS - Just 2 required */}
                                             <div className="space-y-6 mb-8">
                                                 <div className="grid md:grid-cols-2 gap-6">
@@ -291,7 +291,7 @@ export function RoiCalculator() {
                                                             required
                                                             value={contact}
                                                             onChange={(e) => setContact(e.target.value)}
-                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
                                                             placeholder="Nume sau Fermă"
                                                         />
                                                     </div>
@@ -311,17 +311,17 @@ export function RoiCalculator() {
 
                                             {/* OPTIONAL DETAILS - Collapsible */}
                                             <details className="mb-8 group">
-                                                <summary className="cursor-pointer text-zinc-500 text-xs font-bold uppercase tracking-wider hover:text-zinc-300 transition-colors flex items-center gap-2">
+                                                <summary className="cursor-pointer text-zinc-500 text-xs font-bold uppercase tracking-wider hover:text-zinc-700 transition-colors flex items-center gap-2">
                                                     <span className="group-open:rotate-90 transition-transform">▶</span>
                                                     Adaugă detalii suplimentare (opțional)
                                                 </summary>
-                                                <div className="mt-4 grid md:grid-cols-2 gap-6 pl-4 border-l-2 border-zinc-800">
+                                                <div className="mt-4 grid md:grid-cols-2 gap-6 pl-4 border-l-2 border-zinc-200">
                                                     <div>
                                                         <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Județ</label>
                                                         <select
                                                             value={county}
                                                             onChange={(e) => setCounty(e.target.value)}
-                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
+                                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
                                                         >
                                                             <option value="">Selectați Județul</option>
                                                             {COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -347,7 +347,7 @@ export function RoiCalculator() {
                                                                     onClick={() => toggleCrop(crop)}
                                                                     className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all ${selectedCrops.includes(crop)
                                                                         ? 'bg-ea-green-600 border-ea-green-500 text-white shadow-lg'
-                                                                        : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                                                                        : 'bg-white border-zinc-200 text-zinc-500 hover:border-zinc-400'
                                                                         }`}
                                                                 >
                                                                     {crop}
@@ -369,14 +369,14 @@ export function RoiCalculator() {
                                                 </div>
                                             </details>
 
-                                            <div className="flex items-start gap-3 mb-6 bg-zinc-900/50 p-4 rounded-xl border border-zinc-800">
+                                            <div className="flex items-start gap-3 mb-6 bg-zinc-50 p-4 rounded-xl border border-zinc-200">
                                                 <input
                                                     type="checkbox"
                                                     id="gdpr-audit"
                                                     required
                                                     checked={gdprConsent}
                                                     onChange={(e) => setGdprConsent(e.target.checked)}
-                                                    className="mt-1 w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-ea-green-600 focus:ring-ea-green-500 cursor-pointer"
+                                                    className="mt-1 w-4 h-4 rounded border-zinc-300 bg-white text-ea-green-600 focus:ring-ea-green-500 cursor-pointer"
                                                 />
                                                 <label htmlFor="gdpr-audit" className="text-[11px] text-zinc-400 leading-snug cursor-pointer">
                                                     Sunt de acord cu prelucrarea datelor conform{' '}

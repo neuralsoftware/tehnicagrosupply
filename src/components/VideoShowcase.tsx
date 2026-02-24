@@ -48,7 +48,7 @@ export function VideoShowcase({ title, videoSrc, badge, ctaText, ctaHref }: Vide
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="relative rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800 group"
+            className="relative rounded-3xl overflow-hidden bg-white border border-zinc-200 shadow-sm group"
         >
             {badge && (
                 <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-ea-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">
@@ -100,7 +100,7 @@ export function VideoShowcase({ title, videoSrc, badge, ctaText, ctaHref }: Vide
             </div>
 
             {ctaText && ctaHref && (
-                <div className="p-4 bg-zinc-950">
+                <div className="p-4 bg-zinc-50">
                     <a
                         href={ctaHref}
                         className="block w-full py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center font-bold rounded-xl uppercase tracking-wide transition-all"

@@ -45,7 +45,7 @@ export default function Home() {
     };
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-ea-green-500 selection:text-white pt-16">
+        <main className="min-h-screen bg-white text-zinc-900 font-sans selection:bg-ea-green-500 selection:text-white pt-16">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -76,15 +76,15 @@ export default function Home() {
             <ExpertAuthority />
 
             {/* Partner Logos Section */}
-            <section className="py-12 bg-zinc-950 border-y border-zinc-900">
+            <section className="py-12 bg-zinc-50 border-y border-zinc-200">
                 <div className="max-w-5xl mx-auto px-4">
-                    <p className="text-center text-zinc-600 text-sm uppercase tracking-widest font-bold mb-8">
+                    <p className="text-center text-zinc-400 text-sm uppercase tracking-widest font-bold mb-8">
                         Producători Reprezentați
                     </p>
-                    <div className="flex items-center justify-center gap-16 flex-wrap opacity-80 hover:opacity-100 transition-opacity">
-                        <img src="/logos/brands/avers-agro.png" alt="Avers-Agro" className="h-12 object-contain invert brightness-90 hover:invert-0 hover:brightness-100 transition-all duration-300" />
-                        <img src="/logos/brands/fliegl.svg" alt="Fliegl Agrartechnik" className="h-9 object-contain invert brightness-90 hover:invert-0 hover:brightness-100 transition-all duration-300" />
-                        <img src="/logos/brands/k-factor.webp" alt="K-Factor Trailers" className="h-9 object-contain opacity-90 hover:opacity-100 transition-all duration-300" />
+                    <div className="flex items-center justify-center gap-16 flex-wrap opacity-70 hover:opacity-100 transition-opacity">
+                        <img src="/logos/brands/avers-agro.png" alt="Avers-Agro" className="h-12 object-contain transition-all duration-300" />
+                        <img src="/logos/brands/fliegl.svg" alt="Fliegl Agrartechnik" className="h-9 object-contain transition-all duration-300" />
+                        <img src="/logos/brands/k-factor.webp" alt="K-Factor Trailers" className="h-9 object-contain transition-all duration-300 brightness-0" />
                     </div>
                 </div>
             </section>

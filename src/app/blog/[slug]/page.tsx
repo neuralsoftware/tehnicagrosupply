@@ -64,7 +64,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     };
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 pt-32 pb-24">
+        <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
@@ -86,7 +86,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                             {post.category.replace('-', ' ')}
                         </span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-black text-white leading-tight uppercase tracking-tight">
+                    <h1 className="text-4xl md:text-5xl font-black text-zinc-900 leading-tight uppercase tracking-tight">
                         {post.title}
                     </h1>
                     <div className="flex flex-wrap items-center gap-6 text-zinc-500 text-sm">
@@ -102,7 +102,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 </header>
 
                 {/* Featured Image */}
-                <div className="aspect-video bg-zinc-900 rounded-3xl overflow-hidden mb-12 border border-zinc-800">
+                <div className="aspect-video bg-zinc-100 rounded-3xl overflow-hidden mb-12 border border-zinc-200">
                     <img
                         src={post.imageSrc}
                         alt={post.title}
@@ -112,23 +112,23 @@ export default async function BlogPostPage({ params }: PageProps) {
 
                 {/* Content */}
                 <article
-                    className="prose prose-invert prose-zinc max-w-none 
+                    className="prose prose-zinc max-w-none 
           prose-headings:uppercase prose-headings:font-black prose-headings:tracking-tight
           prose-h2:text-3xl prose-h2:border-l-4 prose-h2:border-ea-green-500 prose-h2:pl-6
-          prose-p:text-zinc-300 prose-p:leading-relaxed prose-p:text-lg
-          prose-strong:text-white prose-strong:font-bold
-          prose-ul:text-zinc-400 prose-li:mb-2"
+          prose-p:text-zinc-600 prose-p:leading-relaxed prose-p:text-lg
+          prose-strong:text-zinc-900 prose-strong:font-bold
+          prose-ul:text-zinc-600 prose-li:mb-2"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
                 {/* CTA Section */}
-                <div className="mt-24 p-12 bg-zinc-900 rounded-3xl border border-zinc-800 relative overflow-hidden">
+                <div className="mt-24 p-12 bg-zinc-50 rounded-3xl border border-zinc-200 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-ea-green-500 opacity-5 blur-3xl -mr-32 -mt-32"></div>
                     <div className="relative z-10 text-center space-y-8">
-                        <h2 className="text-3xl font-black text-white uppercase tracking-tight">
+                        <h2 className="text-3xl font-black text-zinc-900 uppercase tracking-tight">
                             Ai nevoie de consultanță tehnică?
                         </h2>
-                        <p className="text-zinc-400 max-w-2xl mx-auto">
+                        <p className="text-zinc-500 max-w-2xl mx-auto">
                             Suntem aici să te ajutăm să alegi utilajul potrivit pentru ferma ta și să navighezi prin labirintul subvențiilor.
                         </p>
                         <Contact />

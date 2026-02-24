@@ -32,7 +32,7 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
     }, [target]);
 
     return (
-        <span className="text-4xl font-black text-ea-green-400 tabular-nums">
+        <span className="text-4xl font-black text-ea-green-600 tabular-nums">
             {displayValue}{suffix}
         </span>
     );
@@ -74,18 +74,18 @@ function LiveActivityFeed() {
                     initial={{ opacity: 0, x: -50, scale: 0.9 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     exit={{ opacity: 0, x: -50 }}
-                    className="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 shadow-2xl"
+                    className="bg-white border border-zinc-200 rounded-2xl p-4 shadow-xl"
                 >
                     <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 bg-ea-green-600/20 rounded-full flex items-center justify-center shrink-0">
-                            <MapPin className="w-4 h-4 text-ea-green-500" />
+                        <div className="w-8 h-8 bg-ea-green-50 rounded-full flex items-center justify-center shrink-0">
+                            <MapPin className="w-4 h-4 text-ea-green-600" />
                         </div>
                         <div>
-                            <p className="text-sm text-white font-medium">
-                                Un fermier din <span className="text-ea-green-400 font-bold">{activity.county}</span>
+                            <p className="text-sm text-zinc-800 font-medium">
+                                Un fermier din <span className="text-ea-green-600 font-bold">{activity.county}</span>
                             </p>
-                            <p className="text-xs text-zinc-400 mt-0.5">{activity.message}</p>
-                            <p className="text-[10px] text-zinc-600 mt-1">acum câteva momente</p>
+                            <p className="text-xs text-zinc-500 mt-0.5">{activity.message}</p>
+                            <p className="text-[10px] text-zinc-400 mt-1">acum câteva momente</p>
                         </div>
                     </div>
                 </motion.div>
@@ -96,7 +96,7 @@ function LiveActivityFeed() {
 
 export function SocialProof() {
     return (
-        <section className="py-16 bg-zinc-900/50 border-y border-zinc-800">
+        <section className="py-16 bg-zinc-50 border-y border-zinc-200">
             <div className="max-w-5xl mx-auto px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -104,7 +104,7 @@ export function SocialProof() {
                     viewport={{ once: true }}
                     className="text-center mb-10"
                 >
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ea-green-900/30 border border-ea-green-800 text-ea-green-400 text-xs font-black uppercase tracking-[0.2em]">
+                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ea-green-50 border border-ea-green-200 text-ea-green-600 text-xs font-black uppercase tracking-[0.2em]">
                         <Zap className="w-3 h-3" />
                         De Ce Ne Aleg Fermierii
                     </span>
@@ -115,11 +115,11 @@ export function SocialProof() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center p-6 bg-zinc-950/50 rounded-2xl border border-zinc-800"
+                        className="text-center p-6 bg-white rounded-2xl border border-zinc-200 shadow-sm"
                     >
-                        <Users className="w-8 h-8 text-ea-green-500 mx-auto mb-3" />
-                        <span className="text-4xl font-black text-ea-green-400">56</span>
-                        <span className="text-xl font-black text-ea-green-600"> EUR/ha</span>
+                        <Users className="w-8 h-8 text-ea-green-600 mx-auto mb-3" />
+                        <span className="text-4xl font-black text-ea-green-600">56</span>
+                        <span className="text-xl font-black text-ea-green-700"> EUR/ha</span>
                         <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Subvenție APIA PD-04</p>
                     </motion.div>
 
@@ -128,11 +128,11 @@ export function SocialProof() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="text-center p-6 bg-zinc-950/50 rounded-2xl border border-zinc-800"
+                        className="text-center p-6 bg-white rounded-2xl border border-zinc-200 shadow-sm"
                     >
-                        <TrendingUp className="w-8 h-8 text-blue-500 mx-auto mb-3" />
-                        <span className="text-4xl font-black text-blue-400">-40L</span>
-                        <span className="text-xl font-black text-blue-600"> /ha</span>
+                        <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+                        <span className="text-4xl font-black text-blue-600">-40L</span>
+                        <span className="text-xl font-black text-blue-700"> /ha</span>
                         <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Economie Motorină</p>
                     </motion.div>
 
@@ -141,10 +141,10 @@ export function SocialProof() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="text-center p-6 bg-ea-green-950/20 rounded-2xl border border-ea-green-700/30"
+                        className="text-center p-6 bg-white rounded-2xl border border-ea-green-200 shadow-sm"
                     >
-                        <MapPin className="w-8 h-8 text-ea-green-500 mx-auto mb-3" />
-                        <span className="text-4xl font-black text-ea-green-400">100%</span>
+                        <MapPin className="w-8 h-8 text-ea-green-600 mx-auto mb-3" />
+                        <span className="text-4xl font-black text-ea-green-600">100%</span>
                         <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Eligibil GAEC 6</p>
                     </motion.div>
                 </div>

@@ -56,9 +56,9 @@ export function CookieConsent() {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6 bg-zinc-900/95 backdrop-blur-md border-t border-zinc-800 shadow-2xl">
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:p-6 bg-white/95 backdrop-blur-md border-t border-zinc-200 shadow-2xl">
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="text-sm text-zinc-300 text-center md:text-left">
+                <div className="text-sm text-zinc-600 text-center md:text-left">
                     <p>
                         Folosim cookie-uri pentru a îmbunătăți experiența de utilizare și pentru a analiza traficul.
                         Prin continuarea navigării, ești de acord cu modul nostru de utilizare a acestora.

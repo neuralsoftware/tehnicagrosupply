@@ -58,6 +58,7 @@ export const LeadsService = {
                 subsidy_income: lead.subsidyIncome || 0,
                 fuel_savings: lead.fuelSavings || 0,
                 total_benefit: lead.totalBenefit || 0,
+                notes: lead.notes || '',
                 status: 'new'
             }])
             .select()

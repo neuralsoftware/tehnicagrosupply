@@ -36,10 +36,7 @@ export function ExpertAuthority() {
     ];
 
     return (
-        <section className="py-24 bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 relative overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(22,101,52,0.15),transparent_50%)]"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(22,101,52,0.1),transparent_50%)]"></div>
+        <section className="py-24 bg-zinc-50 relative overflow-hidden border-y border-zinc-200">
 
             <div className="max-w-7xl mx-auto px-4 relative z-10">
                 {/* Header */}
@@ -50,15 +47,15 @@ export function ExpertAuthority() {
                         viewport={{ once: true }}
                         className="space-y-4"
                     >
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-ea-green-900/40 border border-ea-green-700 text-ea-green-400 text-xs font-black uppercase tracking-[0.2em]">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-ea-green-50 border border-ea-green-200 text-ea-green-700 text-xs font-black uppercase tracking-[0.2em]">
                             De Ce TehnicAgro?
                         </span>
-                        <h2 className="text-4xl md:text-5xl font-black uppercase text-white leading-tight">
+                        <h2 className="text-4xl md:text-5xl font-black uppercase text-zinc-900 leading-tight">
                             Soluții Validate.<br />
-                            <span className="text-ea-green-500">Rezultate Imediate.</span>
+                            <span className="text-ea-green-600">Rezultate Imediate.</span>
                         </h2>
-                        <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-                            Combinăm <span className="text-white font-semibold">utilaje de ultimă generație</span> cu
+                        <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
+                            Combinăm <span className="text-zinc-900 font-semibold">utilaje de ultimă generație</span> cu
                             prețuri competitive și determinarea de a demonstra valoare din prima colaborare.
                         </p>
                     </motion.div>
@@ -73,15 +70,15 @@ export function ExpertAuthority() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-zinc-900/50 backdrop-blur-sm p-6 rounded-2xl border border-zinc-800 hover:border-ea-green-900/50 transition-all group"
+                            className="bg-white p-6 rounded-2xl border border-zinc-200 hover:border-ea-green-300 transition-all group shadow-sm hover:shadow-md"
                         >
-                            <div className="w-12 h-12 bg-ea-green-600/10 rounded-xl flex items-center justify-center text-ea-green-500 mb-4 group-hover:bg-ea-green-600/20 transition-colors">
+                            <div className="w-12 h-12 bg-ea-green-50 rounded-xl flex items-center justify-center text-ea-green-600 mb-4 group-hover:bg-ea-green-100 transition-colors">
                                 {adv.icon}
                             </div>
-                            <h3 className="text-lg font-bold text-white mb-2 uppercase tracking-tight">
+                            <h3 className="text-lg font-bold text-zinc-900 mb-2 uppercase tracking-tight">
                                 {adv.title}
                             </h3>
-                            <p className="text-zinc-400 text-sm leading-relaxed">
+                            <p className="text-zinc-500 text-sm leading-relaxed">
                                 {adv.description}
                             </p>
                         </motion.div>
@@ -93,24 +90,24 @@ export function ExpertAuthority() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    className="bg-gradient-to-r from-ea-green-900/30 via-ea-green-800/20 to-ea-green-900/30 rounded-3xl border border-ea-green-700/30 p-8 md:p-12"
+                    className="bg-white rounded-3xl border border-zinc-200 p-8 md:p-12 shadow-lg"
                 >
                     <div className="flex flex-col lg:flex-row items-center gap-12">
                         {/* Left - Promise */}
                         <div className="flex-1 space-y-6">
-                            <h3 className="text-3xl font-black text-white uppercase tracking-tight">
+                            <h3 className="text-3xl font-black text-zinc-900 uppercase tracking-tight">
                                 Promisiunea Noastră
                             </h3>
-                            <p className="text-zinc-300 text-lg leading-relaxed">
-                                Suntem noi pe piață și știm că trebuie să ne <span className="text-ea-green-400 font-bold">demonstrăm valoarea</span>.
+                            <p className="text-zinc-600 text-lg leading-relaxed">
+                                Suntem noi pe piață și știm că trebuie să ne <span className="text-ea-green-600 font-bold">demonstrăm valoarea</span>.
                                 De aceea oferim suport tehnic complet, prețuri transparente și niciun cost ascuns.
                                 Succesul fermei tale este cea mai bună reclamă pentru noi.
                             </p>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {guarantees.map((guarantee, index) => (
-                                    <div key={index} className="flex items-center gap-2 text-zinc-300">
-                                        <CheckCircle2 className="w-5 h-5 text-ea-green-500 shrink-0" />
+                                    <div key={index} className="flex items-center gap-2 text-zinc-700">
+                                        <CheckCircle2 className="w-5 h-5 text-ea-green-600 shrink-0" />
                                         <span className="text-sm font-medium">{guarantee}</span>
                                     </div>
                                 ))}
@@ -119,15 +116,15 @@ export function ExpertAuthority() {
 
                         {/* Right - Key Numbers */}
                         <div className="lg:w-80 space-y-4">
-                            <div className="bg-zinc-950/80 rounded-2xl p-6 border border-zinc-800">
+                            <div className="bg-ea-green-50 rounded-2xl p-6 border border-ea-green-200">
                                 <div className="text-center space-y-1">
-                                    <span className="block text-5xl font-black text-ea-green-400">56€</span>
+                                    <span className="block text-5xl font-black text-ea-green-700">56€</span>
                                     <span className="block text-sm text-zinc-500 uppercase tracking-wider font-bold">Subvenție APIA / Hectar</span>
                                 </div>
                             </div>
-                            <div className="bg-zinc-950/80 rounded-2xl p-6 border border-zinc-800">
+                            <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
                                 <div className="text-center space-y-1">
-                                    <span className="block text-5xl font-black text-blue-400">320 RON</span>
+                                    <span className="block text-5xl font-black text-blue-700">320 RON</span>
                                     <span className="block text-sm text-zinc-500 uppercase tracking-wider font-bold">Economie Motorină / Hectar</span>
                                 </div>
                             </div>
@@ -135,7 +132,7 @@ export function ExpertAuthority() {
                                 onClick={() => {
                                     document.getElementById('audit')?.scrollIntoView({ behavior: 'smooth' });
                                 }}
-                                className="w-full py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center font-black rounded-xl uppercase tracking-wide transition-all shadow-lg shadow-ea-green-900/30 flex items-center justify-center gap-2"
+                                className="w-full py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center font-black rounded-xl uppercase tracking-wide transition-all shadow-lg shadow-ea-green-600/20 flex items-center justify-center gap-2"
                             >
                                 Calculează-ți Beneficiul
                                 <ArrowRight className="w-5 h-5" />

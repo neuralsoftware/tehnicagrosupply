@@ -42,15 +42,15 @@ export function Navbar() {
         <nav className={cn(
             "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
             isScrolled
-                ? "bg-zinc-950/90 backdrop-blur-md border-zinc-800 py-3"
-                : "bg-transparent border-transparent py-5"
+                ? "bg-white/95 backdrop-blur-md border-zinc-200 py-3 shadow-sm"
+                : "bg-white/80 backdrop-blur-sm border-transparent py-5"
         )}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2">
-                        <span className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">
-                            Tehnic<span className="text-ea-green-500">Agro</span>
+                        <span className="text-xl md:text-2xl font-black text-zinc-900 uppercase tracking-tighter">
+                            Tehnic<span className="text-ea-green-600">Agro</span>
                         </span>
                     </Link>
 
@@ -60,19 +60,19 @@ export function Navbar() {
                             <div key={link.name} className="relative group">
                                 <Link
                                     href={link.href}
-                                    className="text-zinc-400 hover:text-white text-sm font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
+                                    className="text-zinc-600 hover:text-ea-green-600 text-sm font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
                                 >
                                     {link.name}
                                     {link.children && <ChevronDown className="w-4 h-4" />}
                                 </Link>
 
                                 {link.children && (
-                                    <div className="absolute top-full left-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
+                                    <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-zinc-200 rounded-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0 shadow-lg">
                                         {link.children.map((child) => (
                                             <Link
                                                 key={child.name}
                                                 href={child.href}
-                                                className="block px-4 py-3 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                                                className="block px-4 py-3 text-sm text-zinc-600 hover:text-ea-green-600 hover:bg-ea-green-50 transition-colors"
                                             >
                                                 {child.name}
                                             </Link>
@@ -95,7 +95,7 @@ export function Navbar() {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="text-zinc-400 hover:text-white p-2"
+                            className="text-zinc-600 hover:text-zinc-900 p-2"
                         >
                             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
@@ -105,7 +105,7 @@ export function Navbar() {
 
             {/* Mobile Nav */}
             <div className={cn(
-                "md:hidden absolute top-full left-0 right-0 bg-zinc-950 border-b border-zinc-800 transition-all duration-300 overflow-hidden",
+                "md:hidden absolute top-full left-0 right-0 bg-white border-b border-zinc-200 transition-all duration-300 overflow-hidden shadow-lg",
                 isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
             )}>
                 <div className="px-4 pt-2 pb-6 flex flex-col gap-4">
@@ -114,18 +114,18 @@ export function Navbar() {
                             <Link
                                 href={link.href}
                                 onClick={() => setIsOpen(false)}
-                                className="text-zinc-100 text-lg font-bold uppercase tracking-widest block py-2"
+                                className="text-zinc-900 text-lg font-bold uppercase tracking-widest block py-2"
                             >
                                 {link.name}
                             </Link>
                             {link.children && (
-                                <div className="pl-4 mt-2 flex flex-col gap-2 border-l border-zinc-800">
+                                <div className="pl-4 mt-2 flex flex-col gap-2 border-l border-zinc-200">
                                     {link.children.map((child) => (
                                         <Link
                                             key={child.name}
                                             href={child.href}
                                             onClick={() => setIsOpen(false)}
-                                            className="text-zinc-500 hover:text-ea-green-500 transition-colors"
+                                            className="text-zinc-500 hover:text-ea-green-600 transition-colors"
                                         >
                                             {child.name}
                                         </Link>
