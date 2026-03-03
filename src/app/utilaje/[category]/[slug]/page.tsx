@@ -1,11 +1,13 @@
 import { PRODUCTS } from '@/data/products';
+import { getPublishedPosts } from '@/data/blog';
 import { notFound } from 'next/navigation';
 import { ProductSection } from '@/components/ProductSection';
 import { Contact } from '@/components/Contact';
 import { TrustSignals } from '@/components/TrustSignals';
 import { ExpertAuthority } from '@/components/ExpertAuthority';
 import { Metadata } from 'next';
-
+import Link from 'next/link';
+import { ArrowRight, BookOpen } from 'lucide-react';
 // Keyword sets per product slug — targetate pe intenție de cumpărare
 const PRODUCT_KEYWORDS: Record<string, string[]> = {
     'chain-disc-kse-680': [
@@ -88,6 +90,16 @@ export default async function ProductPage({ params }: PageProps) {
         notFound();
     }
 
+    const allPosts = getPublishedPosts();
+    // Găsește 3 articole care includ numele sau brandul utilajului în conținut sau titlu. 
+    // Dacă nu găsim, afișăm pur și simplu cele mai noi 3 articole.
+    const exactMatches = allPosts.filter(post =>
+        post.content.toLowerCase().includes(product.name.toLowerCase()) ||
+        post.content.toLowerCase().includes(product.brand.toLowerCase()) ||
+        post.title.toLowerCase().includes(product.name.toLowerCase())
+    );
+    const postsToShow = exactMatches.length > 0 ? exactMatches.slice(0, 3) : allPosts.slice(0, 3);
+
     // Schema.org Product Metadata
     const productSchema = {
         "@context": "https://schema.org",
@@ -128,7 +140,7 @@ export default async function ProductPage({ params }: PageProps) {
                 ctaLabel="Solicită Ofertă Tehnică"
             />
 
-            <div className="max-w-7xl mx-auto px-4 py-16">
+            <div className="max-w-7xl mx-auto px-4 py-16 border-t border-zinc-100">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6">
                         <h3 className="text-3xl font-black uppercase tracking-tight text-zinc-900">
@@ -142,6 +154,46 @@ export default async function ProductPage({ params }: PageProps) {
                     <Contact />
                 </div>
             </div>
+
+            {postsToShow.length > 0 && (
+                <section className="py-24 bg-zinc-50 border-t border-zinc-200">
+                    <div className="max-w-7xl mx-auto px-4">
+                        <div className="flex items-center gap-4 mb-12">
+                            <div className="w-12 h-12 bg-ea-green-100 rounded-2xl flex items-center justify-center">
+                                <BookOpen className="w-6 h-6 text-ea-green-600" />
+                            </div>
+                            <div>
+                                <h2 className="text-3xl font-black uppercase text-zinc-900 tracking-tight">
+                                    Resurse & Articole Relevante
+                                </h2>
+                                <p className="text-zinc-500 text-sm mt-1">
+                                    Informații tehnice, ghiduri APIA și studii de caz pentru {product.brand}.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {postsToShow.map(post => (
+                                <Link key={post.id} href={`/blog/${post.slug}`} className="group flex flex-col h-full bg-white rounded-3xl p-8 border border-zinc-200 shadow-sm hover:shadow-2xl hover:-translate-y-1 hover:border-ea-green-300 transition-all duration-300">
+                                    <div className="mb-6 flex-grow">
+                                        <span className="text-[10px] font-black uppercase text-ea-green-600 tracking-widest bg-ea-green-50 px-4 py-1.5 rounded-full inline-block mb-4">
+                                            {post.category.replace('-', ' ')}
+                                        </span>
+                                        <h3 className="text-xl font-bold text-zinc-900 mb-4 group-hover:text-ea-green-600 transition-colors line-clamp-2 leading-tight">
+                                            {post.title}
+                                        </h3>
+                                        <p className="text-sm text-zinc-500 line-clamp-3 leading-relaxed">
+                                            {post.excerpt}
+                                        </p>
+                                    </div>
+                                    <div className="pt-6 border-t border-zinc-100 flex items-center text-xs font-black text-ea-green-600 uppercase tracking-widest group-hover:translate-x-2 transition-transform mt-auto">
+                                        Citește Articolul <ArrowRight className="w-4 h-4 ml-2" />
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             <ExpertAuthority />
         </main>

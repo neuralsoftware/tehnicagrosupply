@@ -216,7 +216,52 @@ export function RoiCalculator() {
                         </div>
                     </div>
 
-                    {!submitted && (
+                    {/* Results Block - Hidden/Teaser until submitted */}
+                    {!submitted ? (
+                        <div className="mb-12 relative">
+                            {/* Blurry teaser overlay */}
+                            <div className="grid md:grid-cols-3 gap-8 filter blur-sm opacity-50 select-none pointer-events-none">
+                                <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center shadow-sm">
+                                    <Banknote className="w-10 h-10 text-ea-green-600 mb-4" />
+                                    <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Venit Securizat APIA</span>
+                                    <span className="text-3xl font-bold text-zinc-900">??? RON</span>
+                                </div>
+                                <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center shadow-sm">
+                                    <Droplets className="w-10 h-10 text-blue-600 mb-4" />
+                                    <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Optimizare Costuri</span>
+                                    <span className="text-3xl font-bold text-zinc-900">??? RON</span>
+                                </div>
+                                <div className="bg-ea-green-50 p-6 rounded-2xl border border-ea-green-300 flex flex-col items-center text-center shadow-sm">
+                                    <TrendingUp className="w-10 h-10 text-ea-green-600 mb-4" />
+                                    <span className="text-ea-green-600 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Impact Profit Net</span>
+                                    <span className="text-4xl font-black text-ea-green-600">??? RON</span>
+                                </div>
+                            </div>
+
+                            {/* CTA to unlock */}
+                            {!showForm && (
+                                <div className="absolute inset-0 flex items-center justify-center z-10 bg-white/40 rounded-2xl">
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => {
+                                            setShowForm(true);
+                                            if (typeof window !== 'undefined' && (window as any).fbq) {
+                                                (window as any).fbq('trackCustom', 'AuditStart');
+                                            }
+                                        }}
+                                        className="group relative inline-flex items-center gap-3 px-8 mx-4 py-5 bg-ea-green-600 text-white font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-ea-green-500 transition-all overflow-hidden"
+                                    >
+                                        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                                        <span className="relative z-10 flex items-center gap-2">
+                                            <Calculator className="w-5 h-5" />
+                                            Află Rezultatul pentru {hectares} ha
+                                        </span>
+                                    </motion.button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
                         <div className="grid md:grid-cols-3 gap-8 mb-12">
                             <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center group hover:border-ea-green-300 transition-colors shadow-sm">
                                 <Banknote className="w-10 h-10 text-ea-green-600 mb-4 group-hover:scale-110 transition-transform" />
@@ -243,32 +288,11 @@ export function RoiCalculator() {
                     )}
 
 
+
                     {/* Action Area */}
                     <div className="border-t border-zinc-200 pt-10">
                         {!showForm ? (
-                            <div className="text-center">
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => {
-                                        setShowForm(true);
-                                        // Track view start
-                                        if (typeof window !== 'undefined' && (window as any).fbq) {
-                                            (window as any).fbq('trackCustom', 'AuditStart');
-                                        }
-                                    }}
-                                    className="group relative inline-flex items-center gap-3 px-12 py-6 bg-ea-green-600 text-white font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-ea-green-500 transition-all overflow-hidden"
-                                >
-                                    <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                                    <Send className="w-6 h-6 text-white" />
-                                    <span>Primește Raportul Gratuit</span>
-                                </motion.button>
-                                <p className="mt-4 text-zinc-500 text-xs font-medium">
-                                    ✔ Doar 2 câmpuri • Fără obligații • Rezultat instant
-                                </p>
-                                <p className="mt-2 text-zinc-600 text-xs">
-                                    Parametrii calculați conform normativelor APIA PD-04 și GAEC 6.
-                                </p>
+                            <div className="text-center text-zinc-500 text-sm">
                             </div>
                         ) : (
                             <AnimatePresence mode="wait">
@@ -281,7 +305,12 @@ export function RoiCalculator() {
                                         className="max-w-4xl mx-auto"
                                     >
                                         <div className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
-                                            {/* ESSENTIAL FIELDS - Just 2 required */}
+                                            <div className="text-center mb-6">
+                                                <h3 className="text-xl font-bold text-zinc-900 mb-2">Completare Date pentru Generare</h3>
+                                                <p className="text-zinc-500 text-sm">Pentru a genera analiza financiară precisă pe {hectares} hectare, te rugăm să introduci datele de mai jos.</p>
+                                            </div>
+
+                                            {/* ESSENTIAL FIELDS */}
                                             <div className="space-y-6 mb-8">
                                                 <div className="grid md:grid-cols-2 gap-6">
                                                     <div>
@@ -292,19 +321,43 @@ export function RoiCalculator() {
                                                             value={contact}
                                                             onChange={(e) => setContact(e.target.value)}
                                                             className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
-                                                            placeholder="Nume sau Fermă"
+                                                            placeholder="Numele tău sau denumirea fermei"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Telefon (WhatsApp) *</label>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Adresă de E-mail *</label>
+                                                        <input
+                                                            type="email"
+                                                            required
+                                                            value={email}
+                                                            onChange={(e) => setEmail(e.target.value)}
+                                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            placeholder="adresa@email.ro"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="grid md:grid-cols-2 gap-6">
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Telefon (Opțional)</label>
                                                         <input
                                                             type="tel"
-                                                            required
                                                             value={phone}
                                                             onChange={(e) => setPhone(e.target.value)}
-                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
                                                             placeholder="07xx xxx xxx"
                                                         />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Județ *</label>
+                                                        <select
+                                                            required
+                                                            value={county}
+                                                            onChange={(e) => setCounty(e.target.value)}
+                                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
+                                                        >
+                                                            <option value="">Selectează județul fermei</option>
+                                                            {COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
@@ -313,40 +366,19 @@ export function RoiCalculator() {
                                             <details className="mb-8 group">
                                                 <summary className="cursor-pointer text-zinc-500 text-xs font-bold uppercase tracking-wider hover:text-zinc-700 transition-colors flex items-center gap-2">
                                                     <span className="group-open:rotate-90 transition-transform">▶</span>
-                                                    Adaugă detalii suplimentare (opțional)
+                                                    Specificul Fermei (Opțional - pentru acuratețe maximă)
                                                 </summary>
                                                 <div className="mt-4 grid md:grid-cols-2 gap-6 pl-4 border-l-2 border-zinc-200">
                                                     <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Județ</label>
-                                                        <select
-                                                            value={county}
-                                                            onChange={(e) => setCounty(e.target.value)}
-                                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
-                                                        >
-                                                            <option value="">Selectați Județul</option>
-                                                            {COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
-                                                        </select>
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Email (pentru raport PDF)</label>
-                                                        <input
-                                                            type="email"
-                                                            value={email}
-                                                            onChange={(e) => setEmail(e.target.value)}
-                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
-                                                            placeholder="nume@ferma.ro"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Culturi</label>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Culturi Principale</label>
                                                         <div className="flex flex-wrap gap-2">
                                                             {CROPS.map(crop => (
                                                                 <button
                                                                     key={crop}
                                                                     type="button"
                                                                     onClick={() => toggleCrop(crop)}
-                                                                    className={`px-4 py-2 rounded-lg text-xs font-bold border transition-all ${selectedCrops.includes(crop)
-                                                                        ? 'bg-ea-green-600 border-ea-green-500 text-white shadow-lg'
+                                                                    className={`px-3 py-2 rounded-lg text-[10px] uppercase font-bold border transition-all ${selectedCrops.includes(crop)
+                                                                        ? 'bg-ea-green-600 border-ea-green-500 text-white shadow-md'
                                                                         : 'bg-white border-zinc-200 text-zinc-500 hover:border-zinc-400'
                                                                         }`}
                                                                 >
@@ -360,7 +392,7 @@ export function RoiCalculator() {
                                                         <select
                                                             value={urgency}
                                                             onChange={(e) => setUrgency(e.target.value)}
-                                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
+                                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none appearance-none"
                                                         >
                                                             <option value="">Alegeți perioada vizată</option>
                                                             {URGENCY_OPTIONS.map(opt => <option key={opt.id} value={opt.id}>{opt.label}</option>)}
@@ -380,7 +412,7 @@ export function RoiCalculator() {
                                                 />
                                                 <label htmlFor="gdpr-audit" className="text-[11px] text-zinc-400 leading-snug cursor-pointer">
                                                     Sunt de acord cu prelucrarea datelor conform{' '}
-                                                    <a href="/privacy-policy" target="_blank" className="text-ea-green-500 hover:underline font-bold">
+                                                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-ea-green-500 hover:underline font-bold">
                                                         Politicii de Confidențialitate
                                                     </a>.
                                                 </label>
@@ -499,8 +531,8 @@ export function RoiCalculator() {
                                                                 <div>
                                                                     <p className="text-xs font-black uppercase text-zinc-400 mb-1">Resurse Utile APIA</p>
                                                                     <p className="text-xs font-bold text-zinc-600 leading-snug">
-                                                                        Consultă <a href="https://apia.org.ro/wp-content/uploads/2023/04/Ghid-informativ-PD-04.pdf" target="_blank" className="text-ea-green-600 underline">Ghidul Solicitantului</a> și
-                                                                        asigură-te că deții <a href="https://apia.org.ro/categorii-documente/modele-caiete-pentru-eco-schemele-din-sectorul-vegetal/" target="_blank" className="text-ea-green-600 underline">Modelele de Caiete</a> necesare pentru audit.
+                                                                        Consultă <a href="https://apia.org.ro/wp-content/uploads/2023/04/Ghid-informativ-PD-04.pdf" target="_blank" rel="noopener noreferrer" className="text-ea-green-600 underline">Ghidul Solicitantului</a> și
+                                                                        asigură-te că deții <a href="https://apia.org.ro/categorii-documente/modele-caiete-pentru-eco-schemele-din-sectorul-vegetal/" target="_blank" rel="noopener noreferrer" className="text-ea-green-600 underline">Modelele de Caiete</a> necesare pentru audit.
                                                                     </p>
                                                                 </div>
                                                             </li>
