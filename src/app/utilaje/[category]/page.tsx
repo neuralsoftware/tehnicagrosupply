@@ -2,6 +2,7 @@ import { PRODUCTS } from '@/data/products';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 
 interface PageProps {
     params: Promise<{
@@ -15,6 +16,49 @@ const CATEGORY_NAMES: Record<string, string> = {
     'protectia-plantelor': 'Protecția Plantelor',
     'recoltare-logistica': 'Recoltare & Logistică',
 };
+
+const CATEGORY_SEO: Record<string, { title: string; description: string; keywords: string[] }> = {
+    'pregatire-sol': {
+        title: 'Utilaje Pregătire Sol Agricol | Grape, Chain Disc | TehnicAgro Supply',
+        description: 'Utilaje pentru pregătirea solului conform GAEC 6, no-till și minitill. Fliegl Chain Disc KSE 680 — 6.8m lățime, 12 ha/oră, eligibil DR-12. Prețuri și oferte personalizate.',
+        keywords: ['utilaje pregatire sol', 'grapa cu lanturi', 'fliegl chain disc', 'grape agricole pret', 'gaec 6 utilaje', 'disc chain no-till', 'pregatire sol conservativa'],
+    },
+    'semanat-fertilizat': {
+        title: 'Semănătoare No-Till & Fertilizat | Avers-Agro | TehnicAgro Supply',
+        description: 'Semănători directe No-Till eligibile APIA PD-04. Avers-Agro Green Plains ADS — 190 kg presiune brăzdar, suspensie paralelogram. Calculează subvenția fermei tale.',
+        keywords: ['semanatoare no-till', 'semanatoare directa', 'avers agro green plains', 'semanatoare apia pd-04', 'semanatoare no-till pret', 'semanatoare directa romania'],
+    },
+    'protectia-plantelor': {
+        title: 'Utilaje Protecția Plantelor Agricole | TehnicAgro Supply',
+        description: 'Soluții complete pentru protecția plantelor: erbicide aplicate, fertilizare foliară, pesticide. Utilaje eligibile DR-12 PNDR 2026. Solicită ofertă.',
+        keywords: ['utilaje protectia plantelor', 'masini aplicat pesticide', 'sprayer agricol romania', 'atomizor agricol pret'],
+    },
+    'recoltare-logistica': {
+        title: 'Remorci & Utilaje Logistică Agricolă | K-Factor | TehnicAgro Supply',
+        description: 'Remorci de transbordare cereale K-Factor Powerbank & Booster. Eficientizează recoltarea, reduce pierderile și costurile de transport. Eligibile DR-12.',
+        keywords: ['remorca transbordare cereale', 'k-factor powerbank', 'remorca agricola cereale', 'logistica recoltare romania', 'remorca cereale pret'],
+    },
+};
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { category } = await params;
+    const seo = CATEGORY_SEO[category];
+    if (!seo) return {};
+    return {
+        title: seo.title,
+        description: seo.description,
+        keywords: seo.keywords,
+        alternates: {
+            canonical: `https://tehnicagrosupply.ro/utilaje/${category}`,
+        },
+        openGraph: {
+            title: seo.title,
+            description: seo.description,
+            locale: 'ro_RO',
+            type: 'website',
+        },
+    };
+}
 
 export async function generateStaticParams() {
     return Object.keys(CATEGORY_NAMES).map((category) => ({

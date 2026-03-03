@@ -6,25 +6,62 @@ import { TrustSignals } from '@/components/TrustSignals';
 import { ExpertAuthority } from '@/components/ExpertAuthority';
 import { Metadata } from 'next';
 
+// Keyword sets per product slug — targetate pe intenție de cumpărare
+const PRODUCT_KEYWORDS: Record<string, string[]> = {
+    'chain-disc-kse-680': [
+        'fliegl chain disc kse 680', 'grapa cu lanturi', 'grapa fliegl pret romania',
+        'utilaje pregatire sol gaec 6', 'disc chain fliegl', 'grapa discuri no-till',
+        'conform gaec 6 2026', 'utilaje agricole fliegl'
+    ],
+    'green-plains-ads': [
+        'avers agro green plains ads', 'semanatoare no-till', 'semanatoare directa pret',
+        'semanatoare no-till romania', 'avers agro pret', 'semanatoare apia pd-04',
+        'semanat direct miristeа', 'semanatoare conservativa'
+    ],
+    'powerbank': [
+        'k-factor powerbank', 'remorca transbordare cereale', 'k factor trailer romania',
+        'remorca agricola cereale', 'remorca cereale pret'
+    ],
+    'booster': [
+        'k-factor booster', 'remorca booster agricola', 'k factor booster pret',
+        'remorca transport cereale romania'
+    ],
+};
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { category, slug } = await params;
     const product = PRODUCTS.find(p => p.slug === slug && p.category === category);
 
     if (!product) return {};
 
+    const keywords = PRODUCT_KEYWORDS[slug] || [
+        product.brand.toLowerCase(), product.name.toLowerCase(), 'utilaje agricole romania',
+        'tehnicagro supply'
+    ];
+
+    const seoTitle = `${product.brand} ${product.name} — Pret & Detalii Tehnice | TehnicAgro Supply`;
+    const seoDesc = `${product.description} Eligibil finanțare DR-12 și eco-scheme APIA. Solicită ofertă personalizată de la TehnicAgro Supply.`;
+    const absImage = `https://tehnicagrosupply.ro${product.imageSrc}`;
+
     return {
-        title: `${product.brand} ${product.name} | TehnicAgro Supply`,
-        description: product.description,
+        title: seoTitle,
+        description: seoDesc,
+        keywords,
+        alternates: {
+            canonical: `https://tehnicagrosupply.ro/utilaje/${category}/${slug}`,
+        },
         openGraph: {
-            title: `${product.brand} ${product.name} - Eficiență în Fermă`,
-            description: product.description,
-            images: [product.imageSrc],
+            title: `${product.brand} ${product.name} - ${product.badge || 'Utilaj Agricol'} | TehnicAgro`,
+            description: seoDesc,
+            images: [{ url: absImage, width: 1200, height: 630, alt: product.name }],
+            type: 'website',
+            locale: 'ro_RO',
         },
         twitter: {
             card: 'summary_large_image',
-            title: product.name,
-            description: product.description,
-            images: [product.imageSrc],
+            title: seoTitle,
+            description: seoDesc,
+            images: [absImage],
         }
     };
 }

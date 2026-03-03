@@ -4,9 +4,18 @@ import { Settings, Wrench, ShieldCheck } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: "Piese de Schimb Utilaje Agricole | John Deere, Lemken, Amazone | TehnicAgro",
-    description: "Căutați piese de schimb pentru utilaje agricole? Oferim piese originale și aftermarket pentru John Deere, Case IH, Lemken, Amazone și multe altele. Livrare rapidă prin Kramp.",
-    keywords: ["piese schimb utilaje agricole", "piese john deere", "piese lemken", "piese amazone", "piese kramp romania", "mentenanta utilaje agricole", "piese tractor", "piese semanatoare"],
+    title: "Piese de Schimb Utilaje Agricole | Brăzdare, Discuri, El. Semănătoare | TehnicAgro",
+    description: "Piese de schimb pentru semănători No-Till Avers-Agro, grape Fliegl și utilaje multimarcă (John Deere, Lemken, Amazone). Brăzdare, discuri, rulmenți, lanțuri — livrare rapidă prin Kramp.",
+    keywords: [
+        'piese schimb semanatoare no-till', 'brazdar semanatoare directa', 'disc semanatoare',
+        'piese fliegl chain disc', 'piese avers agro', 'lant chain disc agricol',
+        'piese schimb utilaje agricole', 'piese john deere', 'piese lemken', 'piese amazone',
+        'piese kramp romania', 'mentenanta utilaje agricole', 'disc despicator semanatoare',
+        'rulment utilaje agricole', 'piese schimb grapa'
+    ],
+    alternates: {
+        canonical: 'https://tehnicagrosupply.ro/piese-schimb',
+    },
 };
 
 export default function PieseSchimbPage() {
@@ -50,11 +59,57 @@ export default function PieseSchimbPage() {
         }
     };
 
+    // FAQ Schema pentru Rich Results în Google
+    const faqSchema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Furnizați brăzdare și discuri pentru semănătoarea Avers-Agro Green Plains?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Da. Furnizăm piese de schimb OEM și aftermarket pentru semănătoarea Avers-Agro Green Plains ADS, inclusiv brăzdare duble disc, discuri despicătoare, roți tasatoare și elemente de suspensie paralelogram. Solicitați piesa cu referința tehnică sau numărul de serie al utilajului."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Puteți aduce piese pentru grapa Fliegl Chain Disc KSE 680?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Da. Asigurăm piese de schimb pentru Fliegl KSE 680, inclusiv discuri cu lanțuri (350mm oțel călit), lagăre, elemente de cadru și sisteme hidraulice. Livrare prin rețeaua Kramp în 24-48 ore."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Cât durează livrarea pieselor de schimb?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Piesele disponibile în stocul Kramp se livrează în 24-48 ore în România. Piesele la comandă specială au un termen de 3-10 zile lucrătoare, în funcție de producător. Contactați-ne pentru confirmare disponibilitate."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Furnizați piese și pentru alte mărci de utilaje agricole?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Da. Pe lângă piesele pentru utilajele din portofoliu (Avers-Agro, Fliegl, K-Factor), oferim piese la comandă pentru Amazone, Lemken, Väderstad, Pöttinger, Gaspardo, Horsch, John Deere și alte branduri. Trimiteți-ne modelul utilajului și piesa necesară."
+                }
+            }
+        ]
+    };
+
+
+
     return (
         <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(sparePartsSchema) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
             />
             <div className="max-w-7xl mx-auto px-4">
                 {/* Header */}
