@@ -1,7 +1,11 @@
-import { BLOG_POSTS } from '@/data/blog';
+import { getPublishedPosts } from '@/data/blog';
 import Link from 'next/link';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { Metadata } from 'next';
+
+// ISR: Vercel revalidă pagina la fiecare 3600 secunde (1 oră).
+// Articolele programate apar automat la data publicării fără deploy manual.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
     title: "Blog & Resurse Tehnice Agricole | TehnicAgro Supply",
@@ -9,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default function BlogPage() {
+    const posts = getPublishedPosts();
     return (
         <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
             <div className="max-w-7xl mx-auto px-4">
@@ -24,7 +29,7 @@ export default function BlogPage() {
 
                 {/* Blog Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {BLOG_POSTS.map((post) => (
+                    {posts.map((post) => (
                         <Link
                             key={post.id}
                             href={`/blog/${post.slug}`}

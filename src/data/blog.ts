@@ -343,3 +343,15 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'fonduri-europene'
   }
 ];
+
+/**
+ * Returnează doar articolele cu data publicării <= azi.
+ * Folosește ACEASTĂ funcție în paginile publice, nu BLOG_POSTS direct.
+ * Paginile cu revalidate=3600 vor afișa articolele automat la data programată.
+ */
+export function getPublishedPosts(): BlogPost[] {
+  const today = new Date();
+  today.setHours(23, 59, 59, 999); // Include toată ziua curentă
+  return BLOG_POSTS.filter(post => new Date(post.date) <= today);
+}
+

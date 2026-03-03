@@ -1,13 +1,17 @@
-import { BLOG_POSTS } from '@/data/blog';
+import { BLOG_POSTS, getPublishedPosts } from '@/data/blog';
 import { notFound } from 'next/navigation';
 import { Contact } from '@/components/Contact';
 import { ChevronLeft, Calendar, User, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 
+// ISR: revalidează la fiecare 1 oră — articolele apar automat la data programată.
+export const revalidate = 3600;
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    const post = BLOG_POSTS.find(p => p.slug === slug);
+    // Metadata doar pentru articolele deja publicate
+    const post = getPublishedPosts().find(p => p.slug === slug);
 
     if (!post) return {};
 
@@ -37,14 +41,17 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-    return BLOG_POSTS.map((post) => ({
+    // Generează pagini statice doar pentru articolele publicate până la momentul build-ului.
+    // ISR + revalidate va adăuga automat articolele noi la data programată.
+    return getPublishedPosts().map((post) => ({
         slug: post.slug,
     }));
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
     const { slug } = await params;
-    const post = BLOG_POSTS.find(p => p.slug === slug);
+    // Returnează 404 dacă articolul nu este încă publicat
+    const post = getPublishedPosts().find(p => p.slug === slug);
 
     if (!post) {
         notFound();
