@@ -76,7 +76,12 @@ export function Contact() {
         }
 
         try {
-            const success = await sendLeadToCRM(farmName, email, phone, message);
+            const pageTitle = typeof document !== 'undefined' ? document.title : 'Pagină Necunoscută';
+            const pagePath = typeof window !== 'undefined' ? window.location.pathname : '';
+            const contextString = `\n\n--- \n📍 Context Lead: Trimis de pe pagina "${pageTitle}" (${pagePath})`;
+            const enrichedMessage = (message || 'Fără mesaj adăugat de client.') + contextString;
+
+            const success = await sendLeadToCRM(farmName, email, phone, enrichedMessage);
 
             if (success) {
                 setIsSubmitted(true);
