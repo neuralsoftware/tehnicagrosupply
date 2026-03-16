@@ -21,6 +21,35 @@ export function Contact() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [gdprConsent, setGdprConsent] = useState(false);
+    const [statusMessage, setStatusMessage] = useState('');
+
+    async function sendLeadToCRM(name: string, email: string, phone: string, message: string) {
+        const SUPABASE_URL = 'https://ubcjrcuydqmixmpzooam.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViY2pyY3V5ZHFtaXhtcHpvb2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzAyODUsImV4cCI6MjA4ODg0NjI4NX0.evJcxIXVj_5JMY5lyRWMMvaAnzbUmze-OSi15rvuCwk';
+
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/process_website_lead`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                },
+                body: JSON.stringify({
+                    p_name: name || 'Fără Nume',
+                    p_email: email || '',
+                    p_phone: phone || '',
+                    p_message: message || ''
+                })
+            });
+
+            const data = await response.json();
+            return data && data.success === true;
+        } catch (error) {
+            console.error('Eroare la conectarea cu CRM:', error);
+            return false;
+        }
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,34 +76,30 @@ export function Contact() {
         }
 
         try {
-            const res = await fetch('/api/leads', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: farmName,
-                    phone: phone,
-                    email: email || '',
-                    county: county || 'Nespecificat',
-                    hectares: 0,
-                    totalBenefit: 0,
-                    crops: ['Formular Contact'],
-                    urgency: 'Discuție',
-                    status: 'new',
-                    message: message || '',
-                })
-            });
-            if (res.ok) {
+            const success = await sendLeadToCRM(farmName, email, phone, message);
+
+            if (success) {
                 setIsSubmitted(true);
+                setStatusMessage("Mesajul a fost trimis cu succes! Vă vom contacta în curând.");
+                
+                // Clear fields
+                setFarmName('');
+                setPhone('');
+                setEmail('');
+                setCounty('');
+                setMessage('');
+                
                 if (typeof window !== 'undefined') {
                     localStorage.setItem('tehnicagro_lead_submitted', 'true');
                 }
             } else {
-                const errorData = await res.json().catch(() => ({ error: 'Eroare necunoscută' }));
-                alert(`Eroare server: ${errorData.error || res.statusText}. Cod: ${res.status}`);
+                setStatusMessage("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
+                alert("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
             }
         } catch (err) {
             console.error(err);
-            alert('Eroare conexiune: ' + (err instanceof Error ? err.message : String(err)));
+            setStatusMessage("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
+            alert("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
         } finally {
             setIsSending(false);
         }
@@ -213,7 +238,7 @@ export function Contact() {
                                 </svg>
                             </div>
                             <h3 className="text-xl font-bold text-zinc-900 uppercase tracking-tighter">Cerere Recepționată!</h3>
-                            <p className="text-sm text-zinc-500">Un specialist TehnicAgro analizează solicitarea ta și te va contacta în cel mai scurt timp.</p>
+                            <p className="text-sm text-zinc-500">{statusMessage || 'Un specialist TehnicAgro analizează solicitarea ta și te va contacta în cel mai scurt timp.'}</p>
                             <button
                                 onClick={() => setIsSubmitted(false)}
                                 className="text-[10px] uppercase font-black text-zinc-600 hover:text-zinc-400 tracking-widest transition-colors"
