@@ -55,25 +55,6 @@ export async function POST(request: Request) {
 
         const lead = await LeadsService.addLead(leadData);
 
-        // ==========================================
-        // SINCRONIZARE UNICĂ ÎN CRM (Tabelul clients)
-        // ==========================================
-        try {
-            const crmData = {
-                name: leadData.name,
-                phone: leadData.phone || '',
-                email: leadData.email || '',
-                county: leadData.county || '',
-                notes: leadData.notes || '',
-                source: leadData.source || 'Website Form',
-                status: 'Lead',
-                is_active: 1
-            };
-            await supabaseAdmin.from('clients').insert([crmData]);
-        } catch (e) {
-            console.error('CRM sync exception:', e);
-        }
-
         return NextResponse.json({ success: true, lead });
     } catch (error) {
         if (error instanceof z.ZodError) {
