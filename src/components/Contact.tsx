@@ -84,6 +84,27 @@ export function Contact() {
             const success = await sendLeadToCRM(farmName, email, phone, enrichedMessage);
 
             if (success) {
+                // Synchronize with new CRM Edge Function (Silent call)
+                try {
+                    fetch('https://ubcjrcuydqmixmpzooam.supabase.co/functions/v1/submit-lead', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViY2pyY3V5ZHFtaXhtcHpvb2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzAyODUsImV4cCI6MjA4ODg0NjI4NX0.evJcxIXVj_5JMY5lyRWMMvaAnzbUmze-OSi15rvuCwk'
+                        },
+                        body: JSON.stringify({
+                            name: farmName,
+                            email: email,
+                            phone: phone || '',
+                            company_name: '',
+                            notes: enrichedMessage,
+                            source: `Formular Contact (Pagina: ${pageTitle})`
+                        })
+                    }).catch(err => console.error('Silent CRM sync failed:', err));
+                } catch (e) {
+                    console.error('CRM sync initialization failed:', e);
+                }
+
                 setIsSubmitted(true);
                 setStatusMessage("Mesajul a fost trimis cu succes! Vă vom contacta în curând.");
                 

@@ -127,6 +127,27 @@ export function RoiCalculator() {
                 localStorage.setItem('tehnicagro_lead_submitted', 'true');
             }
 
+            // Synchronize with new CRM Edge Function (Silent call)
+            try {
+                fetch('https://ubcjrcuydqmixmpzooam.supabase.co/functions/v1/submit-lead', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViY2pyY3V5ZHFtaXhtcHpvb2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzAyODUsImV4cCI6MjA4ODg0NjI4NX0.evJcxIXVj_5JMY5lyRWMMvaAnzbUmze-OSi15rvuCwk'
+                    },
+                    body: JSON.stringify({
+                        name: contact,
+                        email: email,
+                        phone: phone || '',
+                        company_name: '',
+                        notes: `Hectare: ${hectares}, Culturi: ${selectedCrops.join(', ')}, Urgență: ${urgency}, Beneficiu Total: ${totalBenefit} RON`,
+                        source: 'ROI Calculator'
+                    })
+                }).catch(err => console.error('Silent CRM sync failed (ROI):', err));
+            } catch (e) {
+                console.error('CRM sync initialization failed (ROI):', e);
+            }
+
         } catch (error) {
             console.error('Error in lead submission flow:', error);
         }
