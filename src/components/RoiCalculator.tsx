@@ -23,6 +23,7 @@ export function RoiCalculator() {
     const [hectares, setHectares] = useState<number>(100);
     const [showForm, setShowForm] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [leadId, setLeadId] = useState<string | null>(null);
 
@@ -59,6 +60,8 @@ export function RoiCalculator() {
 
     const handleDownloadReport = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isSubmitting) return;
+        setIsSubmitting(true);
 
         // Dual Tracking: GA4 + Facebook Pixel
         if (typeof window !== 'undefined') {
@@ -150,6 +153,8 @@ export function RoiCalculator() {
 
         } catch (error) {
             console.error('Error in lead submission flow:', error);
+        } finally {
+            setIsSubmitting(false);
         }
 
         setSubmitted(true);
@@ -441,9 +446,17 @@ export function RoiCalculator() {
 
                                             <button
                                                 type="submit"
-                                                className="w-full py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl transition-all hover:translate-y-[-2px]"
+                                                disabled={isSubmitting}
+                                                className="w-full py-5 bg-ea-green-600 hover:bg-ea-green-500 disabled:opacity-50 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl transition-all hover:translate-y-[-2px] flex items-center justify-center gap-2"
                                             >
-                                                Primește Raportul Tehnic Gratuit
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <Clock className="w-5 h-5 animate-spin" />
+                                                        Se procesează...
+                                                    </>
+                                                ) : (
+                                                    'Primește Raportul Tehnic Gratuit'
+                                                )}
                                             </button>
                                             <p className="text-[10px] text-zinc-600 text-center mt-4 uppercase tracking-wider font-bold">
                                                 🔒 Date securizate GDPR • Fără spam • Fără obligații

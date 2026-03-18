@@ -19,7 +19,7 @@ export function Contact() {
     const [county, setCounty] = useState('');
     const [message, setMessage] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [isSending, setIsSending] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [gdprConsent, setGdprConsent] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
 
@@ -53,7 +53,8 @@ export function Contact() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsSending(true);
+        if (isSubmitting) return;
+        setIsSubmitting(true);
 
         // Dual Tracking: GA4 + Facebook Pixel
         if (typeof window !== 'undefined') {
@@ -127,7 +128,7 @@ export function Contact() {
             setStatusMessage("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
             alert("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
         } finally {
-            setIsSending(false);
+            setIsSubmitting(false);
         }
     };
 
@@ -247,10 +248,10 @@ export function Contact() {
                             {/* Submit */}
                             <button
                                 type="submit"
-                                disabled={isSending}
+                                disabled={isSubmitting}
                                 className="w-full py-5 bg-ea-green-600 hover:bg-ea-green-500 disabled:opacity-50 text-white font-black uppercase tracking-widest rounded-2xl mt-4 transition-all shadow-xl shadow-ea-green-900/20 flex items-center justify-center gap-2"
                             >
-                                {isSending ? 'Se trimite...' : 'Cere Ofertă Personalizată'}
+                                {isSubmitting ? 'Se trimite...' : 'Cere Ofertă Personalizată'}
                             </button>
                             <p className="text-[9px] text-zinc-600 text-center leading-tight uppercase font-medium">
                                 Datele tale sunt protejate conform standardelor TehnicAgro.
