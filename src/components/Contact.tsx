@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const JUDETE = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brăila',
@@ -20,6 +20,7 @@ export function Contact() {
     const [message, setMessage] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isFetchingRef = useRef(false);
     const [gdprConsent, setGdprConsent] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
 
@@ -53,7 +54,9 @@ export function Contact() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (isSubmitting) return;
+        
+        if (isFetchingRef.current) return;
+        isFetchingRef.current = true;
         setIsSubmitting(true);
 
         // Dual Tracking: GA4 + Facebook Pixel
@@ -128,6 +131,7 @@ export function Contact() {
             setStatusMessage("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
             alert("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
         } finally {
+            isFetchingRef.current = false;
             setIsSubmitting(false);
         }
     };

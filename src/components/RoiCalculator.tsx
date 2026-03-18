@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calculator, Banknote, Droplets, Download, Send, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone, Scale } from 'lucide-react';
 
@@ -24,6 +24,7 @@ export function RoiCalculator() {
     const [showForm, setShowForm] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isFetchingRef = useRef(false);
 
     const [leadId, setLeadId] = useState<string | null>(null);
 
@@ -60,8 +61,11 @@ export function RoiCalculator() {
 
     const handleDownloadReport = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (isSubmitting) return;
+        
+        if (isFetchingRef.current) return;
+        isFetchingRef.current = true;
         setIsSubmitting(true);
+        
 
         // Dual Tracking: GA4 + Facebook Pixel
         if (typeof window !== 'undefined') {
@@ -154,6 +158,7 @@ export function RoiCalculator() {
         } catch (error) {
             console.error('Error in lead submission flow:', error);
         } finally {
+            isFetchingRef.current = false;
             setIsSubmitting(false);
         }
 
