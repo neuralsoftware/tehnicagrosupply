@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import { LeadsService, simpleRateLimit } from '@/lib/leads';
 import { z } from 'zod';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 const leadSchema = z.object({
     name: z.string().min(2, 'Nume prea scurt').max(100, 'Nume prea lung'),
     phone: z.string()
-        .transform((val) => val.replace(/[^\d]/g, '')) // Remove non-digits
-        .refine((val) => /^07\d{8}$/.test(val), {
-            message: 'Telefon invalid (trebuie să fie număr de mobil RO cu 10 cifre)'
+        .transform((val) => {
+            let digits = val.replace(/[^\d+]/g, '');
+            return digits;
+        })
+        .refine((val) => val.length >= 8, {
+            message: 'Telefon invalid'
         }),
     email: z.string().email('Email invalid').optional().or(z.literal('')),
     county: z.string().max(100).optional().default(''),
@@ -17,7 +21,8 @@ const leadSchema = z.object({
     subsidyIncome: z.number().optional(),
     fuelSavings: z.number().optional(),
     totalBenefit: z.number().optional(),
-    message: z.string().max(1000, 'Mesaj prea lung').optional().default(''),
+    message: z.string().max(10000, 'Mesaj prea lung').optional().default(''),
+    source: z.string().optional().default('Website Form'),
 });
 
 export async function POST(request: Request) {
@@ -49,6 +54,25 @@ export async function POST(request: Request) {
         };
 
         const lead = await LeadsService.addLead(leadData);
+
+        // ==========================================
+        // SINCRONIZARE UNICĂ ÎN CRM (Tabelul clients)
+        // ==========================================
+        try {
+            const crmData = {
+                name: leadData.name,
+                phone: leadData.phone || '',
+                email: leadData.email || '',
+                county: leadData.county || '',
+                notes: leadData.notes || '',
+                source: leadData.source || 'Website Form',
+                status: 'Lead',
+                is_active: 1
+            };
+            await supabaseAdmin.from('clients').insert([crmData]);
+        } catch (e) {
+            console.error('CRM sync exception:', e);
+        }
 
         return NextResponse.json({ success: true, lead });
     } catch (error) {

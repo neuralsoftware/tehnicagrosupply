@@ -24,34 +24,6 @@ export function Contact() {
     const [gdprConsent, setGdprConsent] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
 
-    async function sendLeadToCRM(name: string, email: string, phone: string, message: string) {
-        const SUPABASE_URL = 'https://ubcjrcuydqmixmpzooam.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViY2pyY3V5ZHFtaXhtcHpvb2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzAyODUsImV4cCI6MjA4ODg0NjI4NX0.evJcxIXVj_5JMY5lyRWMMvaAnzbUmze-OSi15rvuCwk';
-
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/process_website_lead`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                },
-                body: JSON.stringify({
-                    p_name: name || 'Fără Nume',
-                    p_email: email || '',
-                    p_phone: phone || '',
-                    p_message: message || ''
-                })
-            });
-
-            const data = await response.json();
-            return data && data.success === true;
-        } catch (error) {
-            console.error('Eroare la conectarea cu CRM:', error);
-            return false;
-        }
-    }
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
@@ -85,29 +57,21 @@ export function Contact() {
             const contextString = `\n\n--- \n📍 Context Lead: Trimis de pe pagina "${pageTitle}" (${pagePath})`;
             const enrichedMessage = (message || 'Fără mesaj adăugat de client.') + contextString;
 
-            const success = await sendLeadToCRM(farmName, email, phone, enrichedMessage);
+            const res = await fetch('/api/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: farmName,
+                    phone: phone,
+                    email: email,
+                    county: county,
+                    message: enrichedMessage,
+                    source: `Formular Contact (Pagina: ${pageTitle})`
+                })
+            });
+            const data = await res.json();
 
-            if (success) {
-                // Synchronize with new CRM Edge Function (Silent call)
-                try {
-                    fetch('https://ubcjrcuydqmixmpzooam.supabase.co/functions/v1/submit-lead', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViY2pyY3V5ZHFtaXhtcHpvb2FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzAyODUsImV4cCI6MjA4ODg0NjI4NX0.evJcxIXVj_5JMY5lyRWMMvaAnzbUmze-OSi15rvuCwk'
-                        },
-                        body: JSON.stringify({
-                            name: farmName,
-                            email: email,
-                            phone: phone || '',
-                            company_name: '',
-                            notes: enrichedMessage,
-                            source: `Formular Contact (Pagina: ${pageTitle})`
-                        })
-                    }).catch(err => console.error('Silent CRM sync failed:', err));
-                } catch (e) {
-                    console.error('CRM sync initialization failed:', e);
-                }
+            if (data.success) {
 
                 setIsSubmitted(true);
                 setStatusMessage("Mesajul a fost trimis cu succes! Vă vom contacta în curând.");
