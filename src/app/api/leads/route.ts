@@ -59,19 +59,12 @@ export async function POST(request: Request) {
             phone: leadData.phone || '',
             email: leadData.email || '',
             county: leadData.county || '',
-        hectares: leadData.hectares || 0,
-        crops: leadData.crops || [],
-        urgency: leadData.urgency || '',
-        subsidy_income: leadData.subsidyIncome || 0,
-        fuel_savings: leadData.fuelSavings || 0,
-        total_benefit: leadData.totalBenefit || 0,
-            notes: leadData.notes || '',
-        source: leadData.source || 'Website Form',
-        status: 'Lead'
+            notes: `Sursa: Website Form\nMesaj: ${leadData.notes || '-'}\nHectare: ${leadData.hectares || 0}\nCulturi: ${(leadData.crops || []).join(', ')}\nUrgență: ${leadData.urgency || '-'}`,
+            status: 'Lead'
         };
 
         const { data: insertedData, error: dbError } = await supabaseAdmin
-        .from('leads' as any)
+        .from('clients' as any)
         .insert([dbData] as any)
             .select()
             .single();
@@ -101,9 +94,10 @@ export async function GET() {
     try {
         // Use supabaseAdmin to bypass RLS and fetch all leads
         const { data, error } = await supabaseAdmin
-            .from('leads' as any)
+            .from('clients' as any)
             .select('*')
-            .order('created_at', { ascending: false });
+            .eq('status', 'Lead')
+            .order('id', { ascending: false });
 
         if (error) {
             console.error('Supabase fetch error:', error);
@@ -117,16 +111,8 @@ export async function GET() {
             phone: row.phone,
             email: row.email,
             county: row.county,
-            hectares: row.hectares,
-            crops: row.crops,
-            urgency: row.urgency,
-            subsidyIncome: row.subsidy_income,
-            fuelSavings: row.fuel_savings,
-            totalBenefit: row.total_benefit,
-            createdAt: row.created_at,
             status: row.status,
             notes: row.notes,
-            lastContacted: row.last_contacted
         }));
 
         return NextResponse.json({ leads });
