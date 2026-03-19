@@ -70,21 +70,6 @@ export async function POST(request: Request) {
         status: 'Lead'
         };
 
-    // --- SOLUȚIE PENTRU DUBLA ÎNREGISTRARE ---
-    // Blocăm a doua cerere dacă există deja un client cu același telefon înregistrat în ultimele 5 minute
-    const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    const { data: existingLead } = await supabaseAdmin
-        .from('leads' as any)
-        .select('id')
-        .eq('phone', dbData.phone)
-        .gte('created_at', fiveMinsAgo)
-        .limit(1);
-
-    if (existingLead && existingLead.length > 0) {
-        // Oprim salvarea dublurii și returnăm succes pentru a nu bloca / da eroare pe site
-        return NextResponse.json({ success: true, message: 'Dublură evitată automat' });
-    }
-
         const { data: insertedData, error: dbError } = await supabaseAdmin
         .from('leads' as any)
         .insert([dbData] as any)
