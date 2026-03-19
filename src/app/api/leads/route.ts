@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { LeadsService, simpleRateLimit } from '@/lib/leads';
+import { simpleRateLimit } from '@/lib/leads';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
@@ -94,10 +94,8 @@ export async function POST(request: Request) {
         if (dbError) {
             console.error('Supabase DB Error:', dbError);
             return NextResponse.json({ 
-                error: 'Eroare la salvarea in baza de date', 
-                details: dbError.message,
-                hint: dbError.hint,
-                code: dbError.code
+                error: 'Eroare_DB_Noua', 
+                details: dbError?.message || JSON.stringify(dbError) || 'Detalii indisponibile'
             }, { status: 500 });
         }
 
