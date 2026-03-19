@@ -11,7 +11,12 @@ export default function PrivacyPolicy() {
       <div className="max-w-3xl mx-auto bg-white p-8 md:p-12 shadow-sm rounded-2xl border border-slate-100">
         <h1 className="text-3xl font-bold text-slate-900 mb-8">Politica de Confidențialitate</h1>
         
-        <div className="prose prose-slate prose-emerald max-w-none">        <div className="prose prose-slate prose-emerald max-w-none">        <div className="prose prose-slate prose-emerald max-w-none">        <div className="prose prose-slate prose-emerald max-w-none">        <div className="prose "te        <div className="prose prose-slate prose-emerald max-w-none">  2>
+        <div className="prose prose-slate prose-emerald max-w-none">
+          <p className="lead text-lg text-slate-600 mb-6">
+            Protecția datelor dumneavoastră cu caracter personal este o prioritate pentru <strong>TEHNICAGRO SUPPLY S.R.L.</strong>
+          </p>
+
+          <h2 className="text-xl font-semibold text-slate-800 mt-8 mb-4">1. Operatorul de Date</h2>
           <p className="text-slate-600 mb-4">
             Operatorul datelor dumneavoastră cu caracter personal este:
           </p>

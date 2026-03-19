@@ -28,7 +28,9 @@ export default function CookieBanner() {
 
   const handleAccept = () => {
     localStorage.setItem('cookie_consent', 'granted');
-                                                    };
+    updateConsent(true);
+    setIsVisible(false);
+  };
 
   const handleDecline = () => {
     localStorage.setItem('cookie_consent', 'denied');
