@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     try {
         // Rate limiting
         const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-        const allowed = simpleRateLimit(ip, 5, 900000); // 5 requests per 15 minutes
+        const allowed = simpleRateLimit(ip, 50, 900000); // 50 requests per 15 minutes pt testare
 
         if (!allowed) {
             return NextResponse.json(
@@ -51,11 +51,41 @@ export async function POST(request: Request) {
             fuelSavings: validatedData.fuelSavings || 0,
             totalBenefit: validatedData.totalBenefit || 0,
             notes: validatedData.message || '',
+            source: validatedData.source || 'Website Form',
         };
 
-        const lead = await LeadsService.addLead(leadData);
+        const dbData = {
+            name: leadData.name,
+            phone: leadData.phone || '',
+            email: leadData.email || '',
+            county: leadData.county || '',
+            hectares: leadData.hectares,
+            crops: leadData.crops,
+            urgency: leadData.urgency,
+            subsidy_income: leadData.subsidyIncome,
+            fuel_savings: leadData.fuelSavings,
+            total_benefit: leadData.totalBenefit,
+            notes: leadData.notes || '',
+            source: leadData.source,
+            status: 'Lead',
+        };
 
-        return NextResponse.json({ success: true, lead });
+        const { data: insertedData, error: dbError } = await supabaseAdmin
+            .from('leads')
+            .insert([dbData])
+            .select()
+            .single();
+
+        if (dbError) {
+            console.error('Supabase DB Error:', dbError);
+            // Deoarece testezi direct pe Vercel, returnăm eroarea completă mereu pentru a putea face debug din browser.
+            return NextResponse.json({
+                error: 'Eroare la salvarea in baza de date',
+                details: dbError
+            }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true, lead: insertedData });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json(
@@ -64,11 +94,9 @@ export async function POST(request: Request) {
             );
         }
         console.error('Lead processing error:', error);
-        return NextResponse.json({ error: 'Eroare la procesare' }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Eroare internă server' }, { status: 500 });
     }
 }
-
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function GET() {
     try {

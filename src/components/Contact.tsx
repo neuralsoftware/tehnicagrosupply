@@ -87,8 +87,8 @@ export function Contact() {
                     localStorage.setItem('tehnicagro_lead_submitted', 'true');
                 }
             } else {
-                setStatusMessage("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
-                alert("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
+                setStatusMessage(data.error || "A apărut o eroare la server.");
+                alert(data.error || "A apărut o eroare la server.");
             }
         } catch (err) {
             console.error(err);
