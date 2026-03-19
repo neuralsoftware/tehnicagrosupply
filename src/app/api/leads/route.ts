@@ -93,7 +93,12 @@ export async function POST(request: Request) {
 
         if (dbError) {
             console.error('Supabase DB Error:', dbError);
-        return NextResponse.json({ error: 'Eroare la salvarea in baza de date', details: dbError }, { status: 500 });
+            return NextResponse.json({ 
+                error: 'Eroare la salvarea in baza de date', 
+                details: dbError.message,
+                hint: dbError.hint,
+                code: dbError.code
+            }, { status: 500 });
         }
 
         return NextResponse.json({ success: true, lead: insertedData });
