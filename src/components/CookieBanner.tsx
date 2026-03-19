@@ -26,7 +26,9 @@ export default function CookieBanner() {
     }
   };
 
-  const handleAccept  const handleAccept  const handleAccept  const han',  const handleAccept  eCo  const handleAccept  const handleAccept ;
+  const handleAccept = () => {
+    localStorage.setItem('cookie_consent', 'granted');
+                                                    };
 
   const handleDecline = () => {
     localStorage.setItem('cookie_consent', 'denied');
