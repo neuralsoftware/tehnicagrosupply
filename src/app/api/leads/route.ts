@@ -54,24 +54,29 @@ export async function POST(request: Request) {
             source: validatedData.source || 'Website Form',
         };
 
-    const crmData = {
+    const dbData = {
             name: leadData.name,
             phone: leadData.phone || '',
             email: leadData.email || '',
             county: leadData.county || '',
+        hectares: leadData.hectares || 0,
+        crops: leadData.crops || [],
+        urgency: leadData.urgency || '',
+        subsidy_income: leadData.subsidyIncome || 0,
+        fuel_savings: leadData.fuelSavings || 0,
+        total_benefit: leadData.totalBenefit || 0,
             notes: leadData.notes || '',
         source: leadData.source || 'Website Form',
-            status: 'Lead',
-        is_active: 1
+        status: 'Lead'
         };
 
     // --- SOLUȚIE PENTRU DUBLA ÎNREGISTRARE ---
     // Blocăm a doua cerere dacă există deja un client cu același telefon înregistrat în ultimele 5 minute
     const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     const { data: existingLead } = await supabaseAdmin
-        .from('clients')
+        .from('leads' as any)
         .select('id')
-        .eq('phone', crmData.phone)
+        .eq('phone', dbData.phone)
         .gte('created_at', fiveMinsAgo)
         .limit(1);
 
@@ -81,14 +86,14 @@ export async function POST(request: Request) {
     }
 
         const { data: insertedData, error: dbError } = await supabaseAdmin
-        .from('clients')
-        .insert([crmData])
+        .from('leads' as any)
+        .insert([dbData] as any)
             .select()
             .single();
 
         if (dbError) {
             console.error('Supabase DB Error:', dbError);
-        return NextResponse.json({ error: 'Eroare la salvarea in baza de date' }, { status: 500 });
+        return NextResponse.json({ error: 'Eroare la salvarea in baza de date', details: dbError }, { status: 500 });
         }
 
         return NextResponse.json({ success: true, lead: insertedData });
@@ -108,7 +113,7 @@ export async function GET() {
     try {
         // Use supabaseAdmin to bypass RLS and fetch all leads
         const { data, error } = await supabaseAdmin
-            .from('leads')
+            .from('leads' as any)
             .select('*')
             .order('created_at', { ascending: false });
 
