@@ -54,35 +54,41 @@ export async function POST(request: Request) {
             source: validatedData.source || 'Website Form',
         };
 
-        const dbData = {
+    const crmData = {
             name: leadData.name,
             phone: leadData.phone || '',
             email: leadData.email || '',
             county: leadData.county || '',
-            hectares: leadData.hectares,
-            crops: leadData.crops,
-            urgency: leadData.urgency,
-            subsidy_income: leadData.subsidyIncome,
-            fuel_savings: leadData.fuelSavings,
-            total_benefit: leadData.totalBenefit,
             notes: leadData.notes || '',
-            source: leadData.source,
+        source: leadData.source || 'Website Form',
             status: 'Lead',
+        is_active: 1
         };
 
+    // --- SOLUȚIE PENTRU DUBLA ÎNREGISTRARE ---
+    // Blocăm a doua cerere dacă există deja un client cu același telefon înregistrat în ultimele 5 minute
+    const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data: existingLead } = await supabaseAdmin
+        .from('clients')
+        .select('id')
+        .eq('phone', crmData.phone)
+        .gte('created_at', fiveMinsAgo)
+        .limit(1);
+
+    if (existingLead && existingLead.length > 0) {
+        // Oprim salvarea dublurii și returnăm succes pentru a nu bloca / da eroare pe site
+        return NextResponse.json({ success: true, message: 'Dublură evitată automat' });
+    }
+
         const { data: insertedData, error: dbError } = await supabaseAdmin
-            .from('leads' as any)
-            .insert([dbData] as any)
+        .from('clients')
+        .insert([crmData])
             .select()
             .single();
 
         if (dbError) {
             console.error('Supabase DB Error:', dbError);
-            // Deoarece testezi direct pe Vercel, returnăm eroarea completă mereu pentru a putea face debug din browser.
-            return NextResponse.json({
-                error: 'Eroare la salvarea in baza de date',
-                details: dbError
-            }, { status: 500 });
+        return NextResponse.json({ error: 'Eroare la salvarea in baza de date' }, { status: 500 });
         }
 
         return NextResponse.json({ success: true, lead: insertedData });
@@ -102,7 +108,7 @@ export async function GET() {
     try {
         // Use supabaseAdmin to bypass RLS and fetch all leads
         const { data, error } = await supabaseAdmin
-                .from('leads' as any)
+            .from('leads')
             .select('*')
             .order('created_at', { ascending: false });
 
