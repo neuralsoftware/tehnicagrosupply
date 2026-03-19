@@ -1,3 +1,4 @@
+import CookieBanner from '@/components/CookieBanner';
 import type { Metadata } from 'next';
 import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
@@ -152,7 +153,9 @@ export default function RootLayout({
                 <CookieConsent />
 
                 <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-KR6928Z45R"} />
-            </body>
+              <CookieBanner />
+        <script dangerouslySetInnerHTML={{ __html: "window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('consent', 'default', { 'analytics_storage': 'denied', 'ad_storage': 'denied', 'ad_user_data': 'denied', 'ad_personalization': 'denied' });" }} />
+      </body>
         </html>
     );
 }
