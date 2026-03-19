@@ -71,8 +71,8 @@ export async function POST(request: Request) {
         };
 
         const { data: insertedData, error: dbError } = await supabaseAdmin
-            .from('leads')
-            .insert([dbData])
+            .from('leads' as any)
+            .insert([dbData] as any)
             .select()
             .single();
 
@@ -102,7 +102,7 @@ export async function GET() {
     try {
         // Use supabaseAdmin to bypass RLS and fetch all leads
         const { data, error } = await supabaseAdmin
-            .from('leads')
+                .from('leads' as any)
             .select('*')
             .order('created_at', { ascending: false });
 
