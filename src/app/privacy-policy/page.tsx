@@ -9,14 +9,14 @@ export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-slate-50 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto bg-white p-8 md:p-12 shadow-sm rounded-2xl border border-slate-100">
-        <h1 className="text-3xl font-bold text-slate-900 mb-8">Politica de Confidențialitate</h1>
+        <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-8 uppercase tracking-tight">Politica de Confidențialitate</h1>
         
         <div className="prose prose-slate prose-emerald max-w-none">
           <p className="lead text-lg text-slate-600 mb-6">
             Protecția datelor dumneavoastră cu caracter personal este o prioritate pentru <strong>TEHNICAGRO SUPPLY S.R.L.</strong>
           </p>
 
-          <h2 className="text-xl font-semibold text-slate-800 mt-8 mb-4">1. Operatorul de Date</h2>
+          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">1. Operatorul de Date</h2>
           <p className="text-slate-600 mb-4">
             Operatorul datelor dumneavoastră cu caracter personal este:
           </p>
@@ -28,14 +28,14 @@ export default function PrivacyPolicy() {
             Email de contact: <a href="mailto:tehnicagro.supply@gmail.com" className="text-emerald-600 hover:underline">tehnicagro.supply@gmail.com</a>
           </div>
 
-          <h2 className="text-xl font-semibold text-slate-800 mt-8 mb-4">2. Ce date colectăm?</h2>
+          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">2. Ce date colectăm?</h2>
           <p className="text-slate-600 mb-2">Colectăm informații în următoarele moduri:</p>
           <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
             <li><strong>Informații furnizate direct de dumneavoastră:</strong> Când completați formularul de contact (Nume, Prenume, Număr de telefon, Adresă de email, Numele Companiei).</li>
             <li><strong>Informații colectate automat:</strong> Prin intermediul modulelor cookie (vezi Politica de Cookie-uri) și Google Analytics (adresa IP anonimizată, tipul browserului, paginile vizitate).</li>
           </ul>
 
-          <h2 className="text-xl font-semibold text-slate-800 mt-8 mb-4">3. Scopul prelucrării</h2>
+          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">3. Scopul prelucrării</h2>
           <p className="text-slate-600 mb-4">Datele dumneavoastră sunt prelucrate exclusiv pentru următoarele scopuri:</p>
           <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
             <li>Pentru a răspunde solicitărilor și mesajelor dumneavoastră transmise prin formularele de pe site.</li>
@@ -43,12 +43,12 @@ export default function PrivacyPolicy() {
             <li>Pentru a îmbunătăți experiența pe site-ul nostru (prin date analitice anonimizate).</li>
           </ul>
 
-          <h2 className="text-xl font-semibold text-slate-800 mt-8 mb-4">4. Durata de păstrare a datelor</h2>
+          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">4. Durata de păstrare a datelor</h2>
           <p className="text-slate-600 mb-4">
             Vom păstra datele dumneavoastră cu caracter personal doar atât timp cât este necesar pentru îndeplinirea scopurilor menționate, respectiv pe durata negocierilor comerciale sau conform obligațiilor legale aplicabile în România. Datele din formularele de contact sunt stocate în siguranță în sistemul nostru CRM intern.
           </p>
 
-          <h2 className="text-xl font-semibold text-slate-800 mt-8 mb-4">5. Drepturile dumneavoastră (GDPR)</h2>
+          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">5. Drepturile dumneavoastră (GDPR)</h2>
           <p className="text-slate-600 mb-4">Conform Regulamentului General privind Protecția Datelor (GDPR), beneficiați de următoarele drepturi:</p>
           <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
             <li><strong>Dreptul de acces:</strong> de a afla ce date prelucrăm despre dvs.</li>
@@ -58,7 +58,7 @@ export default function PrivacyPolicy() {
             <li><strong>Dreptul de a depune o plângere</strong> la autoritatea de supraveghere (ANSPDCP - www.dataprotection.ro).</li>
           </ul>
 
-          <h2 className="text-xl font-semibold text-slate-800 mt-8 mb-4">6. Securitatea datelor</h2>
+          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">6. Securitatea datelor</h2>
           <p className="text-slate-600 mb-4">
             Am implementat măsuri tehnice și organizatorice adecvate pentru a asigura securitatea datelor dumneavoastră împotriva prelucrării neautorizate sau ilegale și împotriva pierderii, distrugerii sau deteriorării accidentale.
           </p>
@@ -67,7 +67,7 @@ export default function PrivacyPolicy() {
             <Link href="/" className="text-emerald-600 font-medium hover:underline">
               &larr; Înapoi la pagina principală
             </Link>
-            <span className="text-sm text-slate-400">Ultima actualizare: {new Date().toLocaleDateString('ro-RO')}</span>
+            <span className="text-sm font-bold text-slate-400">Ultima actualizare: 20 Martie 2026</span>
           </div>
         </div>
       </div>
