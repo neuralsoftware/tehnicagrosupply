@@ -35,6 +35,11 @@ export function Footer() {
                             <li><Link href="/privacy-policy" className="hover:text-ea-green-500 transition-colors">Politică de Confidențialitate</Link></li>
                             <li><Link href="/politica-cookie" className="hover:text-ea-green-500 transition-colors">Politică de Cookie-uri</Link></li>
                             <li><Link href="/conditii-utilizare" className="hover:text-ea-green-500 transition-colors">Condiții de Utilizare</Link></li>
+                            <li>
+                                <button onClick={() => window.dispatchEvent(new Event('openCookieSettings'))} className="hover:text-ea-green-500 transition-colors text-left">
+                                    Setări Cookie
+                                </button>
+                            </li>
                         </ul>
                     </div>
 

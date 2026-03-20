@@ -13,6 +13,12 @@ export default function CookieBanner() {
     } else if (consent === 'granted') {
       updateConsent(true);
     }
+
+    // Ascultăm comanda de redeschidere din Footer
+    const handleOpenSettings = () => setIsVisible(true);
+    window.addEventListener('openCookieSettings', handleOpenSettings);
+    
+    return () => window.removeEventListener('openCookieSettings', handleOpenSettings);
   }, []);
 
   const updateConsent = (granted: boolean) => {
