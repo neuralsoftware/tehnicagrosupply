@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { DynamicProduct } from '@/lib/products-store';
 import { Pencil, Trash2, Plus, Check, X, Save, ChevronDown } from 'lucide-react';
 
@@ -78,11 +78,13 @@ export function CatalogTab({ adminAuth, categories }: Props) {
     const [imageUrl, setImageUrl] = useState('');
 
     const load = async () => {
-        const res = await fetch('/api/products');
+        const res = await fetch('/api/products', { cache: 'no-store' });
         const data = await res.json();
         setProducts(data.products || []);
         setLoaded(true);
     };
+
+    useEffect(() => { load(); }, []);
 
     const blank = (): Partial<DynamicProduct> => ({
         id: '', slug: '', name: '', brand: '', category: '', description: '', longDescription: '',
@@ -109,9 +111,10 @@ export function CatalogTab({ adminAuth, categories }: Props) {
     };
 
     if (!loaded) return (
-        <button onClick={load} className="px-6 py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-xl font-bold uppercase tracking-widest text-sm">
-            Încarcă Catalog
-        </button>
+        <div className="flex items-center gap-3 px-4 py-8 text-zinc-500 text-xs uppercase font-bold tracking-widest">
+            <div className="w-4 h-4 border-2 border-ea-green-500 border-t-transparent rounded-full animate-spin" />
+            Se încarcă catalogul...
+        </div>
     );
 
     if (editing !== null) return (

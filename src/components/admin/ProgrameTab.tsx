@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FundingProgram } from '@/data/funding-programs';
 import { RefreshCcw, ExternalLink, CheckCircle, Clock, XCircle } from 'lucide-react';
 
@@ -26,11 +26,13 @@ export function ProgrameTab({ adminAuth }: Props) {
     const [notes, setNotes] = useState<Record<string, string>>({});
 
     const load = async () => {
-        const res = await fetch('/api/funding-programs');
+        const res = await fetch('/api/funding-programs', { cache: 'no-store' });
         const data = await res.json();
         setPrograms(data.programs || {});
         setLoaded(true);
     };
+
+    useEffect(() => { load(); }, []);
 
     const update = async (code: string, updates: Partial<FundingProgram>) => {
         setSaving(code);
@@ -53,9 +55,10 @@ export function ProgrameTab({ adminAuth }: Props) {
     const allPrograms = Object.values(programs).flat();
 
     if (!loaded) return (
-        <button onClick={load} className="px-6 py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-xl font-black uppercase tracking-widest text-sm">
-            Încarcă Programe APIA/AFIR
-        </button>
+        <div className="flex items-center gap-3 px-4 py-8 text-zinc-500 text-xs uppercase font-bold tracking-widest">
+            <div className="w-4 h-4 border-2 border-ea-green-500 border-t-transparent rounded-full animate-spin" />
+            Se încarcă programele APIA/AFIR...
+        </div>
     );
 
     return (

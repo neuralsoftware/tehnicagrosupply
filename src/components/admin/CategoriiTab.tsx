@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Category } from '@/lib/products-store';
 import { Plus, Pencil, Trash2, Save, X, CheckCircle, Clock } from 'lucide-react';
 
@@ -19,12 +19,14 @@ export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
     const [saving, setSaving] = useState(false);
 
     const load = async () => {
-        const res = await fetch('/api/categories');
+        const res = await fetch('/api/categories', { cache: 'no-store' });
         const data = await res.json();
         setCategories(data.categories || []);
         onCategoriesChange(data.categories || []);
         setLoaded(true);
     };
+
+    useEffect(() => { load(); }, []);
 
     const save = async () => {
         if (!editing?.slug || !editing?.name) return;
@@ -51,9 +53,10 @@ export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
     };
 
     if (!loaded) return (
-        <button onClick={load} className="px-6 py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-xl font-black uppercase tracking-widest text-sm">
-            Încarcă Categorii
-        </button>
+        <div className="flex items-center gap-3 px-4 py-8 text-zinc-500 text-xs uppercase font-bold tracking-widest">
+            <div className="w-4 h-4 border-2 border-ea-green-500 border-t-transparent rounded-full animate-spin" />
+            Se încarcă categoriile...
+        </div>
     );
 
     return (
