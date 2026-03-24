@@ -12,7 +12,11 @@ const JUDETE = [
     'Vâlcea', 'Vaslui', 'Vrancea',
 ];
 
-export function Contact() {
+interface ContactProps {
+    productName?: string; // CRM: transmite ce utilaj a cerut clientul
+}
+
+export function Contact({ productName }: ContactProps = {}) {
     const [farmName, setFarmName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
@@ -66,7 +70,8 @@ export function Contact() {
                     email: email,
                     county: county,
                     message: enrichedMessage,
-                    source: `Formular Contact (Pagina: ${pageTitle})`
+                    source: `Formular Contact (Pagina: ${pageTitle})`,
+                    productName: productName || undefined,
                 })
             });
             const data = await res.json();
@@ -128,6 +133,15 @@ export function Contact() {
 
                     {!isSubmitted ? (
                         <form className="space-y-4 text-left relative z-10" onSubmit={handleSubmit}>
+                            {/* Product Badge — shown when form is embedded on a product page */}
+                            {productName && (
+                                <div className="flex items-center gap-2 px-4 py-3 bg-ea-green-50 border border-ea-green-200 rounded-xl">
+                                    <div className="w-2 h-2 rounded-full bg-ea-green-500 flex-shrink-0" />
+                                    <p className="text-xs font-black text-ea-green-800 uppercase tracking-wide">
+                                        Cerere pentru: <span className="text-ea-green-600">{productName}</span>
+                                    </p>
+                                </div>
+                            )}
                             {/* Nume */}
                             <div>
                                 <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Nume Fermă / Proprietar</label>

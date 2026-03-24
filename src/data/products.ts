@@ -1,6 +1,6 @@
 // Product data loaded from individual JSON files
-// To add a new product: create a .json file in src/data/products/[category]/ 
-// then import and add it to the PRODUCTS array below.
+// To add a new product: create a .json file in src/data/products/[category]/
+// Dynamic products (added from Admin) are stored in Vercel Blob via products-store.ts
 
 import greenPlainsAds from './products/semanat-fertilizat/green-plains-ads.json';
 import chainDiscKse680 from './products/pregatire-sol/chain-disc-kse-680.json';
@@ -10,20 +10,26 @@ import booster from './products/recoltare-logistica/booster.json';
 export interface Product {
     id: string;
     slug: string;
-    category: 'pregatire-sol' | 'semanat-fertilizat' | 'protectia-plantelor' | 'recoltare-logistica';
+    category: string; // extended: 'pregatire-sol' | 'semanat-fertilizat' | 'recoltare-logistica' | 'viticol' | 'legumicol' | 'protectia-plantelor' | ...
     name: string;
     brand: string;
     badge?: string;
     description: string;
+    longDescription?: string;       // Rich descriere pentru pagina de produs
     imageSrc: string;
     specs: string[];
+    specIcons?: { icon: string; label: string; value: string }[]; // 3 specs cu iconițe
     detailedSpecs: any;
     expertVerdict: string;
+    videoUrl?: string;              // URL YouTube/Vimeo embed
     priceRange?: string;
     eligibility?: string;
+    metaTitle?: string;             // SEO: titlu custom
+    metaDescription?: string;       // SEO: descriere custom
+    status?: 'active' | 'draft';    // draft = invizibil pe site
 }
 
-// All products — add new imports and entries here when expanding the catalog
+// Static products — existente, neschimbate
 export const PRODUCTS: Product[] = [
     greenPlainsAds as Product,
     chainDiscKse680 as Product,
@@ -31,11 +37,14 @@ export const PRODUCTS: Product[] = [
     booster as Product,
 ];
 
-export const CATEGORIES = {
+// Base categories (static) — new categories can be added from Admin UI
+export const CATEGORIES: Record<string, string> = {
     'pregatire-sol': 'Pregătire Sol',
     'semanat-fertilizat': 'Semănat & Fertilizat',
-    'protectia-plantelor': 'Protecția Plantelor',
     'recoltare-logistica': 'Recoltare & Logistică',
-} as const;
+    'protectia-plantelor': 'Protecția Plantelor',
+    'viticol': 'Viticol',
+    'legumicol': 'Legumicol',
+};
 
-export type CategorySlug = keyof typeof CATEGORIES;
+export type CategorySlug = string;

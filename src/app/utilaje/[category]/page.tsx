@@ -1,8 +1,10 @@
-import { PRODUCTS } from '@/data/products';
+import { getProducts } from '@/lib/products-store';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
     params: Promise<{
@@ -15,6 +17,8 @@ const CATEGORY_NAMES: Record<string, string> = {
     'semanat-fertilizat': 'Semănat & Fertilizat',
     'protectia-plantelor': 'Protecția Plantelor',
     'recoltare-logistica': 'Recoltare & Logistică',
+    'viticol': 'Viticol',
+    'legumicol': 'Legumicol',
 };
 
 const CATEGORY_SEO: Record<string, { title: string; description: string; keywords: string[] }> = {
@@ -60,15 +64,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-export async function generateStaticParams() {
-    return Object.keys(CATEGORY_NAMES).map((category) => ({
-        category,
-    }));
-}
 
 export default async function CategoryPage({ params }: PageProps) {
     const { category } = await params;
-    const filteredProducts = PRODUCTS.filter(p => p.category === category);
+    const allProducts = await getProducts();
+    const filteredProducts = allProducts.filter(p => p.category === category && p.status !== 'draft');
     const categoryName = CATEGORY_NAMES[category];
 
     if (!categoryName) {

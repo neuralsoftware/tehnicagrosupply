@@ -23,6 +23,7 @@ const leadSchema = z.object({
     totalBenefit: z.number().optional(),
     message: z.string().max(10000, 'Mesaj prea lung').optional().default(''),
     source: z.string().optional().default('Website Form'),
+    productName: z.string().max(200).optional(),
 });
 
 export async function POST(request: Request) {
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
             phone: leadData.phone || '',
             email: leadData.email || '',
             county: leadData.county || '',
-            notes: `Sursa: Website Form\nMesaj: ${leadData.notes || '-'}\nHectare: ${leadData.hectares || 0}\nCulturi: ${(leadData.crops || []).join(', ')}\nUrgență: ${leadData.urgency || '-'}`,
+            notes: `Sursa: Website Form\nProdus Interesat: ${validatedData.productName || '-'}\nMesaj: ${leadData.notes || '-'}\nHectare: ${leadData.hectares || 0}\nCulturi: ${(leadData.crops || []).join(', ')}\nUrgență: ${leadData.urgency || '-'}`,
             status: 'Lead'
         };
 

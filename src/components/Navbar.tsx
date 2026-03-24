@@ -13,11 +13,28 @@ function cn(...inputs: ClassValue[]) {
 export function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [utilajeLinks, setUtilajeLinksList] = useState([
+        { name: 'Pregătire Sol', href: '/utilaje/pregatire-sol' },
+        { name: 'Semănat & Fertilizat', href: '/utilaje/semanat-fertilizat' },
+        { name: 'Recoltare & Logistică', href: '/utilaje/recoltare-logistica' },
+        { name: 'Piese de Schimb', href: '/piese-schimb' },
+    ]);
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
-        };
+        // Fetch active categories dynamically so new ones added via Admin show up
+        fetch('/api/categories')
+            .then(r => r.json())
+            .then(data => {
+                if (data.categories) {
+                    const cats = data.categories
+                        .filter((c: { status: string }) => c.status === 'active')
+                        .map((c: { slug: string; name: string }) => ({ name: c.name, href: `/utilaje/${c.slug}` }));
+                    // Always append Piese de Schimb at the end
+                    setUtilajeLinksList([...cats, { name: 'Piese de Schimb', href: '/piese-schimb' }]);
+                }
+            })
+            .catch(() => {}); // Fail silently, fallback already set
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
@@ -27,12 +44,7 @@ export function Navbar() {
         {
             name: 'Utilaje',
             href: '/#oferta',
-            children: [
-                { name: 'Pregătire Sol', href: '/utilaje/pregatire-sol' },
-                { name: 'Semănat & Fertilizat', href: '/utilaje/semanat-fertilizat' },
-                { name: 'Recoltare & Logistică', href: '/utilaje/recoltare-logistica' },
-                { name: 'Piese de Schimb', href: '/piese-schimb' },
-            ]
+            children: utilajeLinks,
         },
         { name: 'Blog Subvenții', href: '/blog' },
         { name: 'Contact', href: '/#contact' },

@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@next/third-parties": "^16.1.4",
+    "@react-pdf/renderer": "^4.3.2",
     "@supabase/supabase-js": "^2.91.0",
     "@types/nodemailer": "^7.0.5",
+    "@vercel/blob": "^2.3.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.27.5",
     "lucide-react": "^0.562.0",
