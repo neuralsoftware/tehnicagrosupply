@@ -217,7 +217,8 @@ export async function POST(request: Request) {
         console.log(`[Materiale] PDF generated successfully. Buffer size: ${buffer.length}`);
 
         // Blob Upload
-        const id = `brochure-${Date.now()}`;
+        const uniqueSuffix = Math.random().toString(36).substring(2, 8) + Date.now().toString(36);
+        const id = `brochure-${uniqueSuffix}`;
         const blob = await put(`materiale/${id}.pdf`, buffer, { 
             access: 'public', 
             contentType: 'application/pdf',
