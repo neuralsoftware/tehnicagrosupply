@@ -6,8 +6,9 @@ import { FUNDING_PROGRAMS } from '@/data/funding-programs';
 import React from 'react';
 
 function isAuthenticated(request: Request): boolean {
-    const auth = request.headers.get('x-admin-auth');
-    return auth === process.env.ADMIN_PASSWORD;
+    const auth = (request.headers.get('x-admin-auth') || '').trim();
+    const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+    return auth !== '' && auth === serverPass;
 }
 
 const COLORS = {
