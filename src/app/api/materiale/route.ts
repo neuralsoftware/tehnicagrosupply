@@ -1,3 +1,4 @@
+import path from 'path';
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { getProducts, saveBrochure, getBrochures, Brochure, DynamicProduct } from '@/lib/products-store';
@@ -5,16 +6,17 @@ import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps, 
 import { FUNDING_PROGRAMS } from '@/data/funding-programs';
 import React from 'react';
 
-// REGISTER ROMANIAN FONT (ROBOTO)
+// Roboto din public/fonts — fișiere locale (nu CDN), ca PDF-ul să nu depindă de rețea la fonturi pe Vercel
+const fontsDir = path.join(process.cwd(), 'public', 'fonts');
 Font.register({
   family: 'Roboto',
   fonts: [
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Regular.ttf', fontWeight: 'normal' },
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Medium.ttf', fontWeight: 'medium' },
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Bold.ttf', fontWeight: 'bold' },
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Italic.ttf', fontStyle: 'italic' },
-    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-MediumItalic.ttf', fontStyle: 'italic', fontWeight: 'medium' }
-  ]
+    { src: path.join(fontsDir, 'Roboto-Regular.ttf'), fontWeight: 'normal' },
+    { src: path.join(fontsDir, 'Roboto-Medium.ttf'), fontWeight: 500 },
+    { src: path.join(fontsDir, 'Roboto-Bold.ttf'), fontWeight: 'bold' },
+    { src: path.join(fontsDir, 'Roboto-Italic.ttf'), fontStyle: 'italic', fontWeight: 'normal' },
+    { src: path.join(fontsDir, 'Roboto-MediumItalic.ttf'), fontStyle: 'italic', fontWeight: 500 },
+  ],
 });
 
 export const maxDuration = 60;
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
     sectionTitle: { fontSize: 24, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 25, letterSpacing: -0.5 },
     mainText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 15, textAlign: 'justify' },
     bulletText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 8, marginLeft: 15 },
-    introHighlight: { fontSize: 13, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'medium', lineHeight: 1.5, marginBottom: 20 },
+    introHighlight: { fontSize: 13, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 500, lineHeight: 1.5, marginBottom: 20 },
     categoryHero: { backgroundColor: COLORS.primary, flex: 1, justifyContent: 'center', alignItems: 'center', padding: 60 },
     categoryTitle: { fontSize: 40, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 4, marginBottom: 20 },
     categoryDesc: { fontSize: 12, color: '#a7f3d0', textAlign: 'center', lineHeight: 1.6, paddingHorizontal: 40 },
