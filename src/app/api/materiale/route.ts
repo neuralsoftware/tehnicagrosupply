@@ -18,14 +18,12 @@ const COLORS = {
 };
 
 // DTP Layout Constants
-const MARGIN = 50; // ~1.8cm
+const MARGIN = 50; 
 const LINE_HEIGHT = 1.6;
 
-// PDF Styles (Professional Refinement)
+// PDF Styles
 const styles = StyleSheet.create({
     page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Helvetica' },
-
-    // Page 1: Cover
     cover: { flex: 1, backgroundColor: COLORS.primary, padding: 0 },
     coverHero: { height: '60%', backgroundColor: '#022c22', justifyContent: 'center', alignItems: 'center' },
     coverContent: { padding: 50, flex: 1, justifyContent: 'center', alignItems: 'center', textAlign: 'center' },
@@ -34,45 +32,32 @@ const styles = StyleSheet.create({
     coverSlogan: { fontSize: 11, color: COLORS.white, opacity: 0.8 },
     coverFooter: { position: 'absolute', bottom: 40, right: 50, textAlign: 'right' },
     coverFooterLink: { fontSize: 9, color: COLORS.white, opacity: 0.6, letterSpacing: 1 },
-
-    // Content Pages (Headers/Footers)
     header: { position: 'absolute', top: 30, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 0.5, borderBottomColor: COLORS.border, paddingBottom: 10, alignItems: 'center' },
     headerLogo: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.primary, letterSpacing: 2, textTransform: 'uppercase' },
     headerTitle: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1 },
     footer: { position: 'absolute', bottom: 30, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 0.5, borderTopColor: COLORS.border, paddingTop: 10 },
     footerPage: { fontSize: 8, color: COLORS.textMuted },
     footerWeb: { fontSize: 8, color: COLORS.primary, fontFamily: 'Helvetica-Bold' },
-
-    // Page 2: About
     sectionTitle: { fontSize: 22, fontFamily: 'Helvetica-Bold', color: COLORS.text, marginBottom: 20, letterSpacing: -0.5 },
     mainText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 40 },
     statsGrid: { flexDirection: 'row', gap: 20 },
     statBox: { flex: 1, backgroundColor: COLORS.bgLight, padding: 25, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: COLORS.primary },
     statNum: { fontSize: 24, fontFamily: 'Helvetica-Bold', color: COLORS.primary, marginBottom: 4 },
     statLabel: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1 },
-
-    // Product Detail Pages
     productLayout: { padding: `${MARGIN + 40}pt ${MARGIN}pt 80pt ${MARGIN}pt`, flex: 1 },
     badge: { position: 'absolute', top: MARGIN + 10, left: -10, backgroundColor: COLORS.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 2 },
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Helvetica-Bold', letterSpacing: 1, textTransform: 'uppercase' },
     brandLabel: { fontSize: 10, color: COLORS.primary, fontFamily: 'Helvetica-Bold', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 6 },
     modelTitle: { fontSize: 28, fontFamily: 'Helvetica-Bold', color: COLORS.text, marginBottom: 20, letterSpacing: -1 },
-
-    // Spec & Funding Blocks
     blockTitle: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4 },
     specItem: { flexDirection: 'row', marginBottom: 8, alignItems: 'center' },
     specDot: { width: 4, height: 4, backgroundColor: COLORS.primary, borderRadius: 2, marginRight: 8 },
     specText: { fontSize: 10, color: COLORS.textMuted, flex: 1 },
-
     fundingBox: { backgroundColor: '#f0fdf4', padding: 15, borderRadius: 4, borderLeftWidth: 3, borderLeftColor: COLORS.accent, marginTop: 20 },
     fundingTitle: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: '#065f46', textTransform: 'uppercase', marginBottom: 4, letterSpacing: 1 },
     fundingText: { fontSize: 9, color: '#065f46', fontFamily: 'Helvetica-Bold' },
-
-    // Image Placeholder
     placeholderBox: { width: '100%', backgroundColor: '#f1f5f9', borderStyle: 'dashed', borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, justifyContent: 'center', alignItems: 'center', marginVertical: 20, padding: 20 },
     placeholderText: { fontSize: 8, color: '#64748b', textAlign: 'center' },
-
-    // Page 6: Contact
     contactPage: { flex: 1, backgroundColor: COLORS.white, padding: MARGIN, justifyContent: 'center' },
     contactTitle: { fontSize: 32, fontFamily: 'Helvetica-Bold', color: COLORS.primary, textAlign: 'center', marginBottom: 40, letterSpacing: -1 },
     contactRow: { flexDirection: 'row', marginBottom: 15, alignItems: 'center', gap: 12 },
@@ -83,18 +68,17 @@ const styles = StyleSheet.create({
     ctaText: { color: COLORS.white, fontSize: 12, fontFamily: 'Helvetica-Bold', letterSpacing: 2, textTransform: 'uppercase' },
 });
 
-// Helper component for Image Placeholder
+// Helpers
 const ImagePlaceholder = ({ description, height = 200 }: { description: string; height?: number }) => (
     React.createElement(View, { style: { ...styles.placeholderBox, height } },
-        React.createElement(Text, { style: styles.placeholderText }, `[IMAGINE: ${description}]`)
+        React.createElement(Text, { style: styles.placeholderText }, `[IMAGINE: ${description || 'Echipament'}]`)
     )
 );
 
-// Header & Footer directly in Page
 const renderPageHeader = (title: string) => (
     React.createElement(View, { style: styles.header, fixed: true },
         React.createElement(Text, { style: styles.headerLogo }, 'TEHNICAGRO SUPPLY'),
-        React.createElement(Text, { style: styles.headerTitle }, title)
+        React.createElement(Text, { style: styles.headerTitle }, title || '')
     )
 );
 
@@ -106,7 +90,7 @@ const renderPageFooter = (pageNumber: number) => (
 );
 
 function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<DocumentProps> {
-    const productsToDisplay = products;
+    const productsToDisplay = products || [];
 
     return React.createElement(Document, { title: config.title || 'Broșură TehnicAgro Supply' },
         // PAGINA 1: COPERTĂ
@@ -146,43 +130,47 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
             renderPageFooter(2)
         ),
 
-        // PAGINA 3-5: PRODUSE
+        // PAGINI PRODUSE
         ...productsToDisplay.map((product, idx) => {
             const pageNum = idx + 3;
-            // Get category programs safely
-            const progList = (product.category && FUNDING_PROGRAMS[product.category]) || [];
-            const categoryPrograms = progList.filter(p => p.status === 'active').slice(0, 1);
+            // Robust Funding Check
+            const cat = product?.category || '';
+            const progList = (cat && (FUNDING_PROGRAMS as any)[cat]) || [];
+            const activePrograms = Array.isArray(progList) ? progList.filter(p => p.status === 'active').slice(0, 1) : [];
 
-            return React.createElement(Page, { size: 'A4', style: styles.page, key: product.slug },
+            return React.createElement(Page, { size: 'A4', style: styles.page, key: product?.slug || `p-${idx}` },
                 renderPageHeader('PRODUSE'),
                 React.createElement(View, { style: styles.productLayout },
-                    product.badge && React.createElement(View, { style: styles.badge },
+                    product?.badge && React.createElement(View, { style: styles.badge },
                         React.createElement(Text, { style: styles.badgeText }, product.badge)
                     ),
-                    React.createElement(Text, { style: styles.brandLabel }, product.brand),
-                    React.createElement(Text, { style: styles.modelTitle }, product.name),
-                    React.createElement(ImagePlaceholder, { description: `${product.name} ${product.brand}` }),
-                    React.createElement(Text, { style: styles.mainText }, product.longDescription || product.description || 'Fără descriere disponibilă.'),
+                    React.createElement(Text, { style: styles.brandLabel }, product?.brand || 'TEHNICAGRO'),
+                    React.createElement(Text, { style: styles.modelTitle }, product?.name || 'Utilaj Agricol'),
+                    React.createElement(ImagePlaceholder, { description: `${product?.name || ''} ${product?.brand || ''}`.trim() }),
+                    React.createElement(Text, { style: styles.mainText }, product?.longDescription || product?.description || 'Descriere în curs de actualizare.'),
                     React.createElement(View, { style: { flex: 1 } },
                         React.createElement(Text, { style: styles.blockTitle }, 'SPECIFICAȚII TEHNICE'),
-                        ...(product.specs || []).slice(0, 5).map((spec, i) =>
-                            React.createElement(View, { key: i, style: styles.specItem },
-                                React.createElement(View, { style: styles.specDot }),
-                                React.createElement(Text, { style: styles.specText }, spec)
-                            )
-                        )
+                        Array.isArray(product?.specs) && product.specs.length > 0 ? 
+                            product.specs.slice(0, 8).map((spec, i) =>
+                                React.createElement(View, { key: i, style: styles.specItem },
+                                    React.createElement(View, { style: styles.specDot }),
+                                    React.createElement(Text, { style: styles.specText }, spec || '')
+                                )
+                            ) : 
+                            React.createElement(Text, { style: { ...styles.specText, fontStyle: 'italic' } }, 'Specificații disponibile la cerere.')
                     ),
-                    categoryPrograms.length > 0 && React.createElement(View, { style: styles.fundingBox },
+                    activePrograms.length > 0 && React.createElement(View, { style: styles.fundingBox },
                         React.createElement(Text, { style: styles.fundingTitle }, 'FINANȚARE ELIGIBILĂ'),
-                        React.createElement(Text, { style: styles.fundingText }, `${categoryPrograms[0].title} — ${categoryPrograms[0].maxGrant}`)
+                        React.createElement(Text, { style: styles.fundingText }, `${activePrograms[0].title || ''} — ${activePrograms[0].maxGrant || ''}`)
                     )
                 ),
                 renderPageFooter(pageNum)
             );
         }),
 
-        // PAGINA 6: CONTACT
+        // PAGINA FINALĂ: CONTACT
         React.createElement(Page, { size: 'A4', style: styles.page },
+            renderPageHeader('CONTACT'),
             React.createElement(View, { style: styles.contactPage },
                 React.createElement(Text, { style: styles.contactTitle }, 'Contactați-ne'),
                 React.createElement(View, { style: { alignSelf: 'center' } },
@@ -199,7 +187,7 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
                     React.createElement(Text, { style: styles.ctaText }, 'SOLICITĂ OFERTĂ')
                 )
             ),
-            renderPageFooter(6)
+            renderPageFooter(productsToDisplay.length + 3)
         )
     );
 }
@@ -219,24 +207,36 @@ export async function POST(request: Request) {
         const selected = (productSlugs || []).map((s: string) => all.find(p => p.slug === s)).filter(Boolean) as DynamicProduct[];
         if (selected.length === 0) return NextResponse.json({ error: 'Selectează produse valide' }, { status: 400 });
 
-        // PDF
-        console.log('Rendering PDF for', selected.length, 'products...');
+        // PDF Generation
+        console.log(`[Materiale] Generating brochure with ${selected.length} products...`);
         const doc = buildPDF(config || {}, selected);
         const buffer = await renderToBuffer(doc);
-        console.log('PDF rendered, length:', buffer.length);
+        console.log(`[Materiale] PDF generated successfully. Buffer size: ${buffer.length}`);
 
-        // Upload
+        // Blob Upload
         const id = `brochure-${Date.now()}`;
         const blob = await put(`materiale/${id}.pdf`, buffer, { access: 'public', contentType: 'application/pdf' });
         
-        // Save
-        const data: Brochure = { id, title: config?.title || 'Broșură', subtitle: config?.subtitle, publicUrl: blob.url, createdAt: new Date().toISOString(), productSlugs: selected.map(p => p.slug), config: config || {} };
+        // Save Metadata
+        const data: Brochure = { 
+            id, 
+            title: config?.title || 'Broșură TehnicAgro', 
+            subtitle: config?.subtitle, 
+            publicUrl: blob.url, 
+            createdAt: new Date().toISOString(), 
+            productSlugs: selected.map(p => p.slug), 
+            config: config || {} 
+        };
         await saveBrochure(data);
 
         return NextResponse.json({ success: true, brochure: { ...data, downloadUrl: blob.url } });
     } catch (err: any) {
-        console.error('API ERROR:', err);
-        return NextResponse.json({ error: 'Failed to generate brochure', details: err?.message }, { status: 500 });
+        console.error('CRITICAL API ERROR in /api/materiale:', err.stack || err);
+        return NextResponse.json({ 
+            error: 'Failed to generate brochure', 
+            details: err?.message, 
+            stack: process.env.NODE_ENV === 'development' ? err?.stack : undefined 
+        }, { status: 500 });
     }
 }
 
@@ -244,7 +244,8 @@ export async function GET() {
     try {
         const list = await (await import('@/lib/products-store')).getBrochures();
         return NextResponse.json({ brochures: list });
-    } catch {
+    } catch (err: any) {
+        console.error('GET error:', err.stack || err);
         return NextResponse.json({ error: 'Failed to fetch brochures' }, { status: 500 });
     }
 }
