@@ -24,7 +24,7 @@ const LINE_HEIGHT = 1.6;
 // PDF Styles (Professional Refinement)
 const styles = StyleSheet.create({
     page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Helvetica' },
-    
+
     // Page 1: Cover
     cover: { flex: 1, backgroundColor: COLORS.primary, relative: true, padding: 0 },
     coverHero: { height: '60%', backgroundColor: '#022c22', justifyContent: 'center', alignItems: 'center' },
@@ -57,13 +57,13 @@ const styles = StyleSheet.create({
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Helvetica-Bold', letterSpacing: 1, textTransform: 'uppercase' },
     brandLabel: { fontSize: 10, color: COLORS.primary, fontFamily: 'Helvetica-Bold', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 6 },
     modelTitle: { fontSize: 28, fontFamily: 'Helvetica-Bold', color: COLORS.text, marginBottom: 20, letterSpacing: -1 },
-    
+
     // Spec & Funding Blocks
     blockTitle: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4 },
     specItem: { flexDirection: 'row', marginBottom: 8, alignItems: 'center' },
     specDot: { width: 4, height: 4, backgroundColor: COLORS.primary, borderRadius: 2, marginRight: 8 },
     specText: { fontSize: 10, color: COLORS.textMuted, flex: 1 },
-    
+
     fundingBox: { backgroundColor: '#f0fdf4', padding: 15, borderRadius: 4, borderLeftWidth: 3, borderLeftColor: COLORS.accent, marginTop: 20 },
     fundingTitle: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: '#065f46', textTransform: 'uppercase', marginBottom: 4, letterSpacing: 1 },
     fundingText: { fontSize: 9, color: '#065f46', fontFamily: 'Helvetica-Bold' },
@@ -132,7 +132,7 @@ function buildPDF(config: Record<string, string>, products: DynamicProduct[]): R
                 React.createElement(Text, { style: { ...styles.headerLogo, marginBottom: 10 } }, 'PARTENERUL TĂU'),
                 React.createElement(Text, { style: styles.sectionTitle }, 'Modernizare prin TehnicAgro Supply'),
                 React.createElement(Text, { style: styles.mainText }, config.introText || 'Ferma modernă necesită versatilitate. Vă propunem un pachet mixt de utilaje care acoperă diversele nevoi ale exploatației dumneavoastră, asigurând o mecanizare eficientă și conformitate deplină cu standardele europene de mediu.'),
-                
+
                 React.createElement(View, { style: styles.statsGrid },
                     ...[
                         { num: '10+', label: 'Ani Experiență' },
@@ -151,7 +151,7 @@ function buildPDF(config: Record<string, string>, products: DynamicProduct[]): R
             const pageNum = idx + 3;
             // Get category programs
             const categoryPrograms = (FUNDING_PROGRAMS[product.category] || []).filter((p: any) => p.status === 'active').slice(0, 1);
-            
+
             return React.createElement(Page, { size: 'A4', style: styles.page, key: product.slug },
                 React.createElement(PageLayout, { pageNumber: pageNum, title: 'PRODUSE' }),
                 React.createElement(View, { style: styles.productLayout },
@@ -159,14 +159,14 @@ function buildPDF(config: Record<string, string>, products: DynamicProduct[]): R
                     product.badge && React.createElement(View, { style: styles.badge },
                         React.createElement(Text, { style: styles.badgeText }, product.badge)
                     ),
-                    
+
                     React.createElement(Text, { style: styles.brandLabel }, product.brand),
                     React.createElement(Text, { style: styles.modelTitle }, product.name),
-                    
+
                     React.createElement(ImagePlaceholder, { description: `Imagine detaliată ${product.name} ${product.brand}`, height: idx === 0 ? 240 : 200 }),
-                    
+
                     React.createElement(Text, { style: { ...styles.mainText, marginBottom: 25 } }, product.longDescription || product.description),
-                    
+
                     // Specs
                     React.createElement(View, { style: { flex: 1 } },
                         React.createElement(Text, { style: styles.blockTitle }, 'SPECIFICAȚII TEHNICE'),
@@ -191,7 +191,7 @@ function buildPDF(config: Record<string, string>, products: DynamicProduct[]): R
         React.createElement(Page, { size: 'A4', style: styles.page },
             React.createElement(View, { style: styles.contactPage },
                 React.createElement(Text, { style: styles.contactTitle }, 'Solicită o ofertă personalizată'),
-                
+
                 React.createElement(ImagePlaceholder, { description: 'Imagine de fundal subtilă fermă modernă', height: 180 }),
 
                 React.createElement(View, { style: { alignSelf: 'center', marginTop: 30 } },
@@ -233,9 +233,9 @@ export async function POST(request: Request) {
         const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
         const bodyAuth = (adminAuth || '').trim();
         const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
-        
-        const isAuthed = (headerAuth !== '' && headerAuth === serverPass) || 
-                         (bodyAuth !== '' && bodyAuth === serverPass);
+
+        const isAuthed = (headerAuth !== '' && headerAuth === serverPass) ||
+            (bodyAuth !== '' && bodyAuth === serverPass);
 
         if (!isAuthed) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

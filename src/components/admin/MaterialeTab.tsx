@@ -96,8 +96,8 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
             const res = await fetch('/api/materiale', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }, // Header-ul x-admin-auth este mutat în BODY pentru fiabilitate maximă
-                body: JSON.stringify({ 
-                    config, 
+                body: JSON.stringify({
+                    config,
                     productSlugs: selectedSlugs,
                     adminAuth: cleanToken // <--- AUTH ÎN BODY (Final Fix for 401)
                 }),
