@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
-import { getProducts, saveBrochure, Brochure, DynamicProduct } from '@/lib/products-store';
+import { getProducts, saveBrochure, getBrochures, Brochure, DynamicProduct } from '@/lib/products-store';
 import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps } from '@react-pdf/renderer';
 import { FUNDING_PROGRAMS } from '@/data/funding-programs';
 import React from 'react';
+
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
 
 // PROFESSIONAL DTP COLOR PALETTE
 const COLORS = {
@@ -242,7 +245,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
     try {
-        const list = await (await import('@/lib/products-store')).getBrochures();
+        const list = await getBrochures();
         return NextResponse.json({ brochures: list });
     } catch (err: any) {
         console.error('GET error:', err.stack || err);
