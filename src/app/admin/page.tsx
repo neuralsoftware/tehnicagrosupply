@@ -29,6 +29,7 @@ export default function AdminPage() {
     const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
     const [allProducts, setAllProducts] = useState<DynamicProduct[]>([]);
     const [adminAuth, setAdminAuth] = useState('');
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const fetchProducts = async () => {
         try {
@@ -70,6 +71,11 @@ export default function AdminPage() {
             fetchProducts();
         }
         setCheckingAuth(false);
+
+        // Auto-refresh data when user returns to this tab/window
+        const onFocus = () => setRefreshKey(k => k + 1);
+        window.addEventListener('focus', onFocus);
+        return () => window.removeEventListener('focus', onFocus);
     }, []);
 
     if (checkingAuth) {
@@ -145,7 +151,10 @@ export default function AdminPage() {
                     {TABS.map(tab => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as Tab)}
+                            onClick={() => {
+                                setActiveTab(tab.id as Tab);
+                                setRefreshKey(k => k + 1); // forțează remount = date fresh
+                            }}
                             className={`flex items-center gap-2 px-5 py-3 text-[11px] font-black uppercase tracking-widest border-b-2 transition-all ${activeTab === tab.id ? 'border-ea-green-500 text-ea-green-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}
                         >
                             {tab.icon}{tab.label}
@@ -156,16 +165,16 @@ export default function AdminPage() {
 
             <div className="max-w-[1400px] mx-auto px-6 py-8">
                 {activeTab === 'catalog' && (
-                    <CatalogTab adminAuth={adminAuth} categories={categories} />
+                    <CatalogTab key={refreshKey} adminAuth={adminAuth} categories={categories} />
                 )}
                 {activeTab === 'categorii' && (
-                    <CategoriiTab adminAuth={adminAuth} onCategoriesChange={setCategories} />
+                    <CategoriiTab key={refreshKey} adminAuth={adminAuth} onCategoriesChange={setCategories} />
                 )}
                 {activeTab === 'programe' && (
-                    <ProgrameTab adminAuth={adminAuth} />
+                    <ProgrameTab key={refreshKey} adminAuth={adminAuth} />
                 )}
                 {activeTab === 'materiale' && (
-                    <MaterialeTab adminAuth={adminAuth} allProducts={allProducts} />
+                    <MaterialeTab key={refreshKey} adminAuth={adminAuth} allProducts={allProducts} />
                 )}
             </div>
         </div>
