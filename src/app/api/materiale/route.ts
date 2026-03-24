@@ -26,12 +26,12 @@ const styles = StyleSheet.create({
     page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Helvetica' },
 
     // Page 1: Cover
-    cover: { flex: 1, backgroundColor: COLORS.primary, relative: true, padding: 0 },
+    cover: { flex: 1, backgroundColor: COLORS.primary, padding: 0 },
     coverHero: { height: '60%', backgroundColor: '#022c22', justifyContent: 'center', alignItems: 'center' },
     coverContent: { padding: 50, flex: 1, justifyContent: 'center', alignItems: 'center', textAlign: 'center' },
     coverTitle: { fontSize: 36, fontFamily: 'Helvetica-Bold', color: COLORS.white, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 },
-    coverSubtitle: { fontSize: 16, color: '#a7f3d0', letterSpacing: 1, marginBottom: 8, fontWeight: 'medium' },
-    coverSlogan: { fontSize: 11, color: COLORS.white, opacity: 0.8, fontStyle: 'italic' },
+    coverSubtitle: { fontSize: 16, color: '#a7f3d0', letterSpacing: 1, marginBottom: 8 },
+    coverSlogan: { fontSize: 11, color: COLORS.white, opacity: 0.8 },
     coverFooter: { position: 'absolute', bottom: 40, right: 50, textAlign: 'right' },
     coverFooterLink: { fontSize: 9, color: COLORS.white, opacity: 0.6, letterSpacing: 1 },
 
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     statsGrid: { flexDirection: 'row', gap: 20 },
     statBox: { flex: 1, backgroundColor: COLORS.bgLight, padding: 25, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: COLORS.primary },
     statNum: { fontSize: 24, fontFamily: 'Helvetica-Bold', color: COLORS.primary, marginBottom: 4 },
-    statLabel: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 'bold' },
+    statLabel: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1 },
 
     // Product Detail Pages
     productLayout: { padding: `${MARGIN + 40}pt ${MARGIN}pt 80pt ${MARGIN}pt`, flex: 1 },
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
 
     // Image Placeholder
     placeholderBox: { width: '100%', backgroundColor: '#f1f5f9', borderStyle: 'dashed', borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, justifyContent: 'center', alignItems: 'center', marginVertical: 20, padding: 20 },
-    placeholderText: { fontSize: 8, color: '#64748b', textAlign: 'center', fontStyle: 'italic', maxWidth: '80%' },
+    placeholderText: { fontSize: 8, color: '#64748b', textAlign: 'center' },
 
     // Page 6: Contact
     contactPage: { flex: 1, backgroundColor: COLORS.white, padding: MARGIN, justifyContent: 'center' },
@@ -86,215 +86,165 @@ const styles = StyleSheet.create({
 // Helper component for Image Placeholder
 const ImagePlaceholder = ({ description, height = 200 }: { description: string; height?: number }) => (
     React.createElement(View, { style: { ...styles.placeholderBox, height } },
-        React.createElement(Text, { style: styles.placeholderText }, `[IMAGINE_PLACEHOLDER: ${description}]`)
+        React.createElement(Text, { style: styles.placeholderText }, `[IMAGINE: ${description}]`)
     )
 );
 
-// Header & Footer Reusable
-const PageLayout = ({ pageNumber, title }: { pageNumber: number; title: string }) => (
-    React.createElement(React.Fragment, null,
-        React.createElement(View, { style: styles.header, fixed: true },
-            React.createElement(Text, { style: styles.headerLogo }, 'TEHNICAGRO SUPPLY'),
-            React.createElement(Text, { style: styles.headerTitle }, title)
-        ),
-        React.createElement(View, { style: styles.footer, fixed: true },
-            React.createElement(Text, { style: styles.footerPage }, `Pagina ${pageNumber}`),
-            React.createElement(Text, { style: styles.footerWeb }, 'tehnicagrosupply.ro')
-        )
+// Header & Footer directly in Page
+const renderPageHeader = (title: string) => (
+    React.createElement(View, { style: styles.header, fixed: true },
+        React.createElement(Text, { style: styles.headerLogo }, 'TEHNICAGRO SUPPLY'),
+        React.createElement(Text, { style: styles.headerTitle }, title)
     )
 );
 
-function buildPDF(config: Record<string, string>, products: DynamicProduct[]): React.ReactElement<DocumentProps> {
-    const productsToDisplay = products.slice(0, 3); // Map to P3, P4, P5
+const renderPageFooter = (pageNumber: number) => (
+    React.createElement(View, { style: styles.footer, fixed: true },
+        React.createElement(Text, { style: styles.footerPage }, `Pagina ${pageNumber}`),
+        React.createElement(Text, { style: styles.footerWeb }, 'tehnicagrosupply.ro')
+    )
+);
+
+function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<DocumentProps> {
+    const productsToDisplay = products.slice(0, 3);
 
     return React.createElement(Document, { title: config.title || 'Broșură TehnicAgro Supply' },
         // PAGINA 1: COPERTĂ
         React.createElement(Page, { size: 'A4', style: styles.page },
             React.createElement(View, { style: styles.cover },
                 React.createElement(View, { style: styles.coverHero },
-                    React.createElement(ImagePlaceholder, { description: 'Imagine reprezentativă tractor/semănătoare No-Till la lucru pe câmp', height: 400 })
+                    React.createElement(ImagePlaceholder, { description: 'Utilaj în câmp', height: 400 })
                 ),
                 React.createElement(View, { style: styles.coverContent },
                     React.createElement(Text, { style: styles.coverTitle }, 'TEHNICAGRO SUPPLY'),
-                    React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Echipamente pentru Ferma Viitorului'),
-                    React.createElement(Text, { style: styles.coverSlogan }, 'Un mix de tehnologii pentru diversitate și performanță'),
+                    React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Echipamente Agricole'),
+                    React.createElement(Text, { style: styles.coverSlogan }, 'Tehnologie pentru Performanță'),
                 ),
                 React.createElement(View, { style: styles.coverFooter },
-                    React.createElement(Text, { style: styles.coverFooterLink }, `tehnicagrosupply.ro  |  ${config.phone || '+40 723 380 022'}  |  Ediția 2026`)
+                    React.createElement(Text, { style: styles.coverFooterLink }, `tehnicagrosupply.ro | ${config.phone || '+40 723 380 022'}`)
                 )
             )
         ),
 
         // PAGINA 2: DESPRE NOI
         React.createElement(Page, { size: 'A4', style: styles.page },
-            React.createElement(PageLayout, { pageNumber: 2, title: 'DESPRE NOI' }),
+            renderPageHeader('DESPRE NOI'),
             React.createElement(View, { style: { padding: `100pt ${MARGIN}pt`, flex: 1 } },
-                React.createElement(Text, { style: { ...styles.headerLogo, marginBottom: 10 } }, 'PARTENERUL TĂU'),
-                React.createElement(Text, { style: styles.sectionTitle }, 'Modernizare prin TehnicAgro Supply'),
-                React.createElement(Text, { style: styles.mainText }, config.introText || 'Ferma modernă necesită versatilitate. Vă propunem un pachet mixt de utilaje care acoperă diversele nevoi ale exploatației dumneavoastră, asigurând o mecanizare eficientă și conformitate deplină cu standardele europene de mediu.'),
-
+                React.createElement(Text, { style: styles.sectionTitle }, config.introTitle || 'Modernizare prin TehnicAgro Supply'),
+                React.createElement(Text, { style: styles.mainText }, config.introText || 'Vă propunem un pachet de utilaje adaptat cerințelor moderne.'),
                 React.createElement(View, { style: styles.statsGrid },
-                    ...[
-                        { num: '10+', label: 'Ani Experiență' },
-                        { num: '500+', label: 'Clienți Activi' },
-                        { num: '98%', label: 'Satisfacție Clienți' },
-                    ].map(stat => React.createElement(View, { key: stat.label, style: styles.statBox },
-                        React.createElement(Text, { style: styles.statNum }, stat.num),
-                        React.createElement(Text, { style: styles.statLabel }, stat.label),
-                    ))
+                    React.createElement(View, { style: styles.statBox },
+                        React.createElement(Text, { style: styles.statNum }, '10+'),
+                        React.createElement(Text, { style: styles.statLabel }, 'Ani Experiență')
+                    ),
+                    React.createElement(View, { style: styles.statBox },
+                        React.createElement(Text, { style: styles.statNum }, '500+'),
+                        React.createElement(Text, { style: styles.statLabel }, 'Clienți')
+                    )
                 )
-            )
+            ),
+            renderPageFooter(2)
         ),
 
         // PAGINA 3-5: PRODUSE
         ...productsToDisplay.map((product, idx) => {
             const pageNum = idx + 3;
-            // Get category programs
-            const categoryPrograms = (FUNDING_PROGRAMS[product.category] || []).filter((p: any) => p.status === 'active').slice(0, 1);
+            // Get category programs safely
+            const progList = (product.category && FUNDING_PROGRAMS[product.category]) || [];
+            const categoryPrograms = progList.filter(p => p.status === 'active').slice(0, 1);
 
             return React.createElement(Page, { size: 'A4', style: styles.page, key: product.slug },
-                React.createElement(PageLayout, { pageNumber: pageNum, title: 'PRODUSE' }),
+                renderPageHeader('PRODUSE'),
                 React.createElement(View, { style: styles.productLayout },
-                    // Badge
                     product.badge && React.createElement(View, { style: styles.badge },
                         React.createElement(Text, { style: styles.badgeText }, product.badge)
                     ),
-
                     React.createElement(Text, { style: styles.brandLabel }, product.brand),
                     React.createElement(Text, { style: styles.modelTitle }, product.name),
-
-                    React.createElement(ImagePlaceholder, { description: `Imagine detaliată ${product.name} ${product.brand}`, height: idx === 0 ? 240 : 200 }),
-
-                    React.createElement(Text, { style: { ...styles.mainText, marginBottom: 25 } }, product.longDescription || product.description),
-
-                    // Specs
+                    React.createElement(ImagePlaceholder, { description: `${product.name} ${product.brand}` }),
+                    React.createElement(Text, { style: styles.mainText }, product.longDescription || product.description || 'Fără descriere disponibilă.'),
                     React.createElement(View, { style: { flex: 1 } },
                         React.createElement(Text, { style: styles.blockTitle }, 'SPECIFICAȚII TEHNICE'),
-                        ...(product.specs || []).slice(0, 5).map((spec: string, i: number) =>
+                        ...(product.specs || []).slice(0, 5).map((spec, i) =>
                             React.createElement(View, { key: i, style: styles.specItem },
                                 React.createElement(View, { style: styles.specDot }),
                                 React.createElement(Text, { style: styles.specText }, spec)
                             )
                         )
                     ),
-
-                    // Funding
                     categoryPrograms.length > 0 && React.createElement(View, { style: styles.fundingBox },
-                        React.createElement(Text, { style: styles.fundingTitle }, 'PROGRAME FINANȚARE ELIGIBILE'),
-                        React.createElement(Text, { style: styles.fundingText }, `${categoryPrograms[0].title} (${categoryPrograms[0].code}) — max ${categoryPrograms[0].maxGrant}`)
+                        React.createElement(Text, { style: styles.fundingTitle }, 'FINANȚARE ELIGIBILĂ'),
+                        React.createElement(Text, { style: styles.fundingText }, `${categoryPrograms[0].title} — ${categoryPrograms[0].maxGrant}`)
                     )
-                )
+                ),
+                renderPageFooter(pageNum)
             );
         }),
 
-        // PAGINA 6: CONTACT (SPATE)
+        // PAGINA 6: CONTACT
         React.createElement(Page, { size: 'A4', style: styles.page },
             React.createElement(View, { style: styles.contactPage },
-                React.createElement(Text, { style: styles.contactTitle }, 'Solicită o ofertă personalizată'),
-
-                React.createElement(ImagePlaceholder, { description: 'Imagine de fundal subtilă fermă modernă', height: 180 }),
-
-                React.createElement(View, { style: { alignSelf: 'center', marginTop: 30 } },
+                React.createElement(Text, { style: styles.contactTitle }, 'Contactați-ne'),
+                React.createElement(View, { style: { alignSelf: 'center' } },
                     React.createElement(View, { style: styles.contactRow },
-                        React.createElement(View, { style: styles.contactIcon }, React.createElement(Text, { style: { fontSize: 10 } }, '☎')),
                         React.createElement(Text, { style: styles.contactLabel }, 'Telefon:'),
                         React.createElement(Text, { style: styles.contactValue }, config.phone || '+40 723 380 022')
                     ),
                     React.createElement(View, { style: styles.contactRow },
-                        React.createElement(View, { style: styles.contactIcon }, React.createElement(Text, { style: { fontSize: 10 } }, '✉')),
                         React.createElement(Text, { style: styles.contactLabel }, 'Email:'),
                         React.createElement(Text, { style: styles.contactValue }, config.email || 'office@tehnicagrosupply.ro')
-                    ),
-                    React.createElement(View, { style: styles.contactRow },
-                        React.createElement(View, { style: styles.contactIcon }, React.createElement(Text, { style: { fontSize: 10 } }, '🌐')),
-                        React.createElement(Text, { style: styles.contactLabel }, 'Web:'),
-                        React.createElement(Text, { style: styles.contactValue }, 'tehnicagrosupply.ro')
-                    ),
+                    )
                 ),
-
                 React.createElement(View, { style: styles.ctaButton },
-                    React.createElement(Text, { style: styles.ctaText }, 'CONTACTAȚI-NE ASTĂZI')
-                ),
-
-                React.createElement(View, { style: { position: 'absolute', bottom: 40, left: 0, right: 0, textAlign: 'center' } },
-                    React.createElement(Text, { style: { fontSize: 8, color: COLORS.textMuted } }, '© 2026 TehnicAgro Supply. Toate drepturile rezervate.')
+                    React.createElement(Text, { style: styles.ctaText }, 'SOLICITĂ OFERTĂ')
                 )
-            )
+            ),
+            renderPageFooter(6)
         )
     );
 }
 
 export async function POST(request: Request) {
     try {
-        const body = await request.json();
-        const { config, productSlugs, adminAuth } = body;
+        const bodyInput = await request.json();
+        const { config, productSlugs, adminAuth } = bodyInput;
 
-        // AUTH VERIFICATION (Double check: Header and Body)
-        const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
-        const bodyAuth = (adminAuth || '').trim();
+        // AUTH
         const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+        const authOk = (adminAuth || '').trim() === serverPass || (request.headers.get('x-admin-auth') || '').trim() === serverPass;
+        if (!authOk) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const isAuthed = (headerAuth !== '' && headerAuth === serverPass) ||
-            (bodyAuth !== '' && bodyAuth === serverPass);
+        // Products
+        const all = await getProducts();
+        const selected = (productSlugs || []).map((s: string) => all.find(p => p.slug === s)).filter(Boolean) as DynamicProduct[];
+        if (selected.length === 0) return NextResponse.json({ error: 'Selectează produse valide' }, { status: 400 });
 
-        if (!isAuthed) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        // PDF
+        console.log('Rendering PDF for', selected.length, 'products...');
+        const doc = buildPDF(config || {}, selected);
+        const buffer = await renderToBuffer(doc);
+        console.log('PDF rendered, length:', buffer.length);
 
-        // Fetch selected products
-        const allProducts = await getProducts();
-        const selectedProducts = productSlugs
-            .map((slug: string) => allProducts.find(p => p.slug === slug))
-            .filter(Boolean);
-
-        if (selectedProducts.length === 0) {
-            return NextResponse.json({ error: 'Niciun produs selectat valid' }, { status: 400 });
-        }
-
-        // Generate PDF
-        const pdfElement = buildPDF(config, selectedProducts as DynamicProduct[]);
-        const pdfBuffer = await renderToBuffer(pdfElement);
-
-        // Upload to Vercel Blob
+        // Upload
         const id = `brochure-${Date.now()}`;
-        const fileName = `materiale/${id}.pdf`;
-        const blob = await put(fileName, pdfBuffer, {
-            access: 'public',
-            contentType: 'application/pdf',
-            addRandomSuffix: false,
-        });
+        const blob = await put(`materiale/${id}.pdf`, buffer, { access: 'public', contentType: 'application/pdf' });
+        
+        // Save
+        const data: Brochure = { id, title: config?.title || 'Broșură', subtitle: config?.subtitle, publicUrl: blob.url, createdAt: new Date().toISOString(), productSlugs: selected.map(p => p.slug), config: config || {} };
+        await saveBrochure(data);
 
-        // Save metadata
-        const brochure: Brochure = {
-            id,
-            title: config.title || 'Broșură TehnicAgro',
-            subtitle: config.subtitle,
-            publicUrl: blob.url,
-            createdAt: new Date().toISOString(),
-            productSlugs,
-            config,
-        };
-        await saveBrochure(brochure);
-
-        return NextResponse.json({
-            success: true,
-            brochure: {
-                ...brochure,
-                downloadUrl: blob.url,
-            }
-        });
-    } catch (error) {
-        console.error('Brochure generation error:', error);
-        return NextResponse.json({ error: 'Failed to generate brochure' }, { status: 500 });
+        return NextResponse.json({ success: true, brochure: { ...data, downloadUrl: blob.url } });
+    } catch (err: any) {
+        console.error('API ERROR:', err);
+        return NextResponse.json({ error: 'Failed to generate brochure', details: err?.message }, { status: 500 });
     }
 }
 
 export async function GET() {
     try {
-        const { getBrochures } = await import('@/lib/products-store');
-        const brochures = await getBrochures();
-        return NextResponse.json({ brochures });
-    } catch (error) {
+        const list = await (await import('@/lib/products-store')).getBrochures();
+        return NextResponse.json({ brochures: list });
+    } catch {
         return NextResponse.json({ error: 'Failed to fetch brochures' }, { status: 500 });
     }
 }
