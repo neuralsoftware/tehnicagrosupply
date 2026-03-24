@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     statBox: { flex: 1, backgroundColor: COLORS.bgLight, padding: 25, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: COLORS.primary },
     statNum: { fontSize: 24, fontFamily: 'Helvetica-Bold', color: COLORS.primary, marginBottom: 4 },
     statLabel: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1 },
-    productLayout: { padding: `${MARGIN + 40}pt ${MARGIN}pt 80pt ${MARGIN}pt`, flex: 1 },
+    productLayout: { paddingTop: MARGIN + 40, paddingRight: MARGIN, paddingBottom: 80, paddingLeft: MARGIN, flex: 1 },
     badge: { position: 'absolute', top: MARGIN + 10, left: -10, backgroundColor: COLORS.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 2 },
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Helvetica-Bold', letterSpacing: 1, textTransform: 'uppercase' },
     brandLabel: { fontSize: 10, color: COLORS.primary, fontFamily: 'Helvetica-Bold', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 6 },
@@ -113,7 +113,7 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
         // PAGINA 2: DESPRE NOI
         React.createElement(Page, { size: 'A4', style: styles.page },
             renderPageHeader('DESPRE NOI'),
-            React.createElement(View, { style: { padding: `100pt ${MARGIN}pt`, flex: 1 } },
+            React.createElement(View, { style: { paddingVertical: 100, paddingHorizontal: MARGIN, flex: 1 } },
                 React.createElement(Text, { style: styles.sectionTitle }, config.introTitle || 'Modernizare prin TehnicAgro Supply'),
                 React.createElement(Text, { style: styles.mainText }, config.introText || 'Vă propunem un pachet de utilaje adaptat cerințelor moderne.'),
                 React.createElement(View, { style: styles.statsGrid },
