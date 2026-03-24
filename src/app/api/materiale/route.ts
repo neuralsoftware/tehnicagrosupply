@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { getProducts, saveBrochure, getBrochures, Brochure, DynamicProduct } from '@/lib/products-store';
-import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps } from '@react-pdf/renderer';
+import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps, Image } from '@react-pdf/renderer';
 import { FUNDING_PROGRAMS } from '@/data/funding-programs';
 import React from 'react';
 
@@ -72,11 +72,21 @@ const styles = StyleSheet.create({
 });
 
 // Helpers
-const ImagePlaceholder = ({ description, height = 200 }: { description: string; height?: number }) => (
-    React.createElement(View, { style: { ...styles.placeholderBox, height } },
-        React.createElement(Text, { style: styles.placeholderText }, `[IMAGINE: ${description || 'Echipament'}]`)
-    )
-);
+const ProductImage = ({ url, fallback }: { url?: string; fallback?: string }) => {
+    if (!url) {
+        return React.createElement(View, { style: { ...styles.placeholderBox, height: 260 } },
+            React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
+        );
+    }
+    // react-pdf (v4.3+) does not support WebP. Vercel Blob returns .webp from Catalog. 
+    // We use wsrv.nl proxy to instantly transcode the blob image to a PDF-safe .jpg!
+    const safeJpgUrl = `https://wsrv.nl/?url=${encodeURIComponent(url.replace(/^https?:\/\//, ''))}&output=jpg&w=800`;
+    
+    return React.createElement(Image, { 
+        src: safeJpgUrl,
+        style: { width: '100%', height: 260, objectFit: 'contain', marginVertical: 20 } 
+    });
+};
 
 const renderPageHeader = (title: string) => (
     React.createElement(View, { style: styles.header, fixed: true },
@@ -99,9 +109,7 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
         // PAGINA 1: COPERTĂ
         React.createElement(Page, { size: 'A4', style: styles.page },
             React.createElement(View, { style: styles.cover },
-                React.createElement(View, { style: styles.coverHero },
-                    React.createElement(ImagePlaceholder, { description: 'Utilaj în câmp', height: 400 })
-                ),
+                React.createElement(View, { style: styles.coverHero }),
                 React.createElement(View, { style: styles.coverContent },
                     React.createElement(Text, { style: styles.coverTitle }, 'TEHNICAGRO SUPPLY'),
                     React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Echipamente Agricole'),
@@ -117,18 +125,8 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
         React.createElement(Page, { size: 'A4', style: styles.page },
             renderPageHeader('DESPRE NOI'),
             React.createElement(View, { style: { paddingVertical: 100, paddingHorizontal: MARGIN, flex: 1 } },
-                React.createElement(Text, { style: styles.sectionTitle }, config.introTitle || 'Modernizare prin TehnicAgro Supply'),
-                React.createElement(Text, { style: styles.mainText }, config.introText || 'Vă propunem un pachet de utilaje adaptat cerințelor moderne.'),
-                React.createElement(View, { style: styles.statsGrid },
-                    React.createElement(View, { style: styles.statBox },
-                        React.createElement(Text, { style: styles.statNum }, '10+'),
-                        React.createElement(Text, { style: styles.statLabel }, 'Ani Experiență')
-                    ),
-                    React.createElement(View, { style: styles.statBox },
-                        React.createElement(Text, { style: styles.statNum }, '500+'),
-                        React.createElement(Text, { style: styles.statLabel }, 'Clienți')
-                    )
-                )
+                React.createElement(Text, { style: styles.sectionTitle }, config.introTitle || 'Soluții Agricole Premium'),
+                React.createElement(Text, { style: styles.mainText }, config.introText || 'Vă propunem o selecție de utilaje adaptată perfect exigențelor fermei moderne.')
             ),
             renderPageFooter(2)
         ),
@@ -149,7 +147,7 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
                     ),
                     React.createElement(Text, { style: styles.brandLabel }, product?.brand || 'TEHNICAGRO'),
                     React.createElement(Text, { style: styles.modelTitle }, product?.name || 'Utilaj Agricol'),
-                    React.createElement(ImagePlaceholder, { description: `${product?.name || ''} ${product?.brand || ''}`.trim() }),
+                    React.createElement(ProductImage, { url: product?.imageSrc, fallback: `${product?.name || ''} ${product?.brand || ''}`.trim() }),
                     React.createElement(Text, { style: styles.mainText }, product?.longDescription || product?.description || 'Descriere în curs de actualizare.'),
                     React.createElement(View, { style: { flex: 1 } },
                         React.createElement(Text, { style: styles.blockTitle }, 'SPECIFICAȚII TEHNICE'),
