@@ -218,7 +218,12 @@ export async function POST(request: Request) {
 
         // Blob Upload
         const id = `brochure-${Date.now()}`;
-        const blob = await put(`materiale/${id}.pdf`, buffer, { access: 'public', contentType: 'application/pdf' });
+        const blob = await put(`materiale/${id}.pdf`, buffer, { 
+            access: 'public', 
+            contentType: 'application/pdf',
+            addRandomSuffix: true,
+            allowOverwrite: true
+        });
         
         // Save Metadata
         const data: Brochure = { 
