@@ -125,9 +125,10 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
 
     // Group products by category
     const byCategory: Record<string, DynamicProduct[]> = {};
-    allProducts.filter(p => p.status === 'active').forEach(p => {
-        if (!byCategory[p.category]) byCategory[p.category] = [];
-        byCategory[p.category].push(p);
+    // Lenient filter: allow 'active' or products without an explicit status (migrated items)
+    allProducts.filter(p => !p.status || p.status === 'active').forEach(p => {
+        if (!byCategory[p.category || 'diverse']) byCategory[p.category || 'diverse'] = [];
+        byCategory[p.category || 'diverse'].push(p);
     });
 
     return (

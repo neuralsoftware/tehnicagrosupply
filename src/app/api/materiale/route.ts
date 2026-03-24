@@ -106,7 +106,7 @@ const renderPageFooter = (pageNumber: number) => (
 );
 
 function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<DocumentProps> {
-    const productsToDisplay = products.slice(0, 3);
+    const productsToDisplay = products;
 
     return React.createElement(Document, { title: config.title || 'Broșură TehnicAgro Supply' },
         // PAGINA 1: COPERTĂ
