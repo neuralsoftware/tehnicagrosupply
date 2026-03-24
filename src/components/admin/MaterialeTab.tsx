@@ -9,7 +9,8 @@ interface Props {
 }
 
 const PHONE = '+40 723 380 022';
-const EMAIL = 'office@tehnicagrosupply.ro';
+/** Același email ca în footer-ul site-ului (contact real) */
+const EMAIL = 'tehnicagro.supply@gmail.com';
 
 const TEMPLATES: Record<string, { title: string; subtitle: string; introTitle: string; introText: string }> = {
     viticol: {

@@ -18,6 +18,8 @@ Font.register({
     { src: path.join(fontsDir, 'Roboto-MediumItalic.ttf'), fontStyle: 'italic', fontWeight: 500 },
   ],
 });
+// Fără cratimă la sfârșit de rând (titluri/cuvinte întregi pe rândul următor)
+Font.registerHyphenationCallback((word) => [word]);
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -54,8 +56,15 @@ const COLORS = {
 // Same asset as layout.tsx icons — avoids broken v3 URL after graphic deploys
 const LOGO_URL = resolvePublicUrl('/logos/tehnicagro_logo_v1_1769155922952.png');
 
-// DTP Layout Constants
-const MARGIN = 50; 
+/** Contact real (ca pe site); PDF nu folosește adrese sau mail inventate */
+const DEFAULT_PHONE = '+40 723 380 022';
+const DEFAULT_EMAIL = 'tehnicagro.supply@gmail.com';
+const PUBLIC_WEB = 'tehnicagrosupply.ro';
+
+// DTP Layout Constants — spațiu pentru header/footer fixe, fără suprapuneri
+const MARGIN = 48;
+const HEADER_BLOCK = 72;
+const FOOTER_BLOCK = 56;
 const LINE_HEIGHT = 1.6;
 
 // PDF Styles
@@ -64,29 +73,29 @@ const styles = StyleSheet.create({
     cover: { flex: 1, backgroundColor: COLORS.primary, padding: 0 },
     coverHero: { height: '50%', backgroundColor: '#022c22', justifyContent: 'center', alignItems: 'center' },
     coverContent: { padding: MARGIN, flex: 1, justifyContent: 'center', alignItems: 'center', textAlign: 'center' },
-    coverTitle: { fontSize: 34, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.white, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 16 },
-    coverSubtitle: { fontSize: 14, color: '#a7f3d0', letterSpacing: 1.5, marginBottom: 12, textTransform: 'uppercase' },
-    coverSlogan: { fontSize: 11, color: COLORS.white, opacity: 0.8, lineHeight: 1.5, paddingHorizontal: 40 },
-    coverFooter: { position: 'absolute', bottom: 40, right: 50, textAlign: 'right' },
-    coverFooterLink: { fontSize: 9, color: COLORS.white, opacity: 0.6, letterSpacing: 1 },
-    header: { position: 'absolute', top: 30, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 10, alignItems: 'center' },
-    headerLogo: { width: 80, objectFit: 'contain' },
-    headerTitle: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 2, fontFamily: 'Roboto', fontWeight: 'bold' },
-    footer: { position: 'absolute', bottom: 30, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 10, alignItems: 'center' },
+    coverTitle: { fontSize: 30, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.white, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14, textAlign: 'center', maxWidth: '100%' },
+    coverSubtitle: { fontSize: 13, color: '#a7f3d0', letterSpacing: 1, marginBottom: 12, textTransform: 'uppercase', textAlign: 'center', paddingHorizontal: 16 },
+    coverSlogan: { fontSize: 11, color: COLORS.white, opacity: 0.85, lineHeight: 1.55, paddingHorizontal: 36, textAlign: 'center' },
+    coverFooter: { position: 'absolute', bottom: 36, left: MARGIN, right: MARGIN, textAlign: 'center' },
+    coverFooterLink: { fontSize: 9, color: COLORS.white, opacity: 0.65, letterSpacing: 0.5 },
+    header: { position: 'absolute', top: 28, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 8, minHeight: 44 },
+    headerLogo: { width: 76, objectFit: 'contain' },
+    headerTitle: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'Roboto', fontWeight: 'bold', flex: 1, flexShrink: 1, marginLeft: 14, textAlign: 'right', maxWidth: 280 },
+    footer: { position: 'absolute', bottom: 28, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 8, minHeight: 36 },
     footerPage: { fontSize: 8, color: COLORS.textMuted, letterSpacing: 1 },
     footerContact: { fontSize: 8, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold' },
-    sectionTitle: { fontSize: 24, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 25, letterSpacing: -0.5 },
+    sectionTitle: { fontSize: 22, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 22, letterSpacing: -0.3 },
     mainText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 15, textAlign: 'justify' },
     bulletText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 8, marginLeft: 15 },
     introHighlight: { fontSize: 13, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 500, lineHeight: 1.5, marginBottom: 20 },
-    categoryHero: { backgroundColor: COLORS.primary, flex: 1, justifyContent: 'center', alignItems: 'center', padding: 60 },
-    categoryTitle: { fontSize: 40, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 4, marginBottom: 20 },
-    categoryDesc: { fontSize: 12, color: '#a7f3d0', textAlign: 'center', lineHeight: 1.6, paddingHorizontal: 40 },
-    productLayout: { paddingTop: MARGIN + 40, paddingRight: MARGIN, paddingBottom: 80, paddingLeft: MARGIN, flex: 1 },
-    badge: { position: 'absolute', top: MARGIN + 10, left: -10, backgroundColor: COLORS.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 2 },
+    categoryHero: { backgroundColor: COLORS.primary, flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 56, paddingHorizontal: 32 },
+    categoryTitle: { fontSize: 28, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16, textAlign: 'center', maxWidth: '100%', paddingHorizontal: 8 },
+    categoryDesc: { fontSize: 11, color: '#a7f3d0', textAlign: 'center', lineHeight: 1.55, paddingHorizontal: 28 },
+    productLayout: { paddingTop: HEADER_BLOCK + 8, paddingRight: MARGIN, paddingBottom: FOOTER_BLOCK + 12, paddingLeft: MARGIN, flex: 1 },
+    badge: { alignSelf: 'flex-start', backgroundColor: COLORS.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 2, marginBottom: 10 },
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
     brandLabel: { fontSize: 10, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 },
-    modelTitle: { fontSize: 28, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 20, letterSpacing: -1 },
+    modelTitle: { fontSize: 24, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 14, letterSpacing: -0.5, maxWidth: '100%' },
     blockTitle: { fontSize: 10, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 15, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 6, marginTop: 25 },
     specItem: { flexDirection: 'row', marginBottom: 10, alignItems: 'center' },
     specDot: { width: 5, height: 5, backgroundColor: COLORS.primary, borderRadius: 2.5, marginRight: 10 },
@@ -99,11 +108,11 @@ const styles = StyleSheet.create({
     verdictText: { fontSize: 10, color: '#92400e', lineHeight: 1.5, fontStyle: 'italic' },
     placeholderBox: { width: '100%', backgroundColor: '#f1f5f9', borderStyle: 'dashed', borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, justifyContent: 'center', alignItems: 'center', marginVertical: 20, padding: 20 },
     placeholderText: { fontSize: 9, color: '#64748b', textAlign: 'center' },
-    contactPage: { flex: 1, backgroundColor: COLORS.white, padding: MARGIN, justifyContent: 'center' },
-    contactTitle: { fontSize: 36, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, textAlign: 'center', marginBottom: 40, letterSpacing: -1 },
-    contactRow: { flexDirection: 'row', marginBottom: 20, alignItems: 'center', gap: 15 },
-    contactLabel: { fontSize: 10, color: COLORS.textMuted, textTransform: 'uppercase', width: 70, letterSpacing: 1 },
-    contactValue: { fontSize: 16, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text },
+    contactPage: { flex: 1, backgroundColor: COLORS.white, padding: MARGIN, paddingTop: HEADER_BLOCK + 4, paddingBottom: FOOTER_BLOCK + 8, justifyContent: 'center' },
+    contactTitle: { fontSize: 26, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, textAlign: 'center', marginBottom: 28, letterSpacing: -0.5, paddingHorizontal: 12 },
+    contactRow: { flexDirection: 'row', marginBottom: 16, alignItems: 'flex-start' },
+    contactLabel: { fontSize: 10, color: COLORS.textMuted, textTransform: 'uppercase', width: 72, letterSpacing: 0.5, marginRight: 12, paddingTop: 3 },
+    contactValue: { fontSize: 13, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, flex: 1, flexShrink: 1, lineHeight: 1.45 },
     ctaButton: { marginTop: 60, paddingVertical: 20, paddingHorizontal: 40, backgroundColor: COLORS.primary, borderRadius: 6, alignItems: 'center', alignSelf: 'center' },
     ctaText: { color: COLORS.white, fontSize: 14, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 2, textTransform: 'uppercase' },
 });
@@ -111,7 +120,7 @@ const styles = StyleSheet.create({
 // Helpers
 const ProductImage = ({ url, fallback }: { url?: string; fallback?: string }) => {
     if (!url) {
-        return React.createElement(View, { style: { ...styles.placeholderBox, height: 260 } },
+        return React.createElement(View, { style: { ...styles.placeholderBox, height: 220 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
     }
@@ -122,7 +131,7 @@ const ProductImage = ({ url, fallback }: { url?: string; fallback?: string }) =>
     
     return React.createElement(Image, { 
         src: safeJpgUrl,
-        style: { width: '100%', height: 260, objectFit: 'contain', marginVertical: 20 } 
+        style: { width: '100%', height: 220, objectFit: 'contain', marginVertical: 14 } 
     });
 };
 
@@ -135,8 +144,8 @@ const renderPageHeader = (title: string) => (
 
 const renderPageFooter = (pageNumber: number, phone?: string) => (
     React.createElement(View, { style: styles.footer, fixed: true },
-        React.createElement(Text, { style: styles.footerPage }, `DOC: v3.1 Pro | Pagină ${pageNumber}`),
-        React.createElement(Text, { style: styles.footerContact }, `Suport Tehnic: ${phone || '+40 723 380 022'}`)
+        React.createElement(Text, { style: styles.footerPage }, `Catalog TehnicAgro · Pag. ${pageNumber}`),
+        React.createElement(Text, { style: styles.footerContact }, `${phone || DEFAULT_PHONE}`)
     )
 );
 
@@ -167,7 +176,7 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
                     React.createElement(Text, { style: styles.coverSlogan }, 'Investiția în tehnologie este singura garanție a profitabilității durabile. TehnicAgro Supply vă oferă acces la elita ingineriei europene.'),
                 ),
                 React.createElement(View, { style: styles.coverFooter },
-                    React.createElement(Text, { style: styles.coverFooterLink }, `EDIȚIE CATALOG PRO | WWW.TEHNICAGRO.RO`)
+                    React.createElement(Text, { style: styles.coverFooterLink }, `EDIȚIE CATALOG PRO · ${PUBLIC_WEB}`)
                 )
             )
         ),
@@ -175,8 +184,8 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
         // PAGINA 2: PROFIL COMPANIE (Magazine Style)
         React.createElement(Page, { size: 'A4', style: styles.page },
             renderPageHeader('PROFILUL COMPANIEI'),
-            React.createElement(View, { style: { paddingVertical: 60, paddingHorizontal: MARGIN, flex: 1 } },
-                React.createElement(Text, { style: styles.sectionTitle }, 'Partenerul de Încredere al Fermierului Român'),
+            React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 48, paddingHorizontal: MARGIN, flex: 1 } },
+                React.createElement(Text, { style: styles.sectionTitle }, 'Partenerul de încredere al fermierului român'),
                 React.createElement(Text, { style: styles.introHighlight }, 'TehnicAgro Supply s-a născut dintr-o nevoie reală: aceea de a oferi fermierilor români nu doar utilaje, ci soluții integrate care să maximizeze randamentul la hectar.'),
                 
                 React.createElement(Text, { style: styles.mainText }, 'Într-o piață în continuă schimbare, succesul unei exploatații agricole depinde de rapiditatea intervenției și de fiabilitatea echipamentului. De aceea, la TehnicAgro, nu facem compromisuri. Selectăm fiecare brand din portofoliu pe baza unor criterii riguroase de anduranță și eficiență energetică.'),
@@ -194,8 +203,8 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
         // PAGINA 3: PARTENERII NOȘTRI (Brands)
         React.createElement(Page, { size: 'A4', style: styles.page },
             renderPageHeader('BRANDURI DE ELITĂ'),
-            React.createElement(View, { style: { paddingVertical: 60, paddingHorizontal: MARGIN, flex: 1 } },
-                React.createElement(Text, { style: styles.sectionTitle }, 'Tehnologie Globală, Suport Local'),
+            React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 48, paddingHorizontal: MARGIN, flex: 1 } },
+                React.createElement(Text, { style: styles.sectionTitle }, 'Tehnologie globală, suport local'),
                 
                 React.createElement(View, { style: { marginBottom: 30 } },
                     React.createElement(Text, { style: { ...styles.brandLabel, color: COLORS.gold } }, 'FLIEGL AGRARTECHNIK'),
@@ -278,19 +287,23 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
             renderPageHeader('REȚEAUA TEHNICAGRO'),
             React.createElement(View, { style: styles.contactPage },
                 React.createElement(Image, { src: LOGO_URL, style: { width: 150, alignSelf: 'center', marginBottom: 40 } }),
-                React.createElement(Text, { style: styles.contactTitle }, 'Soluții la un Telefon Distanță'),
-                React.createElement(View, { style: { alignSelf: 'center', marginTop: 20 } },
+                React.createElement(Text, { style: styles.contactTitle }, 'Contact și oferte'),
+                React.createElement(View, { style: { alignSelf: 'center', marginTop: 16, maxWidth: 420 } },
                     React.createElement(View, { style: styles.contactRow },
-                        React.createElement(Text, { style: styles.contactLabel }, 'Mobil:'),
-                        React.createElement(Text, { style: styles.contactValue }, config.phone || '+40 723 380 022')
+                        React.createElement(Text, { style: styles.contactLabel }, 'Telefon'),
+                        React.createElement(Text, { style: styles.contactValue }, config.phone || DEFAULT_PHONE)
                     ),
                     React.createElement(View, { style: styles.contactRow },
-                        React.createElement(Text, { style: styles.contactLabel }, 'E-mail:'),
-                        React.createElement(Text, { style: styles.contactValue }, config.email || 'office@tehnicagrosupply.ro')
+                        React.createElement(Text, { style: styles.contactLabel }, 'E-mail'),
+                        React.createElement(Text, { style: styles.contactValue }, (config.email && String(config.email).trim()) || DEFAULT_EMAIL)
                     ),
                     React.createElement(View, { style: styles.contactRow },
-                        React.createElement(Text, { style: styles.contactLabel }, 'Adresă:'),
-                        React.createElement(Text, { style: styles.contactValue }, 'Centrul Logistic TehnicAgro, România')
+                        React.createElement(Text, { style: styles.contactLabel }, 'Site'),
+                        React.createElement(Text, { style: styles.contactValue }, PUBLIC_WEB)
+                    ),
+                    React.createElement(View, { style: styles.contactRow },
+                        React.createElement(Text, { style: styles.contactLabel }, 'Țară'),
+                        React.createElement(Text, { style: styles.contactValue }, 'România')
                     )
                 ),
                 React.createElement(View, { style: styles.ctaButton },
