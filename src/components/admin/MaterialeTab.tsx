@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { DynamicProduct, Brochure } from '@/lib/products-store';
-import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles } from 'lucide-react';
+import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers } from 'lucide-react';
 
 interface Props {
     adminAuth: string;
@@ -20,7 +20,7 @@ const TEMPLATES: Record<string, { title: string; subtitle: string; introTitle: s
     },
     'pregatire-sol': {
         title: 'Performanță în Pregătirea Solului',
-        subtitle: 'Eficiență maximă și conservarea structurii ecosistemului agricol',
+        subtitle: 'Eficiență maximă și conservarea structurii solului',
         introTitle: 'Baza unei recolte reușite',
         introText: 'Utilajele noastre pentru pregătirea solului sunt proiectate să lucreze în condiții dificile, asigurând un pat germinativ optim cu un consum minim de combustibil. Descoperiți soluțiile noastre pentru cultivare, arat și grapare.'
     },
@@ -41,6 +41,25 @@ const TEMPLATES: Record<string, { title: string; subtitle: string; introTitle: s
         subtitle: 'Siguranță, acuratețe și respect pentru mediu',
         introTitle: 'Control Total asupra Tratamentelelor',
         introText: 'Echipamentele noastre de stropit și protecție asigură o acoperire uniformă și reduc deriva soluțiilor, încadrându-se perfect în normele GAEC și oferind o eficiență maximă a tratamentelor fitosanitare.'
+    },
+    // Mixt / Multi-categorie
+    'mix-cultura-mare': {
+        title: 'Tehnologie Completă pentru Cultură Mare',
+        subtitle: 'Flux de lucru integrat: Pregătire, Semănat și Fertilizare',
+        introTitle: 'Soluția completă pentru ferma ta',
+        introText: 'Am selectat cele mai performante utilaje pentru a vă oferi o soluție completă în gestionarea culturilor mari. De la pregătirea precisă a patului germinativ până la semănatul de mare viteză, TehnicAgro Supply vă asigură echipamentele necesare pentru a maximiza randamentul la hectar.'
+    },
+    'mix-logistica-recolta': {
+        title: 'Soluții pentru Recoltare și Logistică',
+        subtitle: 'Eficiență în campanie: de la câmp la depozit',
+        introTitle: 'Campanii rapide fără pierderi',
+        introText: 'Această selecție de utilaje este dedicată optimizării procesului de recoltare și transport. Oferim soluții care minimizează timpii de descărcare și asigură transportul în siguranță al recoltei, indiferent de condițiile terenului.'
+    },
+    'mix-ferma-moderna': {
+        title: 'Echipamente pentru Ferma Viitorului',
+        subtitle: 'Un mix de tehnologii pentru diversitate și performanță',
+        introTitle: 'Modernizare prin TehnicAgro Supply',
+        introText: 'Ferma modernă necesită versatilitate. Vă propunem un pachet mixt de utilaje care acoperă diversele nevoi ale exploatației dumneavoastră, asigurând o mecanizare eficientă și conformitate deplină cu standardele europene de mediu.'
     }
 };
 
@@ -76,8 +95,12 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
             const cleanToken = (adminAuth || '').trim();
             const res = await fetch('/api/materiale', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-admin-auth': cleanToken },
-                body: JSON.stringify({ config, productSlugs: selectedSlugs }),
+                headers: { 'Content-Type': 'application/json' }, // Header-ul x-admin-auth este mutat în BODY pentru fiabilitate maximă
+                body: JSON.stringify({ 
+                    config, 
+                    productSlugs: selectedSlugs,
+                    adminAuth: cleanToken // <--- AUTH ÎN BODY (Final Fix for 401)
+                }),
             });
             const data = await res.json();
             if (res.ok && data.success) {
@@ -117,20 +140,36 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
                 </div>
 
                 {/* Template bar */}
-                <div className="space-y-2">
-                    <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest">Încarcă Model Rapid (Presets)</label>
-                    <div className="flex flex-wrap gap-2">
-                        {Object.entries({
-                            viticol: 'Viticultură',
-                            'pregatire-sol': 'Pregătire Sol',
-                            'semanat-fertilizat': 'Semănat',
-                            'recoltare-logistica': 'Recoltare',
-                            'protectia-plantelor': 'Protecția Plantelor'
-                        }).map(([k, label]) => (
-                            <button key={k} onClick={() => applyTemplate(k)} className="px-3 py-1.5 bg-zinc-800 hover:bg-ea-green-600/30 hover:text-ea-green-400 text-zinc-400 text-[10px] uppercase font-black tracking-widest rounded-lg border border-zinc-700 transition-all flex items-center gap-1.5">
-                                <Sparkles className="w-3 h-3" /> {label}
-                            </button>
-                        ))}
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest">Alege Domeniu Simplu</label>
+                        <div className="flex flex-wrap gap-2">
+                            {Object.entries({
+                                viticol: 'Viticulture',
+                                'pregatire-sol': 'Soil Prep',
+                                'semanat-fertilizat': 'Se seeding',
+                                'recoltare-logistica': 'Harvesting',
+                                'protectia-plantelor': 'Protection'
+                            }).map(([k, label]) => (
+                                <button key={k} onClick={() => applyTemplate(k)} className="px-3 py-1.5 bg-zinc-800 hover:bg-ea-green-600/30 hover:text-ea-green-400 text-zinc-400 text-[10px] uppercase font-black tracking-widest rounded-lg border border-zinc-700 transition-all flex items-center gap-1.5">
+                                    <Sparkles className="w-3 h-3" /> {label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest text-ea-green-500">Alege Combinație Mixtă (Multi-categorie)</label>
+                        <div className="flex flex-wrap gap-2">
+                            {Object.entries({
+                                'mix-cultura-mare': 'Tehnologie Cultură Mare',
+                                'mix-logistica-recolta': 'Recoltare + Logistică',
+                                'mix-ferma-moderna': 'Fermă Modernă (General)'
+                            }).map(([k, label]) => (
+                                <button key={k} onClick={() => applyTemplate(k)} className="px-3 py-1.5 bg-ea-green-950/20 hover:bg-ea-green-600/30 text-ea-green-400 text-[10px] uppercase font-black tracking-widest rounded-lg border border-ea-green-900/40 transition-all flex items-center gap-1.5">
+                                    <Layers className="w-3 h-3 text-ea-green-500" /> {label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
@@ -152,7 +191,7 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
                 </div>
                 <div>
                     <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">Mesaj Introductiv</label>
-                    <textarea value={config.introText} onChange={e => setConfig(p => ({ ...p, introText: e.target.value }))} rows={4} placeholder="Descrieți pe scurt oferta sau contextul broșurii..." className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 resize-none transition-all" />
+                    <textarea value={config.introText} onChange={e => setConfig(p => ({ ...p, introText: e.target.value }))} rows={5} placeholder="Descrieți pe scurt oferta sau contextul broșurii..." className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 resize-none transition-all leading-relaxed" />
                 </div>
             </div>
 
@@ -190,7 +229,7 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
 
             {/* Generate button */}
             <button onClick={generate} disabled={generating || selectedSlugs.length === 0} className="w-full py-5 bg-ea-green-600 hover:bg-ea-green-500 disabled:opacity-40 text-white rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 shadow-2xl shadow-ea-green-900/40 transition-all hover:-translate-y-0.5 active:translate-y-0">
-                {generating ? <><Loader className="w-5 h-5 animate-spin" />Se generează PDF-ul...</> : <><FileText className="w-5 h-5" />Generează Document Presentation</>}
+                {generating ? <><Loader className="w-5 h-5 animate-spin" />Se calculează și se generează PDF-ul...</> : <><FileText className="w-5 h-5" />Generează Document Publicitar</>}
             </button>
 
             {/* Result */}
@@ -200,7 +239,7 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
                         <div className="w-14 h-14 bg-ea-green-500/20 rounded-2xl flex items-center justify-center border border-ea-green-500/30"><FileText className="w-7 h-7 text-ea-green-400" /></div>
                         <div>
                             <p className="font-black text-white text-lg tracking-tight uppercase leading-tight">{result.title}</p>
-                            <p className="text-[11px] text-ea-green-500 uppercase font-black tracking-widest mt-1">Gata de share-uit!</p>
+                            <p className="text-[11px] text-ea-green-500 uppercase font-black tracking-widest mt-1">Gata de partajat pe WhatsApp/Email!</p>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -218,7 +257,7 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
                         </button>
                     </div>
                     <div className="bg-zinc-950/80 rounded-2xl p-4 border border-zinc-800/50">
-                        <p className="text-[10px] text-zinc-600 mb-2 uppercase font-black tracking-widest">Link Public</p>
+                        <p className="text-[10px] text-zinc-600 mb-2 uppercase font-black tracking-widest">Link Public Shareable</p>
                         <p className="text-xs text-ea-green-500 font-mono break-all selection:bg-ea-green-500/30">{result.publicUrl}</p>
                     </div>
                 </div>
@@ -227,7 +266,7 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
             {/* History */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-xl">
                 <div className="px-6 py-4 bg-zinc-950 border-b border-zinc-800 flex justify-between items-center">
-                    <span className="text-[11px] text-zinc-500 font-black uppercase tracking-widest">Istoric Documente</span>
+                    <span className="text-[11px] text-zinc-500 font-black uppercase tracking-widest">Istoric Documente Prezentare</span>
                     <button onClick={loadHistory} className="text-[11px] text-zinc-600 hover:text-white flex items-center gap-2 transition-colors uppercase font-black tracking-widest"><RefreshCcw className="w-3 h-3" />Actualizează</button>
                 </div>
                 {!historyLoaded ? (

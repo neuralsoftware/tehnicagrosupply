@@ -5,12 +5,6 @@ import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps }
 import { FUNDING_PROGRAMS } from '@/data/funding-programs';
 import React from 'react';
 
-function isAuthenticated(request: Request): boolean {
-    const auth = (request.headers.get('x-admin-auth') || '').trim();
-    const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
-    return auth !== '' && auth === serverPass;
-}
-
 const COLORS = {
     green: { primary: '#16a34a', light: '#dcfce7', dark: '#14532d', muted: '#86efac' },
     dark: { primary: '#18181b', light: '#27272a', dark: '#09090b', muted: '#71717a' },
@@ -135,12 +129,23 @@ function buildPDF(config: Record<string, string>, products: DynamicProduct[]): R
 }
 
 export async function POST(request: Request) {
-    if (!isAuthenticated(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     try {
         const body = await request.json();
-        const { config, productSlugs } = body;
+        const { config, productSlugs, adminAuth } = body;
+
+        // AUTH VERIFICATION (Double check: Header and Body)
+        // Body-based auth is more robust against proxy header stripping
+        const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
+        const bodyAuth = (adminAuth || '').trim();
+        const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+        
+        const isAuthed = (headerAuth !== '' && headerAuth === serverPass) || 
+                         (bodyAuth !== '' && bodyAuth === serverPass);
+
+        if (!isAuthed) {
+            console.warn('Unauthorized brochure attempt. Header size:', headerAuth.length, 'Body size:', bodyAuth.length);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
         // Fetch selected products
         const allProducts = await getProducts();
