@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { getProducts, saveBrochure, getBrochures, Brochure, DynamicProduct } from '@/lib/products-store';
-import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps, Image } from '@react-pdf/renderer';
+import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps, Image, Font } from '@react-pdf/renderer';
 import { FUNDING_PROGRAMS } from '@/data/funding-programs';
 import React from 'react';
+
+// REGISTER ROMANIAN FONT (ROBOTO)
+Font.register({
+  family: 'Roboto',
+  fonts: [
+    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Regular.ttf', fontWeight: 'normal' },
+    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Medium.ttf', fontWeight: 'medium' },
+    { src: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Bold.ttf', fontWeight: 'bold' }
+  ]
+});
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
@@ -26,49 +36,48 @@ const LINE_HEIGHT = 1.6;
 
 // PDF Styles
 const styles = StyleSheet.create({
-    page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Helvetica' },
+    page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Roboto' },
     cover: { flex: 1, backgroundColor: COLORS.primary, padding: 0 },
-    coverHero: { height: '60%', backgroundColor: '#022c22', justifyContent: 'center', alignItems: 'center' },
-    coverContent: { padding: 50, flex: 1, justifyContent: 'center', alignItems: 'center', textAlign: 'center' },
-    coverTitle: { fontSize: 36, fontFamily: 'Helvetica-Bold', color: COLORS.white, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12 },
-    coverSubtitle: { fontSize: 16, color: '#a7f3d0', letterSpacing: 1, marginBottom: 8 },
-    coverSlogan: { fontSize: 11, color: COLORS.white, opacity: 0.8 },
+    coverHero: { height: '50%', backgroundColor: '#022c22', justifyContent: 'center', alignItems: 'center' },
+    coverContent: { padding: MARGIN, flex: 1, justifyContent: 'center', alignItems: 'center', textAlign: 'center' },
+    coverTitle: { fontSize: 34, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.white, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 16 },
+    coverSubtitle: { fontSize: 14, color: '#a7f3d0', letterSpacing: 1.5, marginBottom: 12, textTransform: 'uppercase' },
+    coverSlogan: { fontSize: 11, color: COLORS.white, opacity: 0.8, lineHeight: 1.5, paddingHorizontal: 40 },
     coverFooter: { position: 'absolute', bottom: 40, right: 50, textAlign: 'right' },
     coverFooterLink: { fontSize: 9, color: COLORS.white, opacity: 0.6, letterSpacing: 1 },
-    header: { position: 'absolute', top: 30, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 0.5, borderBottomColor: COLORS.border, paddingBottom: 10, alignItems: 'center' },
-    headerLogo: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.primary, letterSpacing: 2, textTransform: 'uppercase' },
-    headerTitle: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1 },
-    footer: { position: 'absolute', bottom: 30, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 0.5, borderTopColor: COLORS.border, paddingTop: 10 },
-    footerPage: { fontSize: 8, color: COLORS.textMuted },
-    footerWeb: { fontSize: 8, color: COLORS.primary, fontFamily: 'Helvetica-Bold' },
-    sectionTitle: { fontSize: 22, fontFamily: 'Helvetica-Bold', color: COLORS.text, marginBottom: 20, letterSpacing: -0.5 },
-    mainText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 40 },
-    statsGrid: { flexDirection: 'row', gap: 20 },
-    statBox: { flex: 1, backgroundColor: COLORS.bgLight, padding: 25, borderRadius: 8, borderLeftWidth: 4, borderLeftColor: COLORS.primary },
-    statNum: { fontSize: 24, fontFamily: 'Helvetica-Bold', color: COLORS.primary, marginBottom: 4 },
-    statLabel: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1 },
+    header: { position: 'absolute', top: 30, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 15, alignItems: 'center' },
+    headerLogo: { fontSize: 11, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, letterSpacing: 2, textTransform: 'uppercase' },
+    headerTitle: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 2 },
+    footer: { position: 'absolute', bottom: 30, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 10 },
+    footerPage: { fontSize: 8, color: COLORS.textMuted, letterSpacing: 1 },
+    footerWeb: { fontSize: 8, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 1 },
+    sectionTitle: { fontSize: 24, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 25, letterSpacing: -0.5 },
+    mainText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 15, textAlign: 'justify' },
+    bulletText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 8, marginLeft: 15 },
     productLayout: { paddingTop: MARGIN + 40, paddingRight: MARGIN, paddingBottom: 80, paddingLeft: MARGIN, flex: 1 },
     badge: { position: 'absolute', top: MARGIN + 10, left: -10, backgroundColor: COLORS.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 2 },
-    badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Helvetica-Bold', letterSpacing: 1, textTransform: 'uppercase' },
-    brandLabel: { fontSize: 10, color: COLORS.primary, fontFamily: 'Helvetica-Bold', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 6 },
-    modelTitle: { fontSize: 28, fontFamily: 'Helvetica-Bold', color: COLORS.text, marginBottom: 20, letterSpacing: -1 },
-    blockTitle: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 12, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4 },
-    specItem: { flexDirection: 'row', marginBottom: 8, alignItems: 'center' },
-    specDot: { width: 4, height: 4, backgroundColor: COLORS.primary, borderRadius: 2, marginRight: 8 },
-    specText: { fontSize: 10, color: COLORS.textMuted, flex: 1 },
-    fundingBox: { backgroundColor: '#f0fdf4', padding: 15, borderRadius: 4, borderLeftWidth: 3, borderLeftColor: COLORS.accent, marginTop: 20 },
-    fundingTitle: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: '#065f46', textTransform: 'uppercase', marginBottom: 4, letterSpacing: 1 },
-    fundingText: { fontSize: 9, color: '#065f46', fontFamily: 'Helvetica-Bold' },
+    badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
+    brandLabel: { fontSize: 10, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 3, textTransform: 'uppercase', marginBottom: 8 },
+    modelTitle: { fontSize: 28, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 20, letterSpacing: -1 },
+    blockTitle: { fontSize: 10, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 15, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 6, marginTop: 25 },
+    specItem: { flexDirection: 'row', marginBottom: 10, alignItems: 'center' },
+    specDot: { width: 5, height: 5, backgroundColor: COLORS.primary, borderRadius: 2.5, marginRight: 10 },
+    specText: { fontSize: 10, color: COLORS.textMuted, flex: 1, lineHeight: 1.4 },
+    fundingBox: { backgroundColor: '#f0fdf4', padding: 20, borderRadius: 6, borderLeftWidth: 4, borderLeftColor: COLORS.accent, marginTop: 25 },
+    fundingTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: '#065f46', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 1 },
+    fundingText: { fontSize: 10, color: '#065f46', lineHeight: 1.4 },
+    verdictBox: { backgroundColor: '#fffbeb', padding: 20, borderRadius: 6, borderLeftWidth: 4, borderLeftColor: '#f59e0b', marginTop: 20 },
+    verdictTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: '#92400e', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 1 },
+    verdictText: { fontSize: 10, color: '#92400e', lineHeight: 1.5, fontStyle: 'italic' },
     placeholderBox: { width: '100%', backgroundColor: '#f1f5f9', borderStyle: 'dashed', borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, justifyContent: 'center', alignItems: 'center', marginVertical: 20, padding: 20 },
-    placeholderText: { fontSize: 8, color: '#64748b', textAlign: 'center' },
+    placeholderText: { fontSize: 9, color: '#64748b', textAlign: 'center' },
     contactPage: { flex: 1, backgroundColor: COLORS.white, padding: MARGIN, justifyContent: 'center' },
-    contactTitle: { fontSize: 32, fontFamily: 'Helvetica-Bold', color: COLORS.primary, textAlign: 'center', marginBottom: 40, letterSpacing: -1 },
-    contactRow: { flexDirection: 'row', marginBottom: 15, alignItems: 'center', gap: 12 },
-    contactIcon: { width: 24, height: 24, backgroundColor: COLORS.bgLight, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-    contactLabel: { fontSize: 9, color: COLORS.textMuted, textTransform: 'uppercase', width: 60 },
-    contactValue: { fontSize: 14, fontFamily: 'Helvetica-Bold', color: COLORS.text },
-    ctaButton: { marginTop: 50, padding: 20, backgroundColor: COLORS.primary, borderRadius: 4, alignItems: 'center' },
-    ctaText: { color: COLORS.white, fontSize: 12, fontFamily: 'Helvetica-Bold', letterSpacing: 2, textTransform: 'uppercase' },
+    contactTitle: { fontSize: 36, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, textAlign: 'center', marginBottom: 40, letterSpacing: -1 },
+    contactRow: { flexDirection: 'row', marginBottom: 20, alignItems: 'center', gap: 15 },
+    contactLabel: { fontSize: 10, color: COLORS.textMuted, textTransform: 'uppercase', width: 70, letterSpacing: 1 },
+    contactValue: { fontSize: 16, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text },
+    ctaButton: { marginTop: 60, paddingVertical: 20, paddingHorizontal: 40, backgroundColor: COLORS.primary, borderRadius: 6, alignItems: 'center', alignSelf: 'center' },
+    ctaText: { color: COLORS.white, fontSize: 14, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 2, textTransform: 'uppercase' },
 });
 
 // Helpers
@@ -112,8 +121,8 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
                 React.createElement(View, { style: styles.coverHero }),
                 React.createElement(View, { style: styles.coverContent },
                     React.createElement(Text, { style: styles.coverTitle }, 'TEHNICAGRO SUPPLY'),
-                    React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Echipamente Agricole'),
-                    React.createElement(Text, { style: styles.coverSlogan }, 'Tehnologie pentru Performanță'),
+                    React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Echipamente Agricole Premium'),
+                    React.createElement(Text, { style: styles.coverSlogan }, 'Inovăm procesele fermei tale. Livrăm performanța care îți garantează o prezență solidă pe piața agricolă europeană.'),
                 ),
                 React.createElement(View, { style: styles.coverFooter },
                     React.createElement(Text, { style: styles.coverFooterLink }, `tehnicagrosupply.ro | ${config.phone || '+40 723 380 022'}`)
@@ -121,12 +130,24 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
             )
         ),
 
-        // PAGINA 2: DESPRE NOI
+        // PAGINA 2: DESPRE NOI (CATALOGUE INTRO)
         React.createElement(Page, { size: 'A4', style: styles.page },
-            renderPageHeader('DESPRE NOI'),
-            React.createElement(View, { style: { paddingVertical: 100, paddingHorizontal: MARGIN, flex: 1 } },
-                React.createElement(Text, { style: styles.sectionTitle }, config.introTitle || 'Soluții Agricole Premium'),
-                React.createElement(Text, { style: styles.mainText }, config.introText || 'Vă propunem o selecție de utilaje adaptată perfect exigențelor fermei moderne.')
+            renderPageHeader('PROFILUL COMPANIEI'),
+            React.createElement(View, { style: { paddingVertical: 80, paddingHorizontal: MARGIN, flex: 1 } },
+                React.createElement(Text, { style: styles.sectionTitle }, config.introTitle || 'Parteneriatul pentru Excelență în Agricultură'),
+                
+                // User text or rich default text
+                config.introText 
+                ? React.createElement(Text, { style: styles.mainText }, config.introText)
+                : React.createElement(React.Fragment, null, 
+                    React.createElement(Text, { style: styles.mainText }, 'TEHNICAGRO SUPPLY s-a format cu viziunea clară de a aduce pe piața agricolă din România cele mai robuste și inovatoare tehnologii disponibile. Nu suntem doar furnizori de utilaje, ci parteneri strategici dedicați creșterii sustenabile a fermei dumneavoastră.'),
+                    React.createElement(Text, { style: styles.mainText }, 'Fiecare echipament pe care îl livrăm trece printr-un proces riguros de selecție asigurat de inginerii noștri. Ne concentrăm pe utilaje care demonstrează o eficiență sporită, un consum redus și un cost excelent pe ciclul de viață.'),
+                    React.createElement(Text, { style: styles.mainText }, 'Abordarea noastră este completă și acoperă toate necesitățile fermei:'),
+                    React.createElement(Text, { style: styles.bulletText }, '• Echipamente pretabile tuturor proceselor (pregătire sol, semănat, îngrijirea culturilor și recoltare).'),
+                    React.createElement(Text, { style: styles.bulletText }, '• Consultanță directă în câmp pentru a identifica setarea optimă a fiecărui utilaj.'),
+                    React.createElement(Text, { style: styles.bulletText }, '• Dosare de finanțare – asistență deplină pentru programele APIA și fondurile AFIR.'),
+                    React.createElement(Text, { style: styles.mainText }, '\nÎn paginile următoare, vă prezentăm o selecție personalizată de mașini agricole, configurată special pentru cerințele tehnologice și bugetare ale exploatației dumneavoastră.')
+                )
             ),
             renderPageFooter(2)
         ),
@@ -158,7 +179,11 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
                                     React.createElement(Text, { style: styles.specText }, spec || '')
                                 )
                             ) : 
-                            React.createElement(Text, { style: { ...styles.specText, fontStyle: 'italic' } }, 'Specificații disponibile la cerere.')
+                            React.createElement(Text, { style: { ...styles.specText, fontStyle: 'italic' } }, 'Vă rugăm să contactați departamentul tehnic pentru tabelul complet de specificații.')
+                    ),
+                    product?.expertVerdict && React.createElement(View, { style: styles.verdictBox },
+                        React.createElement(Text, { style: styles.verdictTitle }, 'Verdictul Expertului Tehnic'),
+                        React.createElement(Text, { style: styles.verdictText }, product.expertVerdict)
                     ),
                     activePrograms.length > 0 && React.createElement(View, { style: styles.fundingBox },
                         React.createElement(Text, { style: styles.fundingTitle }, 'FINANȚARE ELIGIBILĂ'),
@@ -173,19 +198,23 @@ function buildPDF(config: any, products: DynamicProduct[]): React.ReactElement<D
         React.createElement(Page, { size: 'A4', style: styles.page },
             renderPageHeader('CONTACT'),
             React.createElement(View, { style: styles.contactPage },
-                React.createElement(Text, { style: styles.contactTitle }, 'Contactați-ne'),
-                React.createElement(View, { style: { alignSelf: 'center' } },
+                React.createElement(Text, { style: styles.contactTitle }, 'Suntem Aici Pentru Tine'),
+                React.createElement(View, { style: { alignSelf: 'center', marginTop: 20 } },
                     React.createElement(View, { style: styles.contactRow },
                         React.createElement(Text, { style: styles.contactLabel }, 'Telefon:'),
                         React.createElement(Text, { style: styles.contactValue }, config.phone || '+40 723 380 022')
                     ),
                     React.createElement(View, { style: styles.contactRow },
-                        React.createElement(Text, { style: styles.contactLabel }, 'Email:'),
+                        React.createElement(Text, { style: styles.contactLabel }, 'E-mail:'),
                         React.createElement(Text, { style: styles.contactValue }, config.email || 'office@tehnicagrosupply.ro')
+                    ),
+                    React.createElement(View, { style: styles.contactRow },
+                        React.createElement(Text, { style: styles.contactLabel }, 'Web:'),
+                        React.createElement(Text, { style: styles.contactValue }, 'www.tehnicagrosupply.ro')
                     )
                 ),
                 React.createElement(View, { style: styles.ctaButton },
-                    React.createElement(Text, { style: styles.ctaText }, 'SOLICITĂ OFERTĂ')
+                    React.createElement(Text, { style: styles.ctaText }, 'CERE OFERTA PERSONALIZATĂ')
                 )
             ),
             renderPageFooter(productsToDisplay.length + 3)
