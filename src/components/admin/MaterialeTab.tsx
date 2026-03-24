@@ -107,8 +107,9 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
                 setResult(data.brochure);
                 loadHistory();
             } else {
+                const detail = typeof data.details === 'string' && data.details ? `\n\nDetalii: ${data.details}` : '';
                 if (res.status === 401) alert('Eroare: Sesiune expirată sau parolă incorectă (401 Unauthorized)');
-                else alert('Eroare: ' + (data.error || 'Server error'));
+                else alert('Eroare: ' + (data.error || 'Server error') + detail);
             }
         } catch (err) {
             alert('Eroare conexiune: ' + String(err));
