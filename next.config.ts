@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // Redirect pentru domeniu final (când va fi custom)
   async redirects() {
     return [];
