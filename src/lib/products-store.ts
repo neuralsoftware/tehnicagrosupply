@@ -78,6 +78,7 @@ async function writeBlob<T>(key: string, data: T): Promise<string> {
         access: 'public',
         contentType: 'application/json',
         addRandomSuffix: false,
+        allowOverwrite: true,
     });
     return blob.url;
 }
