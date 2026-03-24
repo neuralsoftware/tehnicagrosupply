@@ -16,15 +16,26 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-    if (!isAuthenticated(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     try {
-        const product: DynamicProduct = await request.json();
+        const body = await request.json();
+        const { adminAuth, ...product } = body;
+
+        // AUTH VERIFICATION
+        const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
+        const bodyAuth = (adminAuth || '').trim();
+        const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+        
+        const isAuthed = (headerAuth !== '' && headerAuth === serverPass) || 
+                         (bodyAuth !== '' && bodyAuth === serverPass);
+
+        if (!isAuthed) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         if (!product.slug || !product.name || !product.category) {
             return NextResponse.json({ error: 'Slug, name, and category are required' }, { status: 400 });
         }
-        await saveProduct(product);
+        await saveProduct(product as DynamicProduct);
         return NextResponse.json({ success: true, product });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to save product' }, { status: 500 });

@@ -1,18 +1,24 @@
 import { NextResponse } from 'next/server';
 import { getProducts, saveProduct, deleteProduct } from '@/lib/products-store';
 
-function isAuthenticated(request: Request): boolean {
-    const auth = request.headers.get('x-admin-auth');
-    return auth === process.env.ADMIN_PASSWORD;
-}
-
 export async function PUT(request: Request, { params }: { params: Promise<{ slug: string }> }) {
-    if (!isAuthenticated(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     try {
+        const body = await request.json();
+        const { adminAuth, ...updates } = body;
         const { slug } = await params;
-        const updates = await request.json();
+
+        // AUTH VERIFICATION
+        const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
+        const bodyAuth = (adminAuth || '').trim();
+        const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+        
+        const isAuthed = (headerAuth !== '' && headerAuth === serverPass) || 
+                         (bodyAuth !== '' && bodyAuth === serverPass);
+
+        if (!isAuthed) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         await saveProduct({ ...updates, slug });
         return NextResponse.json({ success: true });
     } catch (error) {
@@ -21,11 +27,23 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ slug: string }> }) {
-    if (!isAuthenticated(request)) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
     try {
+        const body = await request.json();
+        const { adminAuth } = body;
         const { slug } = await params;
+
+        // AUTH VERIFICATION
+        const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
+        const bodyAuth = (adminAuth || '').trim();
+        const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+        
+        const isAuthed = (headerAuth !== '' && headerAuth === serverPass) || 
+                         (bodyAuth !== '' && bodyAuth === serverPass);
+
+        if (!isAuthed) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         await deleteProduct(slug);
         return NextResponse.json({ success: true });
     } catch (error) {

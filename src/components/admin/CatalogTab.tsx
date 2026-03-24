@@ -1,7 +1,7 @@
 'use client';
 import { useState, useCallback, useEffect } from 'react';
 import { DynamicProduct } from '@/lib/products-store';
-import { Pencil, Trash2, Plus, Check, X, Save, ChevronDown } from 'lucide-react';
+import { Pencil, Trash2, Plus, Check, X, Save, ChevronDown, Upload } from 'lucide-react';
 
 const ICON_OPTIONS = ['Ruler', 'Zap', 'Weight', 'Gauge', 'ArrowRight', 'Settings', 'Truck', 'Leaf'];
 
@@ -9,17 +9,18 @@ function slugify(str: string) {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-function ImageOptimizer({ onOptimized }: { onOptimized: (url: string) => void }) {
+function ImageOptimizer({ onOptimized, adminAuth, filename }: { onOptimized: (url: string) => void, adminAuth: string, filename: string }) {
     const [preview, setPreview] = useState<string | null>(null);
     const [quality, setQuality] = useState(80);
     const [originalSize, setOriginalSize] = useState(0);
     const [optimizedSize, setOptimizedSize] = useState(0);
+    const [uploading, setUploading] = useState(false);
 
-    const optimize = useCallback((file: File, q: number) => {
+    const optimizeAndUpload = useCallback((file: File, q: number) => {
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new window.Image();
-            img.onload = () => {
+            img.onload = async () => {
                 const canvas = document.createElement('canvas');
                 const MAX = 1200;
                 const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
@@ -27,38 +28,70 @@ function ImageOptimizer({ onOptimized }: { onOptimized: (url: string) => void })
                 canvas.height = img.height * ratio;
                 const ctx = canvas.getContext('2d')!;
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                const dataUrl = canvas.toDataURL('image/webp', q / 100);
-                setPreview(dataUrl);
-                const bytes = Math.round((dataUrl.length * 3) / 4);
-                setOptimizedSize(bytes);
-                onOptimized(dataUrl);
+                
+                // Convert to Blob for upload
+                canvas.toBlob(async (blob) => {
+                    if (!blob) return;
+                    setPreview(canvas.toDataURL('image/webp', q / 100));
+                    setOptimizedSize(blob.size);
+                    
+                    // Upload to Blob via API
+                    setUploading(true);
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', blob, `${filename || 'product'}.webp`);
+                        formData.append('filename', `${filename || 'product'}.webp`);
+
+                        const res = await fetch('/api/upload', {
+                            method: 'POST',
+                            headers: { 'x-admin-auth': adminAuth },
+                            body: formData,
+                        });
+                        const data = await res.json();
+                        if (data.url) onOptimized(data.url);
+                        else alert('Upload failed: ' + data.error);
+                    } catch (err) {
+                        alert('Upload error: ' + String(err));
+                    } finally {
+                        setUploading(false);
+                    }
+                }, 'image/webp', q / 100);
             };
             img.src = e.target?.result as string;
         };
         reader.readAsDataURL(file);
-    }, [onOptimized]);
+    }, [onOptimized, adminAuth, filename]);
 
     const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         setOriginalSize(file.size);
-        optimize(file, quality);
+        optimizeAndUpload(file, quality);
     };
 
     return (
-        <div className="space-y-3">
-            <input type="file" accept="image/*" onChange={handleFile} className="w-full text-xs text-zinc-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-ea-green-600 file:text-white file:text-xs file:font-bold file:cursor-pointer" />
+        <div className="space-y-3 p-4 bg-zinc-950/50 rounded-2xl border border-zinc-800">
+            <input type="file" accept="image/*" onChange={handleFile} className="w-full text-xs text-zinc-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-ea-green-600 file:text-white file:text-xs file:font-bold file:cursor-pointer disabled:opacity-50" disabled={uploading} />
             {preview && (
-                <div className="space-y-2">
+                <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
                     <div className="flex items-center gap-3">
-                        <label className="text-[10px] text-zinc-400 uppercase font-bold tracking-widest">Calitate WebP: {quality}%</label>
-                        <input type="range" min={40} max={95} value={quality} onChange={(e) => setQuality(+e.target.value)} className="flex-1 accent-ea-green-500" />
+                        <label className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Calitate WebP: {quality}%</label>
+                        <input type="range" min={40} max={95} value={quality} onChange={(e) => setQuality(+e.target.value)} className="flex-1 accent-ea-green-500" disabled={uploading} />
                     </div>
-                    <div className="flex gap-3 text-[10px] text-zinc-500 font-mono">
-                        <span>Original: {(originalSize / 1024).toFixed(1)} KB</span>
-                        <span className="text-ea-green-400">Optimizat: {(optimizedSize / 1024).toFixed(1)} KB (-{Math.round((1 - optimizedSize / originalSize) * 100)}%)</span>
+                    <div className="flex justify-between text-[10px] font-mono">
+                        <span className="text-zinc-600 uppercase">Original: {(originalSize / 1024).toFixed(1)} KB</span>
+                        <span className="text-ea-green-400 font-bold uppercase">Optimized: {(optimizedSize / 1024).toFixed(1)} KB</span>
                     </div>
-                    <img src={preview} alt="preview" className="w-full h-32 object-cover rounded-lg border border-zinc-700" />
+                    <div className="relative rounded-lg overflow-hidden border border-zinc-800 group">
+                        <img src={preview} alt="preview" className="w-full h-32 object-cover transition-all group-hover:scale-105" />
+                        {uploading && (
+                            <div className="absolute inset-0 bg-zinc-950/80 flex items-center justify-center gap-2">
+                                <div className="w-4 h-4 border-2 border-ea-green-500 border-t-transparent rounded-full animate-spin" />
+                                <span className="text-[10px] text-white font-black uppercase tracking-widest">Se încarcă pe Blob...</span>
+                            </div>
+                        )}
+                        {!uploading && <div className="absolute top-2 right-2 bg-ea-green-600 text-white p-1 rounded-md shadow-lg"><Check className="w-3 h-3" /></div>}
+                    </div>
                 </div>
             )}
         </div>
@@ -95,48 +128,62 @@ export function CatalogTab({ adminAuth, categories }: Props) {
     const save = async () => {
         if (!editing) return;
         setSaving(true);
+        // Ensure we use the uploaded Blob URL if available
         const product = { ...editing, id: editing.id || editing.slug, imageSrc: imageUrl || editing.imageSrc };
         const method = products.find(p => p.slug === editing.slug) ? 'PUT' : 'POST';
         const url = method === 'PUT' ? `/api/products/${editing.slug}` : '/api/products';
-        await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'x-admin-auth': adminAuth }, body: JSON.stringify(product) });
+        await fetch(url, { 
+            method, 
+            headers: { 'Content-Type': 'application/json', 'x-admin-auth': adminAuth }, 
+            body: JSON.stringify({ ...product, adminAuth }) // Move auth to body as we did for brochures
+        });
         setSaving(false);
         setEditing(null);
+        setImageUrl('');
         load();
     };
 
     const del = async (slug: string) => {
         if (!confirm('Ștergi produsul?')) return;
-        await fetch(`/api/products/${slug}`, { method: 'DELETE', headers: { 'x-admin-auth': adminAuth } });
+        await fetch(`/api/products/${slug}`, { 
+            method: 'DELETE', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminAuth }) 
+        });
         load();
     };
 
     if (!loaded) return (
-        <div className="flex items-center gap-3 px-4 py-8 text-zinc-500 text-xs uppercase font-bold tracking-widest">
+        <div className="flex items-center gap-3 px-4 py-8 text-zinc-500 text-xs uppercase font-bold tracking-widest leading-none">
             <div className="w-4 h-4 border-2 border-ea-green-500 border-t-transparent rounded-full animate-spin" />
             Se încarcă catalogul...
         </div>
     );
 
     if (editing !== null) return (
-        <div className="space-y-4 max-w-3xl">
-            <div className="flex justify-between items-center">
-                <h3 className="text-lg font-black uppercase text-white">{editing.slug ? 'Editează Produs' : 'Produs Nou'}</h3>
-                <button onClick={() => setEditing(null)} className="p-2 bg-zinc-800 rounded-xl text-zinc-400 hover:text-white"><X className="w-4 h-4" /></button>
+        <div className="space-y-4 max-w-3xl animate-in fade-in slide-in-from-bottom-2">
+            <div className="flex justify-between items-center mb-6">
+                <div>
+                    <h3 className="text-xl font-black uppercase text-white tracking-tight">{editing.slug ? 'Editează Produs' : 'Produs Nou'}</h3>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Toate imaginile sunt acum stocate pe Vercel Blob</p>
+                </div>
+                <button onClick={() => setEditing(null)} className="p-3 bg-zinc-900 border border-zinc-800 rounded-2xl text-zinc-400 hover:text-white transition-all"><X className="w-5 h-5" /></button>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            
+            <div className="grid grid-cols-2 gap-4 bg-zinc-900 p-6 rounded-3xl border border-zinc-800">
                 {[ ['Nume Produs *', 'name'], ['Brand *', 'brand'], ['Badge', 'badge'], ['URL Video (YouTube)', 'videoUrl'] ].map(([label, key]) => (
                     <div key={key}>
                         <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">{label}</label>
                         <input value={(editing as Record<string, string>)[key] || ''} onChange={e => {
                             const v = e.target.value;
                             const update: Partial<DynamicProduct> = { [key]: v };
-                            if (key === 'name') update.slug = slugify(v);
+                            if (key === 'name' && !editing.slug) update.slug = slugify(v);
                             setEditing(prev => ({ ...prev, ...update }));
-                        }} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500" />
+                        }} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 transition-all" />
                     </div>
                 ))}
                 <div>
-                    <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">Slug (URL)</label>
+                    <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">Slug (URL Manual)</label>
                     <input value={editing.slug || ''} onChange={e => setEditing(p => ({ ...p, slug: slugify(e.target.value) }))} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-zinc-400 text-sm font-mono outline-none focus:ring-1 focus:ring-ea-green-500" />
                 </div>
                 <div>
@@ -146,36 +193,39 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                         {categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
                     </select>
                 </div>
-                <div>
-                    <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">Status</label>
-                    <select value={editing.status || 'draft'} onChange={e => setEditing(p => ({ ...p, status: e.target.value as 'active' | 'draft' }))} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500">
-                        <option value="draft">Draft (invizibil)</option>
-                        <option value="active">Activ (vizibil pe site)</option>
-                    </select>
-                </div>
             </div>
-            {[ ['Descriere Scurtă *', 'description', 3], ['Descriere Lungă (pagina produs)', 'longDescription', 5], ['Verdict Expert', 'expertVerdict', 3] ].map(([label, key, rows]) => (
-                <div key={String(key)}>
-                    <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">{String(label)}</label>
-                    <textarea value={(editing as Record<string, string>)[String(key)] || ''} onChange={e => setEditing(p => ({ ...p, [String(key)]: e.target.value }))} rows={Number(rows)} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 resize-none" />
-                </div>
-            ))}
-            <div>
-                <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">Imagine Produs</label>
-                <div className="space-y-2">
-                    <input value={editing.imageSrc || ''} onChange={e => { setEditing(p => ({ ...p, imageSrc: e.target.value })); setImageUrl(e.target.value); }} placeholder="/products/imagine.jpg sau URL extern" className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500" />
-                    <p className="text-[10px] text-zinc-600 uppercase font-bold">-- SAU UPLOADEAZĂ ȘI OPTIMIZEAZĂ --</p>
-                    <ImageOptimizer onOptimized={url => setImageUrl(url)} />
-                </div>
-            </div>
-            <div>
-                <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">Specificații Tehnice (min. 3)</label>
-                {(editing.specs || ['', '', '']).map((spec, i) => (
-                    <input key={i} value={spec} onChange={e => setEditing(p => { const s = [...(p?.specs || ['','',''])]; s[i] = e.target.value; return { ...p, specs: s }; })} placeholder={`Spec. ${i + 1} (ex: Lățime: 6.8m)`} className="w-full mb-2 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500" />
+
+            <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 space-y-4">
+                {[ ['Descriere Scurtă *', 'description', 3], ['Descriere Lungă (pagina produs)', 'longDescription', 5], ['Verdict Expert', 'expertVerdict', 3] ].map(([label, key, rows]) => (
+                    <div key={String(key)}>
+                        <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">{String(label)}</label>
+                        <textarea value={(editing as Record<string, string>)[String(key)] || ''} onChange={e => setEditing(p => ({ ...p, [String(key)]: e.target.value }))} rows={Number(rows)} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 resize-none transition-all" />
+                    </div>
                 ))}
-                <button onClick={() => setEditing(p => ({ ...p, specs: [...(p?.specs || []), ''] }))} className="text-[10px] text-ea-green-500 font-bold uppercase hover:underline">+ Adaugă Spec.</button>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+
+            <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 space-y-3">
+                <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest">Imagine Produs (Vercel Blob)</label>
+                <div className="space-y-4">
+                    <div className="flex gap-2">
+                        <input value={imageUrl || editing.imageSrc || ''} onChange={e => { setImageUrl(e.target.value); setEditing(p => ({ ...p, imageSrc: e.target.value })); }} placeholder="URL Image (Auto-populated from upload)" className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-xs font-mono outline-none focus:ring-1 focus:ring-ea-green-500 opacity-70" />
+                        {(imageUrl || editing.imageSrc) && <img src={imageUrl || editing.imageSrc} alt="" className="w-12 h-12 rounded-lg object-cover border border-zinc-800" />}
+                    </div>
+                    <ImageOptimizer onOptimized={url => { setImageUrl(url); setEditing(p => ({ ...p, imageSrc: url })); }} adminAuth={adminAuth} filename={editing.slug || 'product'} />
+                </div>
+            </div>
+
+            <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800">
+                <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-3">Specificații Tehnice Principale</label>
+                {(editing.specs || ['', '', '']).map((spec, i) => (
+                    <input key={i} value={spec} onChange={e => setEditing(p => { const s = [...(p?.specs || ['','',''])]; s[i] = e.target.value; return { ...p, specs: s }; })} placeholder={`Spec. ${i + 1} (ex: Lățime: 6.8m)`} className="w-full mb-2 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 transition-all font-bold" />
+                ))}
+                <button onClick={() => setEditing(p => ({ ...p, specs: [...(p?.specs || []), ''] }))} className="text-[10px] text-ea-green-500 font-black uppercase hover:text-white transition-colors flex items-center gap-1 mt-2">
+                    <Plus className="w-3 h-3" /> Adaugă Specificație
+                </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 bg-zinc-900 p-6 rounded-3xl border border-zinc-800">
                 <div>
                     <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">Meta Titlu SEO</label>
                     <input value={editing.metaTitle || ''} onChange={e => setEditing(p => ({ ...p, metaTitle: e.target.value }))} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500" />
@@ -185,53 +235,85 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                     <input value={editing.metaDescription || ''} onChange={e => setEditing(p => ({ ...p, metaDescription: e.target.value }))} className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500" />
                 </div>
             </div>
-            <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
-                <button onClick={() => setEditing(null)} className="px-6 py-3 text-zinc-500 font-black uppercase text-xs hover:text-white">Anulează</button>
-                <button onClick={save} disabled={saving} className="px-8 py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-xl font-black uppercase text-xs flex items-center gap-2 disabled:opacity-50">
-                    <Save className="w-4 h-4" />{saving ? 'Se salvează...' : 'Salvează Produsul'}
+
+            <div className="flex justify-end gap-3 py-10 border-t border-zinc-800">
+                <button onClick={() => setEditing(null)} className="px-8 py-4 text-zinc-500 font-black uppercase text-xs hover:text-white transition-colors leading-none">Renunță</button>
+                <button onClick={save} disabled={saving} className="px-10 py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 shadow-2xl shadow-ea-green-900/40 transition-all hover:-translate-y-1 active:translate-y-0 leading-none disabled:opacity-50">
+                    {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+                    {saving ? 'Se salvează în Cloud...' : 'Salvează Produsul'}
                 </button>
             </div>
         </div>
     );
 
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <p className="text-zinc-500 text-sm">{products.length} produse în catalog</p>
-                <button onClick={() => setEditing(blank())} className="flex items-center gap-2 px-5 py-2.5 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-xl font-black uppercase text-xs">
-                    <Plus className="w-4 h-4" />Adaugă Produs Nou
+        <div className="space-y-6">
+            <div className="flex justify-between items-center bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800">
+                <div>
+                    <h2 className="text-sm font-black text-white uppercase tracking-widest">Catalog Produse</h2>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">{products.length} produse active pe Vercel Blob</p>
+                </div>
+                <button onClick={() => setEditing(blank())} className="flex items-center gap-2 px-6 py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase text-xs shadow-xl shadow-ea-green-900/20 transition-all hover:scale-105 active:scale-95 leading-none">
+                    <Plus className="w-4 h-4" /> Adaugă Produs
                 </button>
             </div>
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
                 <table className="w-full text-sm">
-                    <thead className="bg-zinc-950 text-zinc-400 text-[10px] uppercase font-black tracking-widest">
+                    <thead className="bg-zinc-950 text-zinc-500 text-[10px] uppercase font-black tracking-widest border-b border-zinc-800">
                         <tr>
-                            <th className="px-5 py-4 text-left">Produs</th>
-                            <th className="px-5 py-4 text-left">Categorie</th>
-                            <th className="px-5 py-4 text-left">Slug</th>
-                            <th className="px-5 py-4 text-center">Status</th>
-                            <th className="px-5 py-4 text-right">Acțiuni</th>
+                            <th className="px-6 py-5 text-left">Utilaj / Brand</th>
+                            <th className="px-6 py-5 text-left">Categorie</th>
+                            <th className="px-6 py-5 text-left">Imagine</th>
+                            <th className="px-6 py-5 text-center">Status</th>
+                            <th className="px-6 py-5 text-right">Gestiune</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800/50">
                         {products.map(p => (
-                            <tr key={p.slug} className="hover:bg-zinc-800/30 transition-colors">
-                                <td className="px-5 py-4"><div className="font-bold text-white">{p.name}</div><div className="text-[10px] text-zinc-500">{p.brand}</div></td>
-                                <td className="px-5 py-4 text-zinc-400 text-xs">{p.category}</td>
-                                <td className="px-5 py-4 text-zinc-600 font-mono text-xs">{p.slug}</td>
-                                <td className="px-5 py-4 text-center">
-                                    <span className={`px-2 py-1 rounded text-[9px] font-black uppercase ${p.status === 'active' ? 'bg-ea-green-900/40 text-ea-green-400' : 'bg-zinc-800 text-zinc-500'}`}>{p.status === 'active' ? 'Activ' : 'Draft'}</span>
+                            <tr key={p.slug} className="hover:bg-zinc-800/30 transition-all group">
+                                <td className="px-6 py-5">
+                                    <div className="font-black text-white uppercase tracking-tight">{p.name}</div>
+                                    <div className="text-[10px] text-zinc-500 font-bold uppercase">{p.brand}</div>
                                 </td>
-                                <td className="px-5 py-4 text-right">
+                                <td className="px-6 py-5">
+                                    <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest bg-zinc-800 px-2 py-1 rounded">
+                                        {p.category}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-5">
+                                    {p.imageSrc ? (
+                                        <div className="relative group/img">
+                                            <img src={p.imageSrc} alt="" className="w-12 h-12 rounded-xl object-cover border border-zinc-800 transition-transform group-hover/img:scale-110" />
+                                            {p.imageSrc.includes('public.blob.vercel-storage.com') && (
+                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-ea-green-500 rounded-full border-2 border-zinc-900" title="Stocat pe Blob" />
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="w-12 h-12 rounded-xl bg-zinc-950 border border-dotted border-zinc-700" />
+                                    )}
+                                </td>
+                                <td className="px-6 py-5 text-center">
+                                    <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest ${p.status === 'active' ? 'bg-ea-green-500/10 text-ea-green-400' : 'bg-zinc-950 text-zinc-600'}`}>
+                                        <div className={`w-1 h-1 rounded-full ${p.status === 'active' ? 'bg-ea-green-500' : 'bg-zinc-600'}`} />
+                                        {p.status === 'active' ? 'Activ' : 'Draft'}
+                                    </div>
+                                </td>
+                                <td className="px-6 py-5 text-right">
                                     <div className="flex items-center justify-end gap-2">
-                                        <button onClick={() => { setEditing(p); setImageUrl(p.imageSrc); }} className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-white"><Pencil className="w-3.5 h-3.5" /></button>
-                                        <button onClick={() => del(p.slug)} className="p-2 bg-zinc-800 hover:bg-red-900/40 rounded-lg text-zinc-400 hover:text-red-400"><Trash2 className="w-3.5 h-3.5" /></button>
+                                        <button onClick={() => { setEditing(p); setImageUrl(p.imageSrc); }} className="p-3 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-zinc-400 hover:text-white transition-all"><Pencil className="w-4 h-4" /></button>
+                                        <button onClick={() => del(p.slug)} className="p-3 bg-zinc-950 hover:bg-red-950/20 border border-zinc-800 rounded-xl text-zinc-600 hover:text-red-400 transition-all"><Trash2 className="w-4 h-4" /></button>
                                     </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                {products.length === 0 && (
+                    <div className="py-20 text-center text-zinc-600 text-xs font-bold uppercase tracking-widest">
+                        Niciun produs găsit. Începe prin a adăuga unul!
+                    </div>
+                )}
             </div>
         </div>
     );
