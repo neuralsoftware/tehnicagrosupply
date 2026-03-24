@@ -56,8 +56,8 @@ const TEMPLATES: Record<string, { title: string; subtitle: string; introTitle: s
         introText: 'Această selecție de utilaje este dedicată optimizării procesului de recoltare și transport. Oferim soluții care minimizează timpii de descărcare și asigură transportul în siguranță al recoltei, indiferent de condițiile terenului.'
     },
     'mix-ferma-moderna': {
-        title: 'Echipamente pentru Ferma Viitorului',
-        subtitle: 'Un mix de tehnologii pentru diversitate și performanță',
+        title: 'TEHNICAGRO SUPPLY',
+        subtitle: 'Echipamente pentru Ferma Viitorului',
         introTitle: 'Modernizare prin TehnicAgro Supply',
         introText: 'Ferma modernă necesită versatilitate. Vă propunem un pachet mixt de utilaje care acoperă diversele nevoi ale exploatației dumneavoastră, asigurând o mecanizare eficientă și conformitate deplină cu standardele europene de mediu.'
     }
