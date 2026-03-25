@@ -150,6 +150,62 @@ const styles = StyleSheet.create({
         minHeight: 86,
         justifyContent: 'center',
     },
+    zigZagRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 8 },
+    zigZagSpecsCol: { flex: 1, minWidth: 0, paddingRight: 12 },
+    zigZagSpecsBox: {
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        padding: 12,
+        backgroundColor: '#f8fafc',
+    },
+    zigZagGalleryCol: {
+        width: '36%',
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        padding: 10,
+        backgroundColor: COLORS.bgLight,
+    },
+    zigZagGalleryTitle: {
+        fontSize: 8,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.primary,
+        textTransform: 'uppercase' as const,
+        letterSpacing: 0.8,
+        marginBottom: 10,
+    },
+    zigZagGalleryThumb: {
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 6,
+        padding: 4,
+        backgroundColor: COLORS.white,
+    },
+    productContLayout: {
+        paddingTop: HEADER_BLOCK + 8,
+        paddingBottom: FOOTER_BLOCK + 20,
+        paddingHorizontal: MARGIN,
+        flex: 1,
+    },
+    productContHead: {
+        fontSize: 10,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.text,
+        marginBottom: 12,
+        letterSpacing: 0.2,
+    },
+    specFullWidthBox: {
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        padding: 12,
+        backgroundColor: '#f8fafc',
+        marginTop: 4,
+    },
     brandPageCard: {
         marginBottom: 14,
         padding: 14,
@@ -358,26 +414,52 @@ function detailedSpecBlocks(product: DynamicProduct, maxLines: number): { group:
     return blocks;
 }
 
-function renderProductExtraBlocks(product: DynamicProduct): React.ReactElement[] {
-    const out: React.ReactElement[] = [];
+type SpecPdfLine = { kind: 'group'; text: string } | { kind: 'line'; text: string };
+
+/** Toate liniile pentru specificații extinse (paginare explicită — evită suprapunere cu antet fix) */
+function flattenDetailedSpecLines(product: DynamicProduct): SpecPdfLine[] {
+    const blocks = detailedSpecBlocks(product, 4000);
+    const out: SpecPdfLine[] = [];
+    for (const b of blocks) {
+        out.push({ kind: 'group', text: b.group });
+        for (const line of b.lines) {
+            out.push({ kind: 'line', text: line });
+        }
+    }
+    return out;
+}
+
+function specLinesToElements(lines: SpecPdfLine[], keyBase: string): React.ReactElement[] {
+    return lines.map((sl, i) =>
+        sl.kind === 'group'
+            ? React.createElement(Text, { key: `${keyBase}-g-${i}`, style: styles.specDetailGroup }, sl.text)
+            : React.createElement(Text, { key: `${keyBase}-l-${i}`, style: styles.specDetailLine }, sl.text)
+    );
+}
+
+/** Indicativ preț / eligibilitate — rămâne pe pagina principală produs */
+function renderProductMetaOnly(product: DynamicProduct): React.ReactElement[] {
     const parts: string[] = [];
     if (product.priceRange) parts.push(`Indicativ: ${product.priceRange}`);
     if (product.eligibility) parts.push(`Eligibilitate (informare): ${product.eligibility}`);
-    if (parts.length > 0) {
-        out.push(React.createElement(Text, { key: 'meta', style: styles.productMetaStrip }, parts.join(' · ')));
-    }
-    const dsBlocks = detailedSpecBlocks(product, 28);
-    if (dsBlocks.length === 0) return out;
-    const inner: React.ReactElement[] = [];
-    inner.push(React.createElement(Text, { key: 'dt', style: styles.blockTitle }, 'Specificații extinse'));
-    for (const block of dsBlocks) {
-        inner.push(React.createElement(Text, { key: `G${block.group}`, style: styles.specDetailGroup }, block.group));
-        for (let i = 0; i < block.lines.length; i++) {
-            inner.push(React.createElement(Text, { key: `${block.group}L${i}`, style: styles.specDetailLine }, block.lines[i]));
-        }
-    }
-    out.push(React.createElement(View, { key: 'det', style: styles.specDetailBlock }, ...inner));
-    return out;
+    if (parts.length === 0) return [];
+    return [React.createElement(Text, { key: 'meta', style: styles.productMetaStrip }, parts.join(' · '))];
+}
+
+/** Coloană dreaptă: poze suplimentare în casete, pe verticală */
+function renderSupplementaryGalleryColumn(urls: string[], productName: string | undefined, keyBase: string): React.ReactElement {
+    return React.createElement(
+        View,
+        { style: styles.zigZagGalleryCol },
+        React.createElement(Text, { style: styles.zigZagGalleryTitle }, 'Imagini suplimentare'),
+        ...urls.map((u, i) =>
+            React.createElement(
+                View,
+                { key: `${keyBase}-gcol-${i}`, style: styles.zigZagGalleryThumb },
+                React.createElement(ProductImage, { url: u, fallback: productName, galleryThumb: true })
+            )
+        )
+    );
 }
 
 const renderPageHeader = (title: string) => (
@@ -396,15 +478,6 @@ const renderPageFooter = (pageNumber: number, phone?: string) => (
         React.createElement(Text, { style: styles.footerContact, wrap: false }, formatPhoneForPdf(phone || DEFAULT_PHONE))
     )
 );
-
-/** Grupează URL galerie în rânduri de câte 2 pentru chenare alăturate */
-function galleryRows(urls: string[]): string[][] {
-    const rows: string[][] = [];
-    for (let i = 0; i < urls.length; i += 2) {
-        rows.push(urls.slice(i, i + 2));
-    }
-    return rows;
-}
 
 function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Category[]): React.ReactElement<DocumentProps> {
     const productsToDisplay = products || [];
@@ -551,8 +624,11 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                       )
                     : null;
 
-            // 2. Produsele din acea categorie
-            const productPages = catProducts.map((product, idx) => {
+            // 2. Produsele: pag. A = imagine stânga + text dreapta; pag. B+ = zig-zag (spec stânga / galerie dreapta) + foi doar pentru specificații extinse
+            const SPEC_LINES_WITH_GALLERY = 18;
+            const SPEC_LINES_FULL_PAGE = 34;
+
+            const productPages = catProducts.flatMap((product, idx) => {
                 const progList = (product?.category && (FUNDING_PROGRAMS as any)[product.category]) || [];
                 const activePrograms = Array.isArray(progList) ? progList.filter((p: any) => p.status === 'active').slice(0, 1) : [];
 
@@ -560,42 +636,29 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                 const secTitle = categoryDisplayName(catName, categoriesFromDb);
                 const extraGallery = (
                     Array.isArray(product.gallery)
-                        ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 4)
+                        ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 6)
                         : []
                 ) as string[];
+                const pSlug = product?.slug || `p-${catName}-${idx}`;
+                let specRemaining = flattenDetailedSpecLines(product);
+                const hasGallery = extraGallery.length > 0;
+                const hasSpecs = specRemaining.length > 0;
 
-                return React.createElement(Page, { size: 'A4', style: styles.page, key: product?.slug || `p-${catName}-${idx}` },
+                const mainPage = React.createElement(
+                    Page,
+                    { size: 'A4', style: styles.page, key: `p1-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productLayout },
-                        product?.badge && React.createElement(View, { style: styles.badgeRow },
-                            React.createElement(View, { style: styles.badge },
-                                React.createElement(Text, { style: styles.badgeText }, product.badge)
-                            )
-                        ),
+                        product?.badge &&
+                            React.createElement(View, { style: styles.badgeRow },
+                                React.createElement(View, { style: styles.badge },
+                                    React.createElement(Text, { style: styles.badgeText }, product.badge)
+                                )
+                            ),
                         React.createElement(View, { style: styles.catalogRow },
                             React.createElement(View, { style: styles.catalogImageCol },
                                 React.createElement(View, { style: styles.productMainImageBox },
                                     React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true })
-                                ),
-                                ...galleryRows(extraGallery).map((pair, ri) =>
-                                    React.createElement(
-                                        View,
-                                        { key: `grow-${product?.slug || idx}-${ri}`, style: styles.galleryGridRow },
-                                        ...pair.map((u, ci) =>
-                                            React.createElement(
-                                                View,
-                                                { key: `gcell-${ri}-${ci}`, style: styles.galleryCell },
-                                                React.createElement(ProductImage, {
-                                                    url: u,
-                                                    fallback: product?.name,
-                                                    galleryThumb: true,
-                                                })
-                                            )
-                                        ),
-                                        ...(pair.length === 1
-                                            ? [React.createElement(View, { key: `gpad-${ri}`, style: { width: '48%' } })]
-                                            : [])
-                                    )
                                 )
                             ),
                             React.createElement(View, { style: styles.catalogTextCol },
@@ -627,12 +690,75 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                         React.createElement(Text, { style: styles.fundingTitle }, 'Finanțare — informare generală'),
                                         React.createElement(Text, { style: styles.fundingText }, `${activePrograms[0].title || ''} (${activePrograms[0].maxGrant || 'condiții în ghidul oficial'}). Text orientativ; eligibilitatea se stabilește doar după reglementările în vigoare și dosarul dumneavoastră — nu întocmim noi dosarul.`)
                                     ),
-                                ...renderProductExtraBlocks(product)
+                                ...renderProductMetaOnly(product)
                             )
                         )
                     ),
                     renderPageFooter(currentPage += 1, config.phone)
                 );
+
+                const extraPages: React.ReactElement[] = [];
+
+                if (hasGallery) {
+                    const chunk0 = specRemaining.slice(0, SPEC_LINES_WITH_GALLERY);
+                    specRemaining = specRemaining.slice(SPEC_LINES_WITH_GALLERY);
+                    extraPages.push(
+                        React.createElement(Page, { key: `pzz-${pSlug}`, size: 'A4', style: styles.page },
+                            renderPageHeader(secTitle.toUpperCase()),
+                            React.createElement(View, { style: styles.productContLayout },
+                                React.createElement(Text, { style: styles.productContHead }, `${product?.name || 'Produs'} — specificații detaliate și imagini`),
+                                React.createElement(View, { style: styles.zigZagRow },
+                                    React.createElement(View, { style: styles.zigZagSpecsCol },
+                                        React.createElement(View, { style: styles.zigZagSpecsBox },
+                                            React.createElement(Text, { style: { ...styles.blockTitle, marginTop: 0 } }, 'Specificații extinse'),
+                                            ...(chunk0.length > 0
+                                                ? specLinesToElements(chunk0, `zz-${pSlug}`)
+                                                : [
+                                                      React.createElement(
+                                                          Text,
+                                                          { key: 'zz-placeholder', style: styles.mainText },
+                                                          'Tabelul complet cu parametri urmează pe paginile următoare (dacă există). Alăturat: imagini suplimentare pentru identificarea configurației vizuale a modelului.'
+                                                      ),
+                                                  ])
+                                        )
+                                    ),
+                                    renderSupplementaryGalleryColumn(extraGallery, product?.name, pSlug)
+                                )
+                            ),
+                            renderPageFooter(currentPage += 1, config.phone)
+                        )
+                    );
+                }
+
+                let specCont = 0;
+                while (specRemaining.length > 0) {
+                    const take = specRemaining.slice(0, SPEC_LINES_FULL_PAGE);
+                    specRemaining = specRemaining.slice(SPEC_LINES_FULL_PAGE);
+                    const titleExt =
+                        specCont === 0 && !hasGallery
+                            ? 'Specificații extinse'
+                            : 'Specificații extinse (continuare)';
+                    extraPages.push(
+                        React.createElement(Page, { key: `pspec-${pSlug}-${specCont}`, size: 'A4', style: styles.page },
+                            renderPageHeader(secTitle.toUpperCase()),
+                            React.createElement(View, { style: styles.productContLayout },
+                                React.createElement(Text, { style: styles.productContHead }, product?.name || 'Produs'),
+                                React.createElement(View, { style: styles.specFullWidthBox },
+                                    React.createElement(Text, { style: { ...styles.blockTitle, marginTop: 0 } }, titleExt),
+                                    ...specLinesToElements(take, `sp-${pSlug}-${specCont}`)
+                                )
+                            ),
+                            renderPageFooter(currentPage += 1, config.phone)
+                        )
+                    );
+                    specCont += 1;
+                }
+
+                if (!hasGallery && !hasSpecs) {
+                    return [mainPage];
+                }
+
+                return [mainPage, ...extraPages];
             });
 
             return [introPageMain, ...(introPagePrograms ? [introPagePrograms] : []), ...productPages];

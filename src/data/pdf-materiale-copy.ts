@@ -40,10 +40,10 @@ export const PDF_BRANDS_SOURCE_NOTE =
 export const PDF_BRAND_CARDS: { name: string; tagline: string; paragraphs: string[] }[] = [
   {
     name: 'Fliegl Agrartechnik',
-    tagline: 'Transport, manipulare recoltă, remorci și logistică după câmp',
+    tagline: 'Linia de atașamente — lucrări de sol (ex. grapă cu lanțuri de discuri)',
     paragraphs: [
-      'Fliegl este referință pe piața remorcilor agricole și a soluțiilor de transport: volum util, sisteme de acționare, viteze admise și ergonomie la descărcare variază după linia de model. În selecția noastră orientăm clientul spre combinații tractor–remorcă stabile și conforme uzului din România.',
-      'La comandă, verificăm împreună axele, frânele, sistemele hidraulice și compatibilitatea cu masa tractorului dumneavoastră — parametrii „din catalog” trebuie mereu corelați cu fișa de tractare a tractorului.',
+      'În portofoliul Fliegl pentru zona Agro-Center / Attachment Line ne interesează în primul rând utilajele de lucrat solul: de exemplu soluții cu lanțuri de discuri pentru tocarea și uniformizarea miriști, refacerea patului germinativ, controlul buruienilor și integrarea resturilor în stratul superficial, adesea fără inversarea profundă a solului. Greutatea pe metru liniar, viteza de lucru și reglajele hidraulice trebuie alese după tipul de sol și cantitatea de rest vegetal.',
+      'Fliegl oferă și linii large de remorci și logistică recoltă; în fișa TehnicAgro pentru această broșură ne raportăm însă la zona de cultivatoare / discuri cu lanțuri (documentație tip „disc chain harrow” / grapă lanț-disc), nu la transportul recoltei. Parametrii concreti (lățime, masă, conexiuni hidraulice) se validează pe modelul ales și pe tractorul dumneavoastră.',
     ],
   },
   {
@@ -55,11 +55,11 @@ export const PDF_BRAND_CARDS: { name: string; tagline: string; paragraphs: strin
     ],
   },
   {
-    name: 'K-Factor Engineering',
-    tagline: 'Distribuție îngrășăminte, dozare și control la fertilizare',
+    name: 'K-Factor',
+    tagline: 'Bunkere de câmp — transfer și stocare temporară pentru logistică la recoltă',
     paragraphs: [
-      'Soluțiile K-Factor vizează distribuția controlată a îngrășământului și integrarea în lanțul fertilizării de precizie: tipul de material (granule, densitate), lățimea de lucru și debitul trebuie verificate odată cu configurația tractorului.',
-      'Combinațiile cu semănători sau cu pregătirea solului se analizează din perspectiva masei totale tractate și a numerelor de hidraulice disponibile pe tractor, astfel încât reglajele să poată fi menținute în toleranțele din manual.',
+      'K-Factor (Ucraina) este prezentă pe piață cu bunkere de reîncărcare / stocare („BOOSTER”, „POWERBANK” și serii conexe): echipamente pentru fluxul combinașului–câmp–transport, reducerea timpilor morți și păstrarea calității recoltei. În broșură ne raportăm la acest segment logistic, deschis pe site-ul public al mărcii (prezentare companie și produse), nu la utilaje de împrăștiat îngrășăminte.',
+      'Alegerea volumului util, a sistemului de descărcare și a compatibilității cu liniile din fermă trece prin datele tehnice ale modelului și prin masa tractorului de tragere / autonomie — oferta concretă din selecția TehnicAgro se discută la cerere.',
     ],
   },
 ];
