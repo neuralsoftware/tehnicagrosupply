@@ -21,10 +21,8 @@ import { FUNDING_PROGRAMS } from '@/data/funding-programs';
 import { CATEGORIES as CATEGORY_LABELS } from '@/data/products';
 import {
     PDF_COMPANY,
-    PDF_BRANDS_INTRO,
     PDF_DOCUMENTATION_NOTE,
     PDF_BRAND_CARDS,
-    getCategoryPdfCopy,
 } from '@/data/pdf-materiale-copy';
 import React from 'react';
 
@@ -196,8 +194,12 @@ const styles = StyleSheet.create({
     productDetailGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%' },
     productMainCol: { width: '42%', marginRight: 16 },
     productRightCol: { flex: 1, minWidth: 0 },
+    productHeroTopRow: { flexDirection: 'row', alignItems: 'flex-start', width: '100%', marginBottom: 18 },
+    productHeroTitleCol: { width: '44%', paddingRight: 18 },
+    productHeroTextCol: { flex: 1, minWidth: 0 },
+    productHeroImageStage: { width: '100%', marginTop: 6 },
     productOverviewImageFrame: {
-        flex: 1,
+        width: '100%',
         borderWidth: 1,
         borderColor: COLORS.border,
         borderRadius: 10,
@@ -456,7 +458,7 @@ const styles = StyleSheet.create({
         lineHeight: 1.3,
     },
     productModelHero: {
-        fontSize: 24,
+        fontSize: 28,
         fontFamily: 'Roboto',
         fontWeight: 'bold',
         color: COLORS.brochureAccent,
@@ -465,18 +467,22 @@ const styles = StyleSheet.create({
         maxWidth: '100%',
     },
     productIntroBox: {
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        borderRadius: 8,
-        padding: 12,
-        backgroundColor: '#f8fafc',
-        marginTop: 8,
+        marginTop: 6,
+    },
+    productPrincipleTitle: {
+        fontSize: 10,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.primaryDark,
+        textTransform: 'uppercase' as const,
+        letterSpacing: 1.2,
+        marginBottom: 8,
     },
     productIntroBullets: {
         fontSize: 9.5,
         color: COLORS.textMuted,
         lineHeight: 1.5,
-        marginTop: 8,
+        marginTop: 4,
     },
     productImageColumn: { width: '52%', alignSelf: 'flex-start' as const },
     blockTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4, marginTop: 10 },
@@ -522,6 +528,46 @@ const styles = StyleSheet.create({
     contactLabel: { fontSize: 8.5, color: COLORS.textSubtle, textTransform: 'uppercase', width: 68, letterSpacing: 0.5, marginRight: 10 },
     contactValue: { fontSize: 10.5, fontFamily: 'Roboto', fontWeight: '500', color: COLORS.text, flex: 1, lineHeight: 1.35 },
     contactValueNoWrap: { fontSize: 10.5, fontFamily: 'Roboto', fontWeight: '500', color: COLORS.text, flex: 1 },
+    contextGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%' },
+    contextLeftCol: { width: '54%', paddingRight: 14 },
+    contextRightCol: { flex: 1, minWidth: 0 },
+    compactBrandCard: {
+        marginBottom: 10,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        backgroundColor: COLORS.white,
+    },
+    compactBrandTitle: {
+        fontSize: 10,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.primaryDark,
+        textTransform: 'uppercase' as const,
+        letterSpacing: 1.1,
+        marginBottom: 4,
+    },
+    compactBrandTag: { fontSize: 8.5, color: COLORS.brochureAccent, marginBottom: 4, fontFamily: 'Roboto', fontWeight: 'bold' },
+    compactBrandText: { fontSize: 8.5, color: COLORS.textMuted, lineHeight: 1.4, textAlign: 'justify' as const },
+    programCard: {
+        marginBottom: 10,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#d1fae5',
+        borderRadius: 8,
+        backgroundColor: '#f0fdf4',
+    },
+    programCardTitle: {
+        fontSize: 9,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.brochureAccent,
+        textTransform: 'uppercase' as const,
+        letterSpacing: 0.9,
+        marginBottom: 4,
+    },
+    programCardText: { fontSize: 8.5, color: '#166534', lineHeight: 1.4, textAlign: 'justify' as const },
 });
 
 function renderChevronBullet(key: string, textStyle: Record<string, unknown>, text: string) {
@@ -759,6 +805,18 @@ function getBrandCardsForCatalog(products: DynamicProduct[]) {
     );
 }
 
+function getRelevantFundingPrograms(products: DynamicProduct[]) {
+    const picked = new Map<string, any>();
+    for (const p of products) {
+        const list = ((FUNDING_PROGRAMS as any)[p.category] || []) as any[];
+        for (const prog of list.filter((x) => x.status === 'active')) {
+            const key = String(prog.code || prog.title || `${p.category}-${picked.size}`);
+            if (!picked.has(key)) picked.set(key, prog);
+        }
+    }
+    return Array.from(picked.values()).slice(0, 3);
+}
+
 const renderPageHeader = (title: string) => (
     React.createElement(View, { style: styles.header, fixed: true },
         React.createElement(View, { style: styles.headerWordmark },
@@ -780,6 +838,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
     const productsToDisplay = products || [];
     const logoSrc = pdfCatalogLogoSrc(config);
     const brandCardsSelected = getBrandCardsForCatalog(productsToDisplay);
+    const selectedPrograms = getRelevantFundingPrograms(productsToDisplay);
     let currentPage = 1;
 
     // Categorize products for transitions
@@ -842,110 +901,60 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
             renderPageFooter(currentPage += 1, config.phone)
         ),
 
-        // PRODUCĂTORI: doar mărcile din produsele selectate (1 sau 2 pagini, după volum)
-        ...(brandCardsSelected.length === 0
-            ? []
-            : [
-                  React.createElement(Page, { size: 'A4', style: styles.page, key: 'brands-i' },
-                      renderPageHeader(brandCardsSelected.length > 2 ? 'PRODUCĂTORI · I' : 'PRODUCĂTORI'),
+        // PAGINĂ CONTEXT COMPACTĂ: producători selectați + programe relevante
+        ...((brandCardsSelected.length > 0 || selectedPrograms.length > 0)
+            ? [
+                  React.createElement(Page, { size: 'A4', style: styles.page, key: 'context-compact' },
+                      renderPageHeader('PRODUCĂTORI ȘI PROGRAME'),
                       React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 40, paddingHorizontal: MARGIN, flex: 1 } },
-                          renderAccentSectionTitle('brands-h', PDF_BRANDS_INTRO.title),
+                          renderAccentSectionTitle('ctx-title', 'Contextul acestei selecții'),
                           React.createElement(
                               Text,
                               { style: styles.mainText },
-                              `${PDF_BRANDS_INTRO.lead} În această selecție sunt detaliate exclusiv producătorii asociați utilajelor incluse în broșură.`
+                              'Broșura include exclusiv producătorii și programele orientative relevante pentru utilajele selectate. Am redus intenționat această secțiune la o singură pagină pentru a păstra documentul scurt, clar și comercial.'
                           ),
-                          ...brandCardsSelected.slice(0, 2).map((card, ci) =>
-                              React.createElement(View, { key: `brand-${ci}`, style: styles.brandPageCard },
-                                  React.createElement(Text, { style: styles.brandPageName }, card.name),
-                                  React.createElement(Text, { style: styles.brandPageTag }, card.tagline),
-                                  ...card.paragraphs.map((para, pi) =>
-                                      React.createElement(Text, { key: `bp-${ci}-${pi}`, style: styles.mainText }, para)
+                          React.createElement(View, { style: styles.contextGrid },
+                              React.createElement(View, { style: styles.contextLeftCol },
+                                  renderAccentSectionTitle('ctx-brands', 'Producători selectați'),
+                                  ...brandCardsSelected.map((card, ci) =>
+                                      React.createElement(View, { key: `ctx-brand-${ci}`, style: styles.compactBrandCard },
+                                          React.createElement(Text, { style: styles.compactBrandTitle }, card.name),
+                                          React.createElement(Text, { style: styles.compactBrandTag }, card.tagline),
+                                          React.createElement(Text, { style: styles.compactBrandText }, card.paragraphs[0] || '')
+                                      )
                                   )
+                              ),
+                              React.createElement(View, { style: styles.contextRightCol },
+                                  renderAccentSectionTitle('ctx-prog', 'Programe compatibile'),
+                                  ...(selectedPrograms.length > 0
+                                      ? selectedPrograms.map((prog, pi) =>
+                                            React.createElement(View, { key: `ctx-prog-${pi}`, style: styles.programCard },
+                                                React.createElement(Text, { style: styles.programCardTitle }, prog.title || prog.code || 'Program'),
+                                                React.createElement(
+                                                    Text,
+                                                    { style: styles.programCardText },
+                                                    `${prog.maxGrant ? `${prog.maxGrant}. ` : ''}${prog.details || 'Eligibilitatea și cuantumul se verifică exclusiv în ghidurile oficiale și în dosarul fermei.'}`
+                                                )
+                                            )
+                                        )
+                                      : [
+                                            React.createElement(
+                                                Text,
+                                                { key: 'ctx-prog-empty', style: styles.mainText },
+                                                'Nu există în prezent un program activ preluat din administrare pentru această selecție.'
+                                            ),
+                                        ])
                               )
                           )
                       ),
                       renderPageFooter(currentPage += 1, config.phone)
                   ),
-                  ...(brandCardsSelected.length > 2
-                      ? [
-                            React.createElement(Page, { size: 'A4', style: styles.page, key: 'brands-ii' },
-                                renderPageHeader('PRODUCĂTORI · II'),
-                                React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 40, paddingHorizontal: MARGIN, flex: 1 } },
-                                    ...brandCardsSelected.slice(2).map((card, ci) =>
-                                        React.createElement(View, { key: `brand-b-${ci}`, style: styles.brandPageCard },
-                                            React.createElement(Text, { style: styles.brandPageName }, card.name),
-                                            React.createElement(Text, { style: styles.brandPageTag }, card.tagline),
-                                            ...card.paragraphs.map((para, pi) =>
-                                                React.createElement(Text, { key: `bp2-${ci}-${pi}`, style: styles.mainText }, para)
-                                            )
-                                        )
-                                    )
-                                ),
-                                renderPageFooter(currentPage += 1, config.phone)
-                            ),
-                        ]
-                      : []),
-              ]),
+              ]
+            : []),
 
-        // GENERARE DINAMICĂ: CATEGORII + PRODUSE
+        // GENERARE DINAMICĂ: DOAR PRODUSELE (fără pagini separate de categorie/program ca să evităm broșuri prea lungi)
         ...categories.flatMap(catName => {
             const catProducts = byCategory[catName];
-            
-            const catRecord = categoriesFromDb.find((c) => c.slug === catName);
-            const copy = getCategoryPdfCopy(catName);
-            const displayCat = categoryDisplayName(catName, categoriesFromDb);
-            const introParagraphs = [
-                ...(catRecord?.description?.trim() ? [catRecord.description.trim()] : []),
-                ...copy.paragraphs,
-            ];
-
-            const subsectionBlocks = copy.subsections || [];
-
-            const introPageMain = React.createElement(Page, { size: 'A4', style: styles.page, key: `intro-${catName}` },
-                renderPageHeader(displayCat.toUpperCase()),
-                React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 40, paddingHorizontal: MARGIN, flex: 1 } },
-                    React.createElement(View, { style: styles.categoryIntroAccent }),
-                    React.createElement(Text, { style: styles.categoryTitle }, displayCat),
-                    ...introParagraphs.map((p, i) =>
-                        React.createElement(Text, { key: `cp${i}`, style: styles.mainText }, p)
-                    ),
-                    ...(copy.advantageBullets && copy.advantageBullets.length > 0
-                        ? [
-                              renderAccentSectionTitle('adv-title', copy.advantagesSectionTitle || 'Avantaje tehnice'),
-                              ...copy.advantageBullets.map((b, i) =>
-                                  renderChevronBullet(`adv-${i}`, { ...styles.mainText, fontFamily: 'Roboto', fontWeight: '500' }, b)
-                              ),
-                          ]
-                        : []),
-                    renderAccentSectionTitle('aspects', 'Aspecte utile în această secțiune'),
-                    ...copy.bullets.map((b, i) => renderChevronBullet(`cb${i}`, styles.mainText as Record<string, unknown>, b))
-                ),
-                renderPageFooter(currentPage += 1, config.phone)
-            );
-
-            const introPagePrograms =
-                subsectionBlocks.length > 0
-                    ? React.createElement(Page, { size: 'A4', style: styles.page, key: `intro-prog-${catName}` },
-                          renderPageHeader(`${displayCat.toUpperCase()} · CADRU`),
-                          React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 40, paddingHorizontal: MARGIN, flex: 1 } },
-                              renderAccentSectionTitle('cat-prog', `${displayCat} — context programe`),
-                              React.createElement(Text, { style: styles.mainText },
-                                  'Rezumat informativ despre cadrul european și național care poate fi relevant pentru această categorie de utilaje și pentru practicile asociate. Nu înlocuiește ghidurile APIA / AFIR și nu constituie consultanță pentru depunerea cererii; verificați sursele oficiale pentru campania în curs.'
-                              ),
-                              ...subsectionBlocks.flatMap((sub, si) => [
-                                  renderAccentSectionTitle(`sst-${si}`, sub.title),
-                                  ...sub.paragraphs.map((p, pi) =>
-                                      React.createElement(Text, { key: `ssp-${si}-${pi}`, style: styles.mainText }, p)
-                                  ),
-                                  ...(sub.bullets || []).map((b, bi) =>
-                                      renderChevronBullet(`ssb-${si}-${bi}`, styles.mainText as Record<string, unknown>, b)
-                                  ),
-                              ])
-                          ),
-                          renderPageFooter(currentPage += 1, config.phone)
-                      )
-                    : null;
 
             // 2. Produse: paginare controlată, simetrică
             const productPages = catProducts.flatMap((product, idx) => {
@@ -1073,7 +1082,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                 return [overviewPage, detailPage];
             });
 
-            return [introPageMain, ...(introPagePrograms ? [introPagePrograms] : []), ...productPages];
+            return productPages;
         }),
 
         // PAGINA FINALĂ: contact + bandă tip copertă (ierarhie vizuală ca în broșurile de referință)
