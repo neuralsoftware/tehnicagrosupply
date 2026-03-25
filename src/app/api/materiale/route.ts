@@ -198,12 +198,8 @@ const styles = StyleSheet.create({
     productHeroTextCol: { flex: 1, minWidth: 0 },
     productHeroImageStage: { width: '100%', marginTop: 6 },
     productOverviewImageFrame: {
-        width: '100%',
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        borderRadius: 10,
-        padding: 10,
-        backgroundColor: COLORS.white,
+        flex: 1,
+        minHeight: 0,
     },
     catalogRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
     catalogImageCol: {
@@ -325,7 +321,7 @@ const styles = StyleSheet.create({
         padding: 6,
         backgroundColor: COLORS.white,
         marginBottom: 12,
-        minHeight: 232,
+        minHeight: 185,
     },
     productSupplementEmpty: {
         minHeight: 154,
@@ -457,13 +453,14 @@ const styles = StyleSheet.create({
         lineHeight: 1.3,
     },
     productModelHero: {
-        fontSize: 28,
+        fontSize: 36,
         fontFamily: 'Roboto',
         fontWeight: 'bold',
         color: COLORS.brochureAccent,
-        letterSpacing: -0.3,
-        lineHeight: 1.08,
+        letterSpacing: -0.5,
+        lineHeight: 1.05,
         maxWidth: '100%',
+        marginBottom: 2,
     },
     productIntroBox: {
         marginTop: 6,
@@ -482,6 +479,20 @@ const styles = StyleSheet.create({
         color: COLORS.textMuted,
         lineHeight: 1.5,
         marginTop: 4,
+    },
+    heroPrinciple: {
+        fontSize: 11,
+        color: COLORS.textMuted,
+        letterSpacing: 0.3,
+        lineHeight: 1.4,
+        marginTop: 8,
+    },
+    heroAccentRule: {
+        width: 60,
+        height: 3,
+        backgroundColor: COLORS.brochureAccent,
+        marginTop: 14,
+        marginBottom: 18,
     },
     productImageColumn: { width: '52%', alignSelf: 'flex-start' as const },
     blockTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4, marginTop: 10 },
@@ -620,7 +631,7 @@ const ProductImage = ({
     stripThumb?: boolean;
 }) => {
     if (!url) {
-        const h = stripThumb ? 56 : galleryThumb ? 80 : compact ? 72 : hero ? 372 : detail ? 220 : catalog || catalogStack ? 200 : 220;
+        const h = stripThumb ? 56 : galleryThumb ? 80 : compact ? 72 : hero ? 450 : detail ? 180 : catalog || catalogStack ? 200 : 220;
         return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
@@ -634,9 +645,9 @@ const ProductImage = ({
           : compact
             ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
             : hero
-              ? { width: '100%', height: 372, objectFit: 'cover' as const }
+              ? { width: '100%', height: 450, objectFit: 'contain' as const }
               : detail
-                ? { width: '100%', height: 220, objectFit: 'cover' as const }
+                ? { width: '100%', height: 180, objectFit: 'contain' as const }
             : catalog || catalogStack
               ? { width: '100%', height: 200, objectFit: 'contain' as const }
               : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
@@ -719,7 +730,7 @@ type SpecPdfLine = { kind: 'group'; text: string } | { kind: 'line'; text: strin
 
 /** Toate liniile pentru specificații extinse (paginare explicită — evită suprapunere cu antet fix) */
 function flattenDetailedSpecLines(product: DynamicProduct): SpecPdfLine[] {
-    const blocks = detailedSpecBlocks(product, 4000);
+    const blocks = detailedSpecBlocks(product, 25);
     const out: SpecPdfLine[] = [];
     for (const b of blocks) {
         out.push({ kind: 'group', text: b.group });
@@ -814,6 +825,16 @@ function getProfessionalIntroBullets(product: DynamicProduct): string[] {
         'Configurația finală se stabilește în raport cu lățimea de lucru, puterea tractorului și condițiile de exploatare.',
         'Datele tehnice complete, opționalele și cerințele de utilizare se validează pe modelul ofertat.',
     ];
+}
+
+function getProductPrinciple(product: DynamicProduct): string {
+    if (product.slug === 'multisem-ads') {
+        return 'Semănătoare conservativă de precizie — semănat direct, mini-till, convențional';
+    }
+    const desc = product.description || product.longDescription || '';
+    const firstSentence = desc.split(/\.\s/)[0];
+    if (firstSentence && firstSentence.length > 10) return firstSentence + (firstSentence.endsWith('.') ? '' : '.');
+    return product.name || 'Utilaj agricol de înaltă performanță';
 }
 
 const renderPageHeader = (title: string) => (
@@ -936,6 +957,10 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                 const kicker = [secTitle.toUpperCase(), product?.brand].filter(Boolean).join(' · ');
                 const introBullets = getProfessionalIntroBullets(product);
 
+                const principle = getProductPrinciple(product);
+
+                // ═══ PAGINA 1 PRODUS: HERO SPLASH ═══
+                // Vertical: kicker → titlu mare → tagline → linie accent → imagine dominantă
                 const overviewPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-overview-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productOverviewPage },
@@ -945,25 +970,10 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                     React.createElement(Text, { style: styles.badgeText }, product.badge)
                                 )
                             ),
-                        React.createElement(View, { style: styles.productOverviewGrid },
-                            React.createElement(View, { style: styles.productRightCol },
-                                React.createElement(Text, { style: styles.productCategoryKicker }, kicker),
-                                React.createElement(Text, { style: styles.productModelHero }, product?.name || 'Utilaj agricol'),
-                                renderAccentSectionTitle(`princ-${pSlug}`, 'Prezentare tehnică'),
-                                React.createElement(View, { style: styles.productIntroBox },
-                                    React.createElement(Text, { style: styles.productSheetBody }, descText),
-                                    ...introBullets.map((line, bi) =>
-                                        renderChevronBullet(`intro-${pSlug}-${bi}`, styles.productIntroBullets as Record<string, unknown>, line)
-                                    ),
-                                    React.createElement(
-                                        Text,
-                                        { style: styles.productSheetDisclaimer },
-                                        'Prezentare tehnică sintetică redactată pentru această broșură. Parametrii finali se validează pe configurația ofertată.'
-                                    )
-                                ),
-                                ...renderProductMetaOnly(product)
-                            )
-                        ),
+                        React.createElement(Text, { style: styles.productCategoryKicker }, kicker),
+                        React.createElement(Text, { style: styles.productModelHero }, product?.name || 'Utilaj agricol'),
+                        React.createElement(Text, { style: (styles as any).heroPrinciple }, principle),
+                        React.createElement(View, { style: (styles as any).heroAccentRule }),
                         React.createElement(
                             View,
                             { style: styles.productOverviewImageFrame },
@@ -973,17 +983,19 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     renderPageFooter(currentPage += 1, config.phone)
                 );
 
+                // ═══ PAGINA 2 PRODUS: DETALII ═══
+                // Grid: stânga imagini, dreapta prezentare + specs; jos verdict + finanțare
                 const detailGallery = (
                     extraGallery.length >= 2
                         ? extraGallery.slice(0, 2)
                         : extraGallery.length === 1
                           ? [extraGallery[0], product?.imageSrc].filter(Boolean)
-                          : [product?.imageSrc].filter(Boolean)
+                          : [product?.imageSrc, product?.imageSrc].filter(Boolean)
                 ) as string[];
                 const detailPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-detail-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productDetailPage },
-                        React.createElement(View, { style: styles.productDetailGrid },
+                        React.createElement(View, { style: { ...styles.productDetailGrid, flex: 1 } },
                             React.createElement(View, { style: styles.productSupplementStack },
                                 ...detailGallery.map((u, gi) =>
                                     React.createElement(
@@ -994,7 +1006,13 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                 ),
                             ),
                             React.createElement(View, { style: styles.productRightCol },
-                                renderUnifiedTechnicalSpecs(product)
+                                renderAccentSectionTitle(`desc-${pSlug}`, 'Prezentare tehnică'),
+                                React.createElement(Text, { style: styles.productSheetBody }, descText),
+                                ...introBullets.slice(0, 2).map((line, bi) =>
+                                    renderChevronBullet(`intro-${pSlug}-${bi}`, styles.productIntroBullets as Record<string, unknown>, line)
+                                ),
+                                renderUnifiedTechnicalSpecs(product),
+                                ...renderProductMetaOnly(product)
                             )
                         ),
                         (verdictEl || fundingEl) &&
