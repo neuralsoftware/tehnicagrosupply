@@ -14,21 +14,40 @@ export type CategoryPdfCopy = {
   subsections?: { title: string; paragraphs: string[]; bullets?: string[] }[];
 };
 
+export type PdfCompanyCommitment = { label: string; text: string };
+
+/** Pagina 2 broșură — profil / viziune (ton autoritar–consultativ, diacritice românești) */
 export const PDF_COMPANY = {
-  title: 'TehnicAgro Supply — partener de selecție tehnică pentru mecanizare agricolă',
+  title: 'TehnicAgro Supply — arhitectură tehnică pentru productivitate sustenabilă',
   lead:
-    'TehnicAgro Supply operează ca furnizor și integrator de soluții pentru mecanizare agricolă, cu accent pe selecția coerentă a utilajelor în raport cu cultura, condițiile de lucru, nivelul de rest vegetal și capacitatea de tracțiune disponibilă în fermă.',
-  p2:
-    'Compania nu întocmește și nu depune dosare APIA sau AFIR. Informațiile despre scheme, ghiduri și surse oficiale au rol orientativ și trebuie corelate cu documentația actualizată a campaniei și cu dosarul fiecărei exploatații.',
-  p3:
-    'Garanția, service-ul și livrarea pieselor de schimb se realizează conform politicilor mărcii, ale importatorului și ale configurației comandate. Rolul broșurii este de prezentare și orientare tehnică, nu de substituire a fișei de ofertă.',
+    'La TehnicAgro Supply, nu livrăm doar utilaje; integrăm tehnologie în fluxul de producție al fermei dumneavoastră. Operăm ca un centru de selecție și integrare tehnică, unde fiecare echipament este evaluat riguros în raport cu trei piloni esențiali: specificul culturii, managementul resturilor vegetale și optimizarea capacității de tracțiune disponibile.',
+  commitmentTitle: 'Angajamentul nostru pentru transparență și consultanță',
+  commitments: [
+    {
+      label: 'Inginerie înainte de achiziție',
+      text:
+        'Oferim fișe tehnice comparative și analize de performanță pentru a ne asigura că investiția este perfect calibrată pentru terenul și normele fermei.',
+    },
+    {
+      label: 'Expertiză în context legislativ',
+      text:
+        'Deși nu întocmim dosare de finanțare, rolul nostru este de a vă ghida prin labirintul eco-schemelor APIA și AFIR. Informațiile noastre au caracter orientativ și sunt menite să vă ajute să corelați tehnologia aleasă cu cerințele actualizate ale campaniilor de subvenționare.',
+    },
+    {
+      label: 'Parteneriat post-vânzare',
+      text:
+        'Garanția, mentenanța și fluxul pieselor de schimb sunt asigurate conform standardelor stricte ale producătorilor și importatorilor, garantând continuitate în plină campanie.',
+    },
+  ] satisfies PdfCompanyCommitment[],
+  /** Viziune + rolul broșurii (integrat în flux, nu notă la subsol) */
+  visionParagraph:
+    'Viziunea TehnicAgro: Prezentăm mărci consacrate într-un format propriu, filtrat prin experiența noastră de teren. Această broșură este un instrument de orientare tehnică creat pentru a completa, nu pentru a înlocui, fișa finală de ofertă.',
+  finalSectionTitle: 'Ce reprezintă TehnicAgro Supply pentru ferma dumneavoastră',
   bullets: [
-    'Fișe tehnice și compararea variantelor, înainte de decizia de achiziție',
-    'Portofoliu de mărci consacrate, prezentat exclusiv în forma și tonul TehnicAgro Supply',
-    'Transparență: ce rezultă din datele tehnice, ce depinde de teren, norme și practică',
+    'Rigoare în selecția portofoliului de mărci.',
+    'Claritate totală: diferența dintre datele de laborator și realitatea din brazdă.',
+    'Documentație redactată intern, adaptată nevoilor specifice ale fermierului român.',
   ],
-  closing:
-    'Conținutul este redactat de TehnicAgro Supply pe baza documentației tehnice a producătorilor incluși în selecție.',
 };
 
 export const PDF_BRANDS_INTRO = {

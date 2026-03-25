@@ -185,13 +185,13 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     companyDocTitle: {
-        fontSize: 12,
+        fontSize: 13,
         fontFamily: 'Roboto',
         fontWeight: 'bold',
         color: COLORS.primaryDark,
         textAlign: 'left' as const,
         textTransform: 'uppercase' as const,
-        lineHeight: 1.35,
+        lineHeight: 1.3,
     },
     companyLead: {
         fontSize: 10,
@@ -209,13 +209,17 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         textAlign: 'justify' as const,
     },
-    companyClosing: {
+    companyCommitmentParagraph: {
         fontSize: 10,
-        color: COLORS.textSubtle,
+        color: COLORS.textMuted,
         lineHeight: 1.45,
-        marginTop: 8,
-        marginBottom: 0,
+        marginBottom: 6,
         textAlign: 'justify' as const,
+    },
+    companyCommitmentLabel: {
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.primaryDark,
     },
     companyBulletText: {
         fontSize: 10,
@@ -687,6 +691,15 @@ function renderAccentSectionTitle(
     );
 }
 
+function renderCompanyCommitment(key: string, label: string, body: string) {
+    return React.createElement(
+        Text,
+        { key, style: styles.companyCommitmentParagraph },
+        React.createElement(Text, { style: styles.companyCommitmentLabel }, `${label}: `),
+        body
+    );
+}
+
 // Helpers
 const ProductImage = ({
     url,
@@ -990,13 +1003,13 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     React.createElement(Text, { style: styles.companyDocTitle }, PDF_COMPANY.title)
                 ),
                 React.createElement(Text, { style: styles.companyLead }, PDF_COMPANY.lead),
-                React.createElement(Text, { style: styles.companyBody }, PDF_COMPANY.p2),
-                React.createElement(Text, { style: styles.companyBody }, PDF_COMPANY.p3),
-                renderAccentSectionTitle('expect', 'Ce puteți aștepta de la noi', { marginTop: 8, marginBottom: 5 }),
+                renderAccentSectionTitle('commitment', PDF_COMPANY.commitmentTitle, { marginTop: 6, marginBottom: 5 }),
+                ...PDF_COMPANY.commitments.map((c, i) => renderCompanyCommitment(`cmp-c-${i}`, c.label, c.text)),
+                React.createElement(Text, { style: { ...styles.companyBody, marginTop: 4 } }, PDF_COMPANY.visionParagraph),
+                renderAccentSectionTitle('ferma', PDF_COMPANY.finalSectionTitle, { marginTop: 8, marginBottom: 5 }),
                 ...PDF_COMPANY.bullets.map((b, i) =>
                     renderChevronBullet(`cmp-b-${i}`, styles.companyBulletText as Record<string, unknown>, b, 3, styles.companyListChevron)
-                ),
-                React.createElement(Text, { style: styles.companyClosing }, PDF_COMPANY.closing)
+                )
             ),
             renderPageFooter(currentPage += 1, config.phone)
         ),
