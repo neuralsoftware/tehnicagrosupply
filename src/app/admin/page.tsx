@@ -181,7 +181,11 @@ export default function AdminPage() {
                     <ProgrameTab adminAuth={adminAuth} />
                 </div>
                 <div className={activeTab === 'materiale' ? 'block' : 'hidden'}>
-                    <MaterialeTab adminAuth={adminAuth} allProducts={allProducts} />
+                    <MaterialeTab
+                        adminAuth={adminAuth}
+                        allProducts={allProducts}
+                        tabVisible={activeTab === 'materiale'}
+                    />
                 </div>
             </div>
         </div>

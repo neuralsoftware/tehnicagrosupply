@@ -4,26 +4,26 @@
  */
 
 export const PDF_COMPANY = {
-  title: 'TehnicAgro Supply — echipamente agricole, pe bază de date tehnice',
+  title: 'TehnicAgro Supply — selecție tehnică și documentație pentru mecanizare agricolă',
   lead:
-    'Selectăm și propunem utilaje în funcție de cerințele dumneavoastră, de documentația producătorilor și de bunele practici din mecanizarea agricolă. Comunicarea este, în principal, la distanță (telefon, e-mail); detaliile de teren le stabilim pe baza informațiilor pe care ni le transmiteți și a specificațiilor tehnice.',
+    'Lucrăm sub marca TehnicAgro Supply: analizăm nevoile dumneavoastră, sintetizăm informațiile tehnice relevante și propunem echipamente aliniate la exploatație și la reglementările în vigoare. Comunicarea este în principal la distanță (telefon, e-mail); parametrii de teren îi clarificăm pe baza datelor pe care ni le transmiteți.',
   p2:
     'Nu întocmim și nu depunem dosare APIA sau AFIR în numele clientului. Putem indica, în linii mari, cadrul public de eligibilitate și sursele oficiale (ghiduri, site-uri APIA/AFIR), astfel încât să vă orientați singur sau cu consultantul dumneavoastră autorizat.',
   p3:
-    'Intervențiile în garanție și service-ul în rețea se fac conform procedurilor producătorului. Echipa noastră vă sprijină cu informații, oferte și comenzi de piese în programul obișnuit de lucru (luni–vineri, în intervalul orar comunicat la contact), nu ca „urgență 24/7”.',
+    'Garanție și service se fac conform politicilor mărcii și ale importatorului. Echipa noastră vă sprijină cu informații, oferte și comenzi de piese în programul obișnuit de lucru (luni–vineri, interval orar comunicat la contact), nu ca „urgență 24/7”.',
   bullets: [
-    'Fișe tehnice, compararea variantelor de echipament și clarificări înainte de achiziție',
-    'Legături cu producători recunoscuți și acces la documentație actualizată',
-    'Transparență asupra limitelor: ce știm din catalog, ce depinde de teren și de reglementări',
+    'Fișe tehnice și compararea variantelor, înainte de decizia de achiziție',
+    'Portofoliu de mărci consacrate, prezentat exclusiv în forma și tonul TehnicAgro Supply',
+    'Transparență: ce rezultă din datele tehnice, ce depinde de teren, norme și practică',
   ],
   closing:
-    'Paginile următoare prezintă categoriile și produsele incluse în acest catalog; specificațiile provin din datele introduse în sistem și din documentația producătorului.',
+    'Paginile următoare prezintă categoriile și produsele din această selecție. Conținutul este redactat și structurat de TehnicAgro Supply pe baza documentației tehnice și a configurării din catalogul nostru.',
 };
 
 export const PDF_BRANDS_INTRO = {
-  title: 'Producători din portofoliu',
+  title: 'Portofoliu mărci — în selecția TehnicAgro Supply',
   lead:
-    'Colaborăm cu mărci cu istoric în mecanizare agricolă. Descrierile de mai jos sintetizează domeniul principal al fiecărei mărci; detaliile concrete (modele, opționale, garanție) sunt pe fișa fiecărui produs.',
+    'Mărcile enumerate mai jos sunt prezente în oferta noastră. Descrierile sunt sintetizate de echipa TehnicAgro Supply după domeniul lor principal; nu reprezintă site-uri oficiale ale producătorilor.',
 };
 
 /** Conținut extins pe slug categorie (cheie = product.category din catalog) */

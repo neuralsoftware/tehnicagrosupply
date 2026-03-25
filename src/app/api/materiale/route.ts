@@ -55,16 +55,17 @@ function resolvePublicUrl(href: string): string {
 
 // Paletă aliniată la logo-ul Tehnicagro Supply (verde + gri)
 const COLORS = {
-    primary: '#2D5A27',
-    primaryDark: '#1f3f1c',
-    secondary: '#3d6b38',
-    accent: '#4a8f43',
-    brandGrey: '#9EA1A2',
-    text: '#18181b',
-    textMuted: '#52525b',
+    primary: '#1B4332',
+    primaryDark: '#0f2922',
+    secondary: '#2d6a4f',
+    accent: '#40916c',
+    brandGrey: '#64748b',
+    text: '#0f172a',
+    textMuted: '#475569',
+    textSubtle: '#94a3b8',
     bgLight: '#f8fafc',
     white: '#ffffff',
-    border: '#e4e4e7',
+    border: '#e2e8f0',
     gold: '#8a6d2e',
 };
 
@@ -82,24 +83,25 @@ const LINE_HEIGHT = 1.6;
 // PDF Styles
 const styles = StyleSheet.create({
     page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Roboto' },
-    cover: { flex: 1, backgroundColor: COLORS.primary, padding: 0 },
+    cover: { flex: 1, backgroundColor: COLORS.primaryDark, padding: 0 },
     coverHero: { height: '46%', backgroundColor: COLORS.primaryDark, justifyContent: 'center', alignItems: 'center', paddingHorizontal: MARGIN },
     coverBrandBlock: { alignItems: 'center' },
     coverBrandName: { fontSize: 26, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.white, letterSpacing: 1 },
-    coverBrandTag: { fontSize: 11, color: '#c8e6c9', marginTop: 8, letterSpacing: 0.5 },
-    coverRule: { width: 120, height: 2, backgroundColor: '#c8e6c9', marginTop: 16, opacity: 0.7 },
+    coverBrandTag: { fontSize: 10, color: '#bbf7d0', marginTop: 8, letterSpacing: 0.8, textTransform: 'uppercase' as const },
+    coverEdition: { fontSize: 8, color: '#86efac', marginTop: 14, letterSpacing: 1.5, textTransform: 'uppercase' as const },
+    coverRule: { width: 160, height: 2, backgroundColor: '#86efac', marginTop: 18, opacity: 0.95 },
     coverContent: { padding: MARGIN, flex: 1, justifyContent: 'center', alignItems: 'center', textAlign: 'center' },
     coverTitle: { fontSize: 30, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.white, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14, textAlign: 'center', maxWidth: '100%' },
-    coverSubtitle: { fontSize: 13, color: '#a7f3d0', letterSpacing: 1, marginBottom: 12, textTransform: 'uppercase', textAlign: 'center', paddingHorizontal: 16 },
-    coverSlogan: { fontSize: 11, color: COLORS.white, opacity: 0.85, lineHeight: 1.55, paddingHorizontal: 36, textAlign: 'center' },
+    coverSubtitle: { fontSize: 12, color: '#d1fae5', letterSpacing: 1.4, marginBottom: 14, textTransform: 'uppercase', textAlign: 'center', paddingHorizontal: 20, fontFamily: 'Roboto', fontWeight: 500 },
+    coverSlogan: { fontSize: 10, color: COLORS.white, opacity: 0.88, lineHeight: 1.6, paddingHorizontal: 40, textAlign: 'center' },
     coverFooter: { position: 'absolute', bottom: 36, left: MARGIN, right: MARGIN, textAlign: 'center' },
     coverFooterLink: { fontSize: 9, color: COLORS.white, opacity: 0.65, letterSpacing: 0.5 },
-    header: { position: 'absolute', top: 28, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 8, minHeight: 44 },
+    header: { position: 'absolute', top: 28, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 2, borderBottomColor: '#dcfce7', paddingBottom: 10, minHeight: 46 },
     headerWordmark: { justifyContent: 'center' },
     headerBrandName: { fontSize: 11, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, letterSpacing: 0.5 },
     headerBrandTag: { fontSize: 7, color: COLORS.brandGrey, marginTop: 2, letterSpacing: 0.3 },
     headerTitle: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'Roboto', fontWeight: 'bold', flex: 1, flexShrink: 1, marginLeft: 14, textAlign: 'right', maxWidth: 280 },
-    footer: { position: 'absolute', bottom: 28, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 8, minHeight: 36 },
+    footer: { position: 'absolute', bottom: 28, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 10, minHeight: 38 },
     footerPage: { fontSize: 8, color: COLORS.textMuted, letterSpacing: 1 },
     footerContact: { fontSize: 8, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold' },
     sectionTitle: { fontSize: 22, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 22, letterSpacing: -0.3 },
@@ -111,37 +113,27 @@ const styles = StyleSheet.create({
     categoryTitle: { fontSize: 20, color: COLORS.text, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: -0.2, marginBottom: 12 },
     productLayout: { paddingTop: HEADER_BLOCK + 10, paddingRight: MARGIN, paddingBottom: FOOTER_BLOCK + 28, paddingLeft: MARGIN },
     badgeRow: { marginBottom: 8 },
-    badge: { alignSelf: 'flex-start', backgroundColor: COLORS.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 2 },
+    badge: { alignSelf: 'flex-start', backgroundColor: COLORS.primaryDark, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 4 },
     catalogRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
-    catalogImageCol: { width: '36%', padding: 6, marginRight: 12, borderWidth: 1, borderColor: COLORS.border, borderRadius: 4, backgroundColor: '#fafafa' },
+    catalogImageCol: { width: '35%', padding: 8, marginRight: 14, borderWidth: 1, borderColor: COLORS.border, borderRadius: 6, backgroundColor: COLORS.white },
     catalogTextCol: { flex: 1, minWidth: 0 },
-    catalogDesc: { fontSize: 9.5, color: COLORS.textMuted, lineHeight: 1.4, marginBottom: 8, textAlign: 'left' },
-    pdfLinkSection: {
-        marginBottom: 8,
-        padding: 8,
-        backgroundColor: '#f1f5f9',
-        borderRadius: 3,
-        borderLeftWidth: 3,
-        borderLeftColor: COLORS.primary,
-    },
-    pdfLinkSectionTitle: {
+    catalogDesc: { fontSize: 10, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 6, textAlign: 'left' },
+    pdfDisclaimer: {
         fontSize: 7.5,
-        fontFamily: 'Roboto',
-        fontWeight: 'bold',
-        color: COLORS.textMuted,
-        marginBottom: 4,
-        textTransform: 'uppercase',
-        letterSpacing: 0.6,
+        color: COLORS.textSubtle,
+        fontStyle: 'italic',
+        lineHeight: 1.4,
+        marginBottom: 10,
+        marginTop: 2,
     },
-    pdfLinkLine: { fontSize: 7, color: COLORS.text, lineHeight: 1.35, marginBottom: 2 },
-    catalogSpecsWrap: { marginTop: 4 },
+    catalogSpecsWrap: { marginTop: 6 },
     productMetaStrip: { fontSize: 8.5, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', marginBottom: 8, lineHeight: 1.35 },
     specDetailBlock: { marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: COLORS.border },
     specDetailGroup: { fontSize: 8, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.textMuted, marginBottom: 4, marginTop: 6 },
     specDetailLine: { fontSize: 7.5, color: COLORS.textMuted, lineHeight: 1.35, marginBottom: 2 },
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
-    brandLabel: { fontSize: 9, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 },
-    modelTitle: { fontSize: 17, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 8, letterSpacing: -0.3, maxWidth: '100%' },
+    brandLabel: { fontSize: 8.5, color: COLORS.secondary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 2.2, textTransform: 'uppercase', marginBottom: 5 },
+    modelTitle: { fontSize: 18, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 10, letterSpacing: -0.4, maxWidth: '100%' },
     blockTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4, marginTop: 10 },
     specItem: { flexDirection: 'row', marginBottom: 5, alignItems: 'flex-start' },
     specDot: { width: 5, height: 5, backgroundColor: COLORS.primary, borderRadius: 2.5, marginRight: 10 },
@@ -257,29 +249,6 @@ function detailedSpecBlocks(product: DynamicProduct, maxLines: number): { group:
     return blocks;
 }
 
-/** Linkuri din profil broșură: afișare compactă; nu înlocuiește textul — conținutul bogat e din «Text detaliat» + import */
-function renderPdfLinkSection(product: DynamicProduct): React.ReactElement | null {
-    const m = product.manufacturerUrl?.trim();
-    const refs = (product.referenceLinks || []).filter((l) => l?.url?.trim());
-    if (!m && refs.length === 0) return null;
-    const kids: React.ReactNode[] = [
-        React.createElement(Text, { key: 'tl', style: styles.pdfLinkSectionTitle }, 'Resurse web (referință)'),
-    ];
-    if (m) {
-        kids.push(React.createElement(Text, { key: 'm', style: styles.pdfLinkLine }, `Producător / fișă: ${m}`));
-    }
-    refs.slice(0, 5).forEach((l, i) => {
-        kids.push(
-            React.createElement(
-                Text,
-                { key: `r${i}`, style: styles.pdfLinkLine },
-                `${l.label || 'Link'}: ${l.url.trim()}`
-            )
-        );
-    });
-    return React.createElement(View, { style: styles.pdfLinkSection }, ...kids);
-}
-
 function renderProductExtraBlocks(product: DynamicProduct): React.ReactElement[] {
     const out: React.ReactElement[] = [];
     const parts: string[] = [];
@@ -291,7 +260,7 @@ function renderProductExtraBlocks(product: DynamicProduct): React.ReactElement[]
     const dsBlocks = detailedSpecBlocks(product, 28);
     if (dsBlocks.length === 0) return out;
     const inner: React.ReactElement[] = [];
-    inner.push(React.createElement(Text, { key: 'dt', style: styles.blockTitle }, 'Date extinse (producător)'));
+    inner.push(React.createElement(Text, { key: 'dt', style: styles.blockTitle }, 'Specificații extinse'));
     for (const block of dsBlocks) {
         inner.push(React.createElement(Text, { key: `G${block.group}`, style: styles.specDetailGroup }, block.group));
         for (let i = 0; i < block.lines.length; i++) {
@@ -306,7 +275,7 @@ const renderPageHeader = (title: string) => (
     React.createElement(View, { style: styles.header, fixed: true },
         React.createElement(View, { style: styles.headerWordmark },
             React.createElement(Text, { style: styles.headerBrandName }, 'TehnicAgro Supply'),
-            React.createElement(Text, { style: styles.headerBrandTag }, 'Utilaje agricole')
+            React.createElement(Text, { style: styles.headerBrandTag }, 'Selecție tehnică · materiale comerciale')
         ),
         React.createElement(Text, { style: styles.headerTitle }, title || '')
     )
@@ -314,7 +283,7 @@ const renderPageHeader = (title: string) => (
 
 const renderPageFooter = (pageNumber: number, phone?: string) => (
     React.createElement(View, { style: styles.footer, fixed: true },
-        React.createElement(Text, { style: styles.footerPage }, `Catalog TehnicAgro Supply · Pag. ${pageNumber}`),
+        React.createElement(Text, { style: styles.footerPage }, `TehnicAgro Supply · document selecție · pag. ${pageNumber}`),
         React.createElement(Text, { style: styles.footerContact, wrap: false }, formatPhoneForPdf(phone || DEFAULT_PHONE))
     )
 );
@@ -333,24 +302,25 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
 
     const categories = Object.keys(byCategory);
 
-    return React.createElement(Document, { title: config.title || 'Catalog TehnicAgro Supply v3.1 Pro' },
+    return React.createElement(Document, { title: config.title || 'TehnicAgro Supply — catalog selecție' },
         // PAGINA 1: COPERTĂ PREMIUM
         React.createElement(Page, { size: 'A4', style: styles.page },
             React.createElement(View, { style: styles.cover },
                 React.createElement(View, { style: styles.coverHero },
                     React.createElement(View, { style: styles.coverBrandBlock },
                         React.createElement(Text, { style: styles.coverBrandName }, 'TehnicAgro Supply'),
-                        React.createElement(Text, { style: styles.coverBrandTag }, 'Utilaje agricole · date tehnice · România'),
-                        React.createElement(View, { style: styles.coverRule })
+                        React.createElement(Text, { style: styles.coverBrandTag }, 'Utilaje agricole · selecție tehnică · România'),
+                        React.createElement(View, { style: styles.coverRule }),
+                        React.createElement(Text, { style: styles.coverEdition }, 'Document comercial · 2026')
                     )
                 ),
                 React.createElement(View, { style: styles.coverContent },
-                    React.createElement(Text, { style: styles.coverTitle }, 'CATALOG ECHIPAMENTE'),
-                    React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Mecanizare agricolă — selecție și documentație'),
-                    React.createElement(Text, { style: styles.coverSlogan }, 'Acest document prezintă echipamente selectate din portofoliu, cu specificații preluate din catalogul nostru și de la producători. Pentru oferte și disponibilitate, folosiți datele de contact din ultima pagină.'),
+                    React.createElement(Text, { style: styles.coverTitle }, 'CATALOG SELECȚIE'),
+                    React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Mecanizare agricolă — sinteză TehnicAgro Supply'),
+                    React.createElement(Text, { style: styles.coverSlogan }, 'Conținut exclusiv TehnicAgro Supply: informații sintetizate și adaptate din documentația tehnică a echipamentelor comercializate. Acest document nu reprezintă site-uri oficiale ale producătorilor. Pentru oferte și disponibilitate, folosiți datele din ultima pagină.'),
                 ),
                 React.createElement(View, { style: styles.coverFooter },
-                    React.createElement(Text, { style: styles.coverFooterLink }, `EDIȚIE CATALOG PRO · ${PUBLIC_WEB}`)
+                    React.createElement(Text, { style: styles.coverFooterLink }, `TEHNICAGRO SUPPLY · ${PUBLIC_WEB}`)
                 )
             )
         ),
@@ -448,7 +418,11 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                 React.createElement(Text, { style: styles.brandLabel }, product?.brand || 'TEHNICAGRO'),
                                 React.createElement(Text, { style: styles.modelTitle }, product?.name || 'Utilaj Agricol'),
                                 React.createElement(Text, { style: styles.catalogDesc }, descText),
-                                renderPdfLinkSection(product),
+                                React.createElement(
+                                    Text,
+                                    { style: styles.pdfDisclaimer },
+                                    'Informații sintetizate și prezentate de TehnicAgro Supply. Parametrii tehnici pot fi detaliați în oferta comercială.'
+                                ),
                                 React.createElement(View, { style: styles.catalogSpecsWrap },
                                     React.createElement(Text, { style: styles.blockTitle }, 'Specificații tehnice'),
                                     Array.isArray(product?.specs) && product.specs.length > 0

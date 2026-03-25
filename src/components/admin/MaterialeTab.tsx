@@ -1,11 +1,19 @@
 'use client';
-import { useState } from 'react';
-import { DynamicProduct, Brochure } from '@/lib/products-store';
-import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { DynamicProduct, Brochure, ProductBrochureProfile } from '@/lib/products-store';
+import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers, ImageIcon } from 'lucide-react';
 
 interface Props {
     adminAuth: string;
     allProducts: DynamicProduct[];
+    /** Când ești pe acest tab, se reîncarcă profilurile „Date broșură”. Dacă lipsește, se consideră mereu vizibil. */
+    tabVisible?: boolean;
+}
+
+function pdfContentHints(profile: ProductBrochureProfile | undefined) {
+    const textOk = ((profile?.brochureDescription || '').trim().length >= 40);
+    const extraPhotos = (profile?.gallery?.length || 0) > 0;
+    return { textOk, extraPhotos };
 }
 
 const PHONE = '+40 723 380 022';
@@ -64,13 +72,31 @@ const TEMPLATES: Record<string, { title: string; subtitle: string; introTitle: s
     }
 };
 
-export function MaterialeTab({ adminAuth, allProducts }: Props) {
+export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Props) {
     const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
     const [config, setConfig] = useState({ title: '', subtitle: '', introTitle: '', introText: '', theme: 'green', phone: PHONE, email: EMAIL });
     const [generating, setGenerating] = useState(false);
     const [result, setResult] = useState<Brochure | null>(null);
     const [history, setHistory] = useState<Brochure[]>([]);
     const [historyLoaded, setHistoryLoaded] = useState(false);
+    const [brochureProfiles, setBrochureProfiles] = useState<Record<string, ProductBrochureProfile>>({});
+
+    useEffect(() => {
+        if (!tabVisible || !adminAuth.trim()) return;
+        let cancelled = false;
+        (async () => {
+            const res = await fetch('/api/brochure-profiles', {
+                headers: { 'x-admin-auth': adminAuth.trim() },
+                cache: 'no-store',
+            });
+            if (!res.ok || cancelled) return;
+            const data = await res.json();
+            setBrochureProfiles(data.profiles || {});
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [tabVisible, adminAuth, generating]);
 
     const toggleProduct = (slug: string) =>
         setSelectedSlugs(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]);
@@ -141,8 +167,10 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
                         <FileText className="w-4 h-4 text-ea-green-500" /> Configurare Broșură
                     </h3>
                     <p className="text-[10px] text-zinc-500 leading-relaxed max-w-2xl">
-                        Poze extra, text lung și linkuri pe produs se editează în tab-ul <strong className="text-zinc-400">Date broșură</strong>. Aici
-                        compui layout-ul PDF și selectezi produsele; conținutul detaliat vine din acel tab.
+                        <strong className="text-zinc-400">Flux recomandat:</strong> mai întâi completezi fiecare produs în tab-ul{' '}
+                        <strong className="text-ea-green-500/90">Date broșură</strong> (text PDF + galerie — poți încărca mai multe poze
+                        odată). Apoi revii aici, alegi template-ul și bifezi produsele. Lângă nume vezi dacă există deja text suficient
+                        și poze extra pentru PDF.
                     </p>
                 </div>
 
@@ -221,9 +249,35 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
                                     {prods.map(p => (
                                         <label key={p.slug} className={`flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${selectedSlugs.includes(p.slug) ? 'border-ea-green-600 bg-ea-green-900/10 text-white shadow-lg shadow-ea-green-900/10' : 'border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800/50'}`}>
                                             <input type="checkbox" checked={selectedSlugs.includes(p.slug)} onChange={() => toggleProduct(p.slug)} disabled={!selectedSlugs.includes(p.slug) && selectedSlugs.length >= 8} className="w-4 h-4 rounded accent-ea-green-500 bg-zinc-950 border-zinc-700" />
-                                            <div className="min-w-0">
+                                            <div className="min-w-0 flex-1">
                                                 <div className="text-xs font-black truncate">{p.name}</div>
                                                 <div className="text-[10px] text-zinc-600 font-bold uppercase">{p.brand}</div>
+                                                {(() => {
+                                                    const { textOk, extraPhotos } = pdfContentHints(brochureProfiles[p.slug]);
+                                                    if (!brochureProfiles[p.slug]) {
+                                                        return (
+                                                            <div className="mt-2 flex flex-wrap gap-1.5">
+                                                                <span className="text-[9px] uppercase font-bold text-amber-500/90 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                                                    Fără profil broșură
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    }
+                                                    return (
+                                                        <div className="mt-2 flex flex-wrap gap-1.5">
+                                                            <span
+                                                                className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded border ${textOk ? 'text-ea-green-400 border-ea-green-500/30 bg-ea-green-500/10' : 'text-zinc-500 border-zinc-700 bg-zinc-900/80'}`}
+                                                            >
+                                                                Text PDF {textOk ? '✓' : '…'}
+                                                            </span>
+                                                            <span
+                                                                className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded border inline-flex items-center gap-0.5 ${extraPhotos ? 'text-sky-400 border-sky-500/30 bg-sky-500/10' : 'text-zinc-500 border-zinc-700 bg-zinc-900/80'}`}
+                                                            >
+                                                                <ImageIcon className="w-2.5 h-2.5" /> Extra {extraPhotos ? '✓' : '…'}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })()}
                                             </div>
                                         </label>
                                     ))}

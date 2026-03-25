@@ -195,24 +195,27 @@ export async function deleteBrochureProfile(slug: string): Promise<void> {
 }
 
 /** Combinație produs + profil broșură pentru randare PDF */
+/** Pregătește produsul pentru randare PDF: conținut broșură + imagini, fără URL-uri producător (document 100% TehnicAgro). */
 export function mergeProductForPdf(
     product: DynamicProduct,
     profiles: Record<string, ProductBrochureProfile>
 ): DynamicProduct {
     const bp = profiles[product.slug];
-    if (!bp) {
-        return {
-            ...product,
-            longDescription: product.longDescription || product.description,
-        };
-    }
-    return {
-        ...product,
-        gallery: bp.gallery !== undefined ? bp.gallery : product.gallery,
-        manufacturerUrl: bp.manufacturerUrl !== undefined ? bp.manufacturerUrl : product.manufacturerUrl,
-        referenceLinks: bp.referenceLinks !== undefined ? bp.referenceLinks : product.referenceLinks,
-        longDescription: bp.brochureDescription ?? product.longDescription ?? product.description,
-    };
+    const merged: DynamicProduct =
+        !bp
+            ? {
+                  ...product,
+                  longDescription: product.longDescription || product.description,
+              }
+            : {
+                  ...product,
+                  gallery: bp.gallery !== undefined ? bp.gallery : product.gallery,
+                  longDescription: bp.brochureDescription ?? product.longDescription ?? product.description,
+              };
+    const pdfOnly = { ...merged };
+    delete (pdfOnly as Partial<DynamicProduct>).manufacturerUrl;
+    delete (pdfOnly as Partial<DynamicProduct>).referenceLinks;
+    return pdfOnly;
 }
 
 // ── CATEGORIES ────────────────────────────────────────────

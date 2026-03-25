@@ -3,7 +3,18 @@
 import { useState, useEffect, useMemo } from 'react';
 import { DynamicProduct, ProductBrochureProfile } from '@/lib/products-store';
 import { ImageOptimizer } from './ImageOptimizer';
-import { Save, Sparkles, Loader, Link2, Plus, BookOpen } from 'lucide-react';
+import {
+    Save,
+    Sparkles,
+    Loader,
+    Link2,
+    Plus,
+    BookOpen,
+    ChevronLeft,
+    ChevronRight,
+    ListOrdered,
+    Images,
+} from 'lucide-react';
 
 type ImportPreviewResult = {
     success?: boolean;
@@ -125,6 +136,19 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
             </div>
         );
 
+    const moveGallery = (index: number, delta: number) => {
+        setDraft((d) => {
+            if (!d) return d;
+            const g = [...(d.gallery || [])];
+            const j = index + delta;
+            if (j < 0 || j >= g.length) return d;
+            const t = g[index];
+            g[index] = g[j];
+            g[j] = t;
+            return { ...d, gallery: g };
+        });
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-4 space-y-4">
@@ -134,9 +158,28 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
                         Date broșură (PDF)
                     </h2>
                     <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
-                        Aici pui tot ce e „bogat”: poze extra, text lung, linkuri producător. Nu apare pe site — doar în materialele
-                        publicitare generate. Site-ul rămâne curat din tab-ul Catalog.
+                        Conținut suplimentar doar pentru PDF-ul TehnicAgro: text detaliat și galerie. Pe site rămâne varianta din
+                        Catalog. După ce apeși <strong className="text-zinc-400">Salvează</strong>, mergi la tab-ul{' '}
+                        <strong className="text-ea-green-500/90">Materiale publicitare</strong> și generezi documentul.
                     </p>
+                    <ol className="mt-4 space-y-2 text-[10px] text-zinc-400 leading-relaxed list-decimal list-inside border-t border-zinc-800 pt-4">
+                        <li>
+                            <span className="text-zinc-300 font-bold">Alege produsul</span> din lista din stânga.
+                        </li>
+                        <li>
+                            <span className="text-zinc-300 font-bold">Scrie textul</span> pentru PDF (sau folosește „Preluare din
+                            link” ca punct de plecare, apoi adaptezi).
+                        </li>
+                        <li>
+                            <span className="text-zinc-300 font-bold">Adaugă poze</span> — selectezi sau tragi{' '}
+                            <strong className="text-zinc-500">mai multe fișiere dintr-o dată</strong>; nu le descarci manual, se urcă
+                            direct pe server.
+                        </li>
+                        <li>
+                            <span className="text-zinc-300 font-bold">Salvează</span>, apoi în Materiale alegi produsele și generezi
+                            broșura.
+                        </li>
+                    </ol>
                 </div>
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden max-h-[70vh] overflow-y-auto">
                     {allProducts.map((p) => (
@@ -203,34 +246,72 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
 
                         <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 space-y-4">
                             <label className="text-[10px] text-zinc-500 uppercase font-black tracking-widest flex items-center gap-2">
-                                <Link2 className="w-3.5 h-3.5 text-ea-green-500" /> Galerie imagini (doar PDF)
+                                <Images className="w-3.5 h-3.5 text-ea-green-500" /> Galerie imagini (doar PDF)
                             </label>
-                            <div className="flex flex-wrap gap-2">
+                            <p className="text-[10px] text-zinc-600 leading-relaxed flex items-start gap-2">
+                                <ListOrdered className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
+                                Ordinea miniaturilor este ordinea din broșură. Folosește săgețile sub poză ca să muți în stânga /
+                                dreapta.
+                            </p>
+                            <div className="flex flex-wrap gap-3">
                                 {(draft.gallery || []).map((gurl, gi) => (
-                                    <div key={`${gurl}-${gi}`} className="relative group/thumb">
-                                        <img src={gurl} alt="" className="w-20 h-20 rounded-xl object-cover border border-zinc-800" />
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setDraft((d) =>
-                                                    d
-                                                        ? { ...d, gallery: (d.gallery || []).filter((_, j) => j !== gi) }
-                                                        : d
-                                                )
-                                            }
-                                            className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 text-white rounded-full text-[10px] font-black opacity-0 group-hover/thumb:opacity-100 transition-opacity"
-                                        >
-                                            ×
-                                        </button>
+                                    <div key={`${gurl}-${gi}`} className="flex flex-col items-center gap-1 group/thumb">
+                                        <div className="relative">
+                                            <img
+                                                src={gurl}
+                                                alt=""
+                                                className="w-24 h-24 rounded-xl object-cover border border-zinc-800"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setDraft((d) =>
+                                                        d
+                                                            ? { ...d, gallery: (d.gallery || []).filter((_, j) => j !== gi) }
+                                                            : d
+                                                    )
+                                                }
+                                                className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 text-white rounded-full text-[10px] font-black opacity-0 group-hover/thumb:opacity-100 transition-opacity"
+                                                title="Șterge din galerie"
+                                            >
+                                                ×
+                                            </button>
+                                            <span className="absolute bottom-1 left-1 text-[9px] font-black text-white bg-black/60 px-1 rounded">
+                                                {gi + 1}
+                                            </span>
+                                        </div>
+                                        <div className="flex gap-0.5">
+                                            <button
+                                                type="button"
+                                                disabled={gi === 0}
+                                                onClick={() => moveGallery(gi, -1)}
+                                                className="p-1 rounded-md bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none"
+                                                title="Mută mai la început"
+                                            >
+                                                <ChevronLeft className="w-3.5 h-3.5" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                disabled={gi >= (draft.gallery?.length || 0) - 1}
+                                                onClick={() => moveGallery(gi, 1)}
+                                                className="p-1 rounded-md bg-zinc-800 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none"
+                                                title="Mută mai la sfârșit"
+                                            >
+                                                <ChevronRight className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                             <ImageOptimizer
                                 adminAuth={adminAuth}
-                                filename={`bro-${selectedSlug}-gal-${(draft.gallery?.length || 0) + 1}`}
+                                filename={`bro-${selectedSlug}`}
+                                multiple
+                                getInitialGalleryCount={() => draft.gallery?.length ?? 0}
                                 onOptimized={(url) =>
                                     setDraft((d) => (d ? { ...d, gallery: [...(d.gallery || []), url] } : d))
                                 }
+                                dropZoneHint="Poți alege mai multe poze dintr-o dată (ține Shift sau Cmd în fereastra de sistem) sau le tragi din folder aici. Ele se optimizează și se urcă direct pe server, fără descărcări manuale pe calculator."
                             />
                         </div>
 
@@ -239,11 +320,10 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
                                 Link producător / fișă tehnică (PDF)
                             </label>
                             <p className="text-[10px] text-zinc-600 leading-relaxed">
-                                Un singur câmp pentru pagina principală a producătorului. Mai jos, „Adaugă link” adaugă rânduri extra
-                                (etichetă + URL). În PDF aceste adrese apar ca listă scurtă de referință —{' '}
-                                <strong className="text-zinc-500">nu se citește automat</strong> conținutul site-ului la generarea
-                                broșurii. Ca să aduci text din web în document, folosește mai jos „Preluare din link” și „Pune în text
-                                PDF”.
+                                Folosești aceste adrese doar la tine, în admin: reper când scrii, sau la „Preluare din link” ca să
+                                aduci text în «Text detaliat pentru PDF».{' '}
+                                <strong className="text-zinc-400">În broșura PDF exportată nu apar linkuri către producători</strong> —
+                                documentul rămâne 100% TehnicAgro Supply (datele afișate sunt textele și specificațiile tale).
                             </p>
                             <input
                                 value={draft.manufacturerUrl || ''}
