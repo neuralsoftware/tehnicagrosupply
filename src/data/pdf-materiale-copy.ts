@@ -28,7 +28,7 @@ export const PDF_COMPANY = {
     'Transparență: ce rezultă din datele tehnice, ce depinde de teren, norme și practică',
   ],
   closing:
-    'Paginile următoare prezintă categoriile și produsele din această selecție. Conținutul este redactat și structurat de TehnicAgro Supply pe baza documentației tehnice și a configurării din catalogul nostru.',
+    'Conținutul este redactat de TehnicAgro Supply pe baza documentației tehnice a producătorilor incluși în selecție.',
 };
 
 export const PDF_BRANDS_INTRO = {

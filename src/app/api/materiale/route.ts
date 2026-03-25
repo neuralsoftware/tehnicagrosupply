@@ -168,22 +168,22 @@ const styles = StyleSheet.create({
     sectionTitle: { fontSize: 22, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 22, letterSpacing: -0.3 },
     subsectionTitle: { fontSize: 12, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, marginBottom: 10, marginTop: 6 },
     categoryIntroAccent: { height: 3, backgroundColor: COLORS.brochureAccent, marginBottom: 14, width: '100%' },
-    mainText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 15, textAlign: 'justify' },
-    bulletText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 8, marginLeft: 15 },
-    introHighlight: { fontSize: 13, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 500, lineHeight: 1.5, marginBottom: 20 },
+    mainText: { fontSize: 10, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 10, textAlign: 'justify' },
+    bulletText: { fontSize: 10, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 5, marginLeft: 15 },
+    introHighlight: { fontSize: 11.5, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 500, lineHeight: 1.4, marginBottom: 14 },
     categoryTitle: { fontSize: 20, color: COLORS.primaryDark, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: -0.2, marginBottom: 12 },
     productLayout: { paddingTop: HEADER_BLOCK + 10, paddingRight: MARGIN, paddingBottom: FOOTER_BLOCK + 28, paddingLeft: MARGIN },
     productOverviewPage: {
-        paddingTop: HEADER_BLOCK + 10,
+        paddingTop: HEADER_BLOCK + 8,
         paddingRight: MARGIN,
-        paddingBottom: FOOTER_BLOCK + 18,
+        paddingBottom: FOOTER_BLOCK + 10,
         paddingLeft: MARGIN,
         flex: 1,
     },
     productDetailPage: {
-        paddingTop: HEADER_BLOCK + 10,
+        paddingTop: HEADER_BLOCK + 8,
         paddingRight: MARGIN,
-        paddingBottom: FOOTER_BLOCK + 18,
+        paddingBottom: FOOTER_BLOCK + 10,
         paddingLeft: MARGIN,
         flex: 1,
     },
@@ -200,6 +200,9 @@ const styles = StyleSheet.create({
     productOverviewImageFrame: {
         flex: 1,
         minHeight: 0,
+        backgroundColor: '#f1f5f9',
+        borderRadius: 14,
+        padding: 16,
     },
     catalogRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
     catalogImageCol: {
@@ -288,11 +291,11 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     unifiedSpecsBox: {
-        marginTop: 10,
+        marginTop: 6,
         borderWidth: 1,
         borderColor: COLORS.border,
-        borderRadius: 8,
-        padding: 12,
+        borderRadius: 6,
+        padding: 8,
         backgroundColor: '#f8fafc',
     },
     narrativeSpecsBox: {
@@ -304,7 +307,7 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: '#f8fafc',
     },
-    specLineDetailCompact: { fontSize: 9.5, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 3 },
+    specLineDetailCompact: { fontSize: 8.5, color: COLORS.textMuted, lineHeight: 1.3, marginBottom: 2 },
     productGalleryStackBox: {
         borderWidth: 1,
         borderColor: COLORS.border,
@@ -313,15 +316,15 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         marginTop: 8,
     },
-    productSupplementStack: { width: '42%', marginRight: 16 },
+    productSupplementStack: { width: '42%', marginRight: 12 },
     productSupplementImageBox: {
         borderWidth: 1,
         borderColor: COLORS.border,
-        borderRadius: 8,
-        padding: 6,
+        borderRadius: 6,
+        padding: 4,
         backgroundColor: COLORS.white,
-        marginBottom: 12,
-        minHeight: 185,
+        marginBottom: 8,
+        minHeight: 160,
     },
     productSupplementEmpty: {
         minHeight: 154,
@@ -417,10 +420,10 @@ const styles = StyleSheet.create({
     contactClosingText: { fontSize: 10, color: COLORS.textMuted, lineHeight: 1.5, textAlign: 'center' as const },
     /** Corp comun: dreapta pozei + specificații (aceeași optică) */
     productSheetBody: {
-        fontSize: 9.5,
+        fontSize: 9,
         color: COLORS.textMuted,
-        lineHeight: 1.45,
-        marginBottom: 8,
+        lineHeight: 1.35,
+        marginBottom: 5,
         textAlign: 'justify' as const,
     },
     productSheetDisclaimer: {
@@ -432,10 +435,10 @@ const styles = StyleSheet.create({
         textAlign: 'justify' as const,
     },
     catalogSpecsWrap: { marginTop: 6 },
-    productMetaStrip: { fontSize: 8.5, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', marginBottom: 8, lineHeight: 1.35 },
+    productMetaStrip: { fontSize: 8, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', marginBottom: 4, lineHeight: 1.3 },
     specDetailBlock: { marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: COLORS.border },
-    specDetailGroup: { fontSize: 9.5, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.textMuted, marginBottom: 4, marginTop: 6 },
-    specDetailLine: { fontSize: 9.5, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 3 },
+    specDetailGroup: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.textMuted, marginBottom: 2, marginTop: 4 },
+    specDetailLine: { fontSize: 8.5, color: COLORS.textMuted, lineHeight: 1.3, marginBottom: 2 },
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
     brandLabel: { fontSize: 8.5, color: COLORS.secondary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 2.2, textTransform: 'uppercase', marginBottom: 5 },
     modelTitle: { fontSize: 18, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 10, letterSpacing: -0.4, maxWidth: '100%' },
@@ -475,10 +478,10 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     productIntroBullets: {
-        fontSize: 9.5,
+        fontSize: 9,
         color: COLORS.textMuted,
-        lineHeight: 1.5,
-        marginTop: 4,
+        lineHeight: 1.35,
+        marginTop: 2,
     },
     heroPrinciple: {
         fontSize: 11,
@@ -496,17 +499,17 @@ const styles = StyleSheet.create({
     },
     productImageColumn: { width: '52%', alignSelf: 'flex-start' as const },
     blockTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4, marginTop: 10 },
-    specItem: { flexDirection: 'row', marginBottom: 5, alignItems: 'flex-start' },
-    specChevron: { fontSize: 11, color: COLORS.brochureAccent, marginRight: 8, lineHeight: 1.45, fontFamily: 'Roboto', fontWeight: 'bold' },
-    specText: { fontSize: 9.5, color: COLORS.textMuted, flex: 1, lineHeight: 1.45 },
-    verdictFundingRow: { flexDirection: 'row', alignItems: 'stretch', marginTop: 12, width: '100%' },
-    verdictOrFundingHalf: { flex: 1, minWidth: 0, marginHorizontal: 4 },
-    fundingBox: { backgroundColor: '#f0fdf4', padding: 12, borderRadius: 6, borderLeftWidth: 4, borderLeftColor: COLORS.accent, marginTop: 0 },
-    fundingTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, textTransform: 'uppercase', marginBottom: 6, letterSpacing: 1 },
-    fundingText: { fontSize: 10, color: '#065f46', lineHeight: 1.4 },
-    verdictBox: { backgroundColor: '#fffbeb', padding: 12, borderRadius: 6, borderLeftWidth: 4, borderLeftColor: '#f59e0b', marginTop: 0 },
-    verdictTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, textTransform: 'uppercase', marginBottom: 6, letterSpacing: 1 },
-    verdictText: { fontSize: 9, color: '#92400e', lineHeight: 1.45, fontStyle: 'italic' },
+    specItem: { flexDirection: 'row', marginBottom: 3, alignItems: 'flex-start' },
+    specChevron: { fontSize: 10, color: COLORS.brochureAccent, marginRight: 6, lineHeight: 1.35, fontFamily: 'Roboto', fontWeight: 'bold' },
+    specText: { fontSize: 9, color: COLORS.textMuted, flex: 1, lineHeight: 1.35 },
+    verdictFundingRow: { flexDirection: 'row', alignItems: 'stretch', marginTop: 8, width: '100%' },
+    verdictOrFundingHalf: { flex: 1, minWidth: 0, marginHorizontal: 3 },
+    fundingBox: { backgroundColor: '#f0fdf4', padding: 8, borderRadius: 6, borderLeftWidth: 3, borderLeftColor: COLORS.accent, marginTop: 0 },
+    fundingTitle: { fontSize: 8, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, textTransform: 'uppercase', marginBottom: 3, letterSpacing: 0.8 },
+    fundingText: { fontSize: 8.5, color: '#065f46', lineHeight: 1.3 },
+    verdictBox: { backgroundColor: '#fffbeb', padding: 8, borderRadius: 6, borderLeftWidth: 3, borderLeftColor: '#f59e0b', marginTop: 0 },
+    verdictTitle: { fontSize: 8, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, textTransform: 'uppercase', marginBottom: 3, letterSpacing: 0.8 },
+    verdictText: { fontSize: 8, color: '#92400e', lineHeight: 1.3, fontStyle: 'italic' },
     placeholderBox: { width: '100%', backgroundColor: '#f1f5f9', borderStyle: 'dashed', borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, justifyContent: 'center', alignItems: 'center', marginVertical: 20, padding: 20 },
     placeholderText: { fontSize: 9, color: '#64748b', textAlign: 'center' },
     contactPage: {
@@ -514,7 +517,7 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         padding: MARGIN,
         paddingTop: HEADER_BLOCK + 8,
-        paddingBottom: FOOTER_BLOCK + 52,
+        paddingBottom: FOOTER_BLOCK + 16,
         justifyContent: 'space-between' as const,
         flexDirection: 'column' as const,
     },
@@ -583,7 +586,7 @@ const styles = StyleSheet.create({
 function renderChevronBullet(key: string, textStyle: Record<string, unknown>, text: string) {
     return React.createElement(
         View,
-        { key, style: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 7 } },
+        { key, style: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 4 } },
         React.createElement(Text, { style: styles.specChevron }, '›'),
         React.createElement(Text, { style: textStyle as never }, text)
     );
@@ -592,7 +595,7 @@ function renderChevronBullet(key: string, textStyle: Record<string, unknown>, te
 function renderAccentSectionTitle(key: string, title: string) {
     return React.createElement(
         View,
-        { key, style: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginTop: 2 } },
+        { key, style: { flexDirection: 'row', alignItems: 'center', marginBottom: 6, marginTop: 2 } },
         React.createElement(View, { style: { width: 3, height: 13, backgroundColor: COLORS.brochureAccent, marginRight: 10 } }),
         React.createElement(Text, {
             style: {
@@ -631,7 +634,7 @@ const ProductImage = ({
     stripThumb?: boolean;
 }) => {
     if (!url) {
-        const h = stripThumb ? 56 : galleryThumb ? 80 : compact ? 72 : hero ? 450 : detail ? 180 : catalog || catalogStack ? 200 : 220;
+        const h = stripThumb ? 56 : galleryThumb ? 80 : compact ? 72 : hero ? 410 : detail ? 160 : catalog || catalogStack ? 200 : 220;
         return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
@@ -645,9 +648,9 @@ const ProductImage = ({
           : compact
             ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
             : hero
-              ? { width: '100%', height: 450, objectFit: 'contain' as const }
+              ? { width: '100%', height: 410, objectFit: 'contain' as const }
               : detail
-                ? { width: '100%', height: 180, objectFit: 'contain' as const }
+                ? { width: '100%', height: 160, objectFit: 'contain' as const }
             : catalog || catalogStack
               ? { width: '100%', height: 200, objectFit: 'contain' as const }
               : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
@@ -730,7 +733,7 @@ type SpecPdfLine = { kind: 'group'; text: string } | { kind: 'line'; text: strin
 
 /** Toate liniile pentru specificații extinse (paginare explicită — evită suprapunere cu antet fix) */
 function flattenDetailedSpecLines(product: DynamicProduct): SpecPdfLine[] {
-    const blocks = detailedSpecBlocks(product, 25);
+    const blocks = detailedSpecBlocks(product, 12);
     const out: SpecPdfLine[] = [];
     for (const b of blocks) {
         out.push({ kind: 'group', text: b.group });
@@ -889,7 +892,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                         React.createElement(Text, { style: styles.coverTitle }, 'Catalog selecție'),
                         React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Mecanizare agricolă'),
                         React.createElement(Text, { style: styles.coverSlogan },
-                            'Conținut redactat de TehnicAgro Supply pe baza documentației tehnice a echipamentelor incluse. Nu înlocuiește site-urile oficiale ale producătorilor. Parametrii concrete se validează la ofertare și pe marca tractorului dumneavoastră.'
+                            'Selecție tehnică pe baza documentației producătorilor incluși. Parametrii se validează la ofertare.'
                         )
                     )
                 ),
@@ -1085,7 +1088,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                             React.createElement(View, { style: styles.contactClosing },
                                 React.createElement(Text, { style: styles.contactClosingTitle }, 'Oferte personalizate'),
                                 React.createElement(Text, { style: styles.contactClosingText },
-                                    'Pentru o ofertă adaptată exploatației dumneavoastră (configurație utilaj, opționale, termene), ne puteți contacta la telefon sau e-mailul de mai sus. Acest PDF este document static; nu include elemente apăsabile — discutăm oferta direct pe canalele reale de comunicare.'
+                                    'Pentru ofertă personalizată (configurație, opționale, termene), ne puteți contacta la datele de mai sus.'
                                 )
                             ),
                             React.createElement(View, { style: styles.contactFooterBand },
