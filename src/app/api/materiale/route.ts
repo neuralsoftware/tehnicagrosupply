@@ -91,6 +91,8 @@ const FOOTER_BLOCK = 52;
 const FOOTER_BAND_HEIGHT = 36;
 /** Accent secțiuni „curate” pagina 2 produs */
 const PDF_SECTION_ACCENT = '#064e3b';
+/** Copertă spate / contact — full-bleed */
+const BACK_COVER_SOLID = '#064e3b';
 
 // PDF Styles
 const styles = StyleSheet.create({
@@ -271,7 +273,8 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start' as const,
         width: '100%',
     },
-    productOverviewTitleCol: { flex: 1, minWidth: 0, paddingRight: 14 },
+    /** Stânga 45% / dreapta 55% — fără suprapunere (flexbox strict) */
+    productOverviewTitleCol: { width: '45%', minWidth: 0, paddingRight: 8 },
     productOverviewCategory: {
         fontSize: 11,
         fontFamily: 'Roboto',
@@ -291,7 +294,7 @@ const styles = StyleSheet.create({
         letterSpacing: -1.2,
         textTransform: 'uppercase' as const,
     },
-    productOverviewPrincipleCol: { width: '40%', minWidth: 176 },
+    productOverviewPrincipleCol: { width: '55%', minWidth: 0, paddingLeft: 20 },
     productOverviewPrincipleTitle: {
         fontSize: 10,
         fontFamily: 'Roboto',
@@ -457,6 +460,17 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         marginTop: 8,
     },
+    /** Coloană moodboard — lipit de stânga, fără colțuri rotunjite */
+    productMoodboardStack: { width: '42%', marginRight: 12, alignSelf: 'flex-start' as const },
+    productMoodboardCell: {
+        width: '100%',
+        height: 180,
+        marginBottom: 15,
+        borderRadius: 0,
+        borderWidth: 0,
+        padding: 0,
+        overflow: 'hidden' as const,
+    },
     productSupplementStack: { width: '42%', marginRight: 12 },
     productSupplementImageBox: {
         borderWidth: 1,
@@ -597,6 +611,74 @@ const styles = StyleSheet.create({
     verdictText: { fontSize: 8, color: '#92400e', lineHeight: 1.3, fontStyle: 'italic' },
     placeholderBox: { width: '100%', backgroundColor: '#f1f5f9', borderStyle: 'dashed', borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, justifyContent: 'center', alignItems: 'center', marginVertical: 20, padding: 20 },
     placeholderText: { fontSize: 9, color: '#64748b', textAlign: 'center' },
+    /** Copertă spate — fundal uniform, tot textul alb */
+    contactBackOuter: {
+        flex: 1,
+        flexDirection: 'column' as const,
+        justifyContent: 'space-between' as const,
+        paddingTop: 52,
+        paddingBottom: FOOTER_BAND_HEIGHT + 28,
+        paddingHorizontal: MARGIN,
+    },
+    contactBackTop: { alignItems: 'center' as const },
+    contactBackLogo: {
+        fontSize: 26,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.white,
+        textAlign: 'center' as const,
+        letterSpacing: 1,
+    },
+    contactBackTagline: {
+        fontSize: 9,
+        color: '#c7f0dc',
+        textAlign: 'center' as const,
+        marginTop: 10,
+        letterSpacing: 1.4,
+        textTransform: 'uppercase' as const,
+    },
+    contactBackMiddle: {
+        flex: 1,
+        justifyContent: 'center' as const,
+        alignItems: 'center' as const,
+        paddingVertical: 20,
+    },
+    contactBackHeadline: {
+        fontSize: 30,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.white,
+        textAlign: 'center' as const,
+        lineHeight: 1.2,
+        textTransform: 'uppercase' as const,
+        letterSpacing: 0.6,
+        paddingHorizontal: 12,
+    },
+    contactBackBottom: { alignItems: 'center' as const, paddingBottom: 4 },
+    contactBackLine: {
+        fontSize: 12,
+        fontFamily: 'Roboto',
+        fontWeight: 500,
+        color: COLORS.white,
+        textAlign: 'center' as const,
+        marginBottom: 10,
+        letterSpacing: 0.3,
+    },
+    contactBackLineMuted: {
+        fontSize: 10,
+        color: '#d1fae5',
+        textAlign: 'center' as const,
+        marginBottom: 6,
+        letterSpacing: 0.5,
+    },
+    contactBackNote: {
+        fontSize: 7,
+        color: '#a7c4b8',
+        textAlign: 'center' as const,
+        lineHeight: 1.45,
+        marginTop: 14,
+        paddingHorizontal: 24,
+    },
     contactPage: {
         flex: 1,
         backgroundColor: COLORS.white,
@@ -758,6 +840,7 @@ const ProductImage = ({
     hero,
     detail,
     immersive,
+    moodboard,
     /** Aceeași înălțime ca imaginea principală catalog (coloană stângă) */
     catalogStack,
     compact,
@@ -770,6 +853,7 @@ const ProductImage = ({
     hero?: boolean;
     detail?: boolean;
     immersive?: boolean;
+    moodboard?: boolean;
     catalogStack?: boolean;
     compact?: boolean;
     galleryThumb?: boolean;
@@ -784,19 +868,21 @@ const ProductImage = ({
                 ? 72
                 : immersive
                   ? 456
-                  : hero
-                    ? 410
-                    : detail
-                      ? 160
-                      : catalog || catalogStack
-                        ? 200
-                        : 220;
-        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || immersive || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
+                  : moodboard
+                    ? 180
+                    : hero
+                      ? 410
+                      : detail
+                        ? 160
+                        : catalog || catalogStack
+                          ? 200
+                          : 220;
+        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || immersive || moodboard || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
     }
     const absolute = resolvePublicUrl(url);
-    const wSrv = hero || immersive ? 1400 : 800;
+    const wSrv = hero || immersive ? 1400 : moodboard ? 1100 : 800;
     const safeJpgUrl = `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=jpg&w=${wSrv}`;
     const imgStyle = stripThumb
         ? { width: '100%', height: 56, objectFit: 'contain' as const }
@@ -806,13 +892,15 @@ const ProductImage = ({
             ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
             : immersive
               ? { width: '100%', height: '100%', objectFit: 'cover' as const }
-              : hero
-                ? { width: '100%', height: 410, objectFit: 'contain' as const }
-                : detail
-                  ? { width: '100%', height: 160, objectFit: 'contain' as const }
-                  : catalog || catalogStack
-                    ? { width: '100%', height: 200, objectFit: 'contain' as const }
-                    : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
+              : moodboard
+                ? { width: '100%', height: 180, objectFit: 'cover' as const }
+                : hero
+                  ? { width: '100%', height: 410, objectFit: 'contain' as const }
+                  : detail
+                    ? { width: '100%', height: 160, objectFit: 'contain' as const }
+                    : catalog || catalogStack
+                      ? { width: '100%', height: 200, objectFit: 'contain' as const }
+                      : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
     return React.createElement(Image, { src: safeJpgUrl, style: imgStyle });
 };
 
@@ -1034,10 +1122,16 @@ const renderPageHeader = (title: string) => (
     )
 );
 
-const renderPageFooter = (pageNumber: number, phone?: string) => (
+const renderPageFooter = (pageNumber: number, phone?: string, opts?: { bandBackgroundColor?: string }) => (
     React.createElement(
         View,
-        { style: styles.footerBand, fixed: true },
+        {
+            style: {
+                ...styles.footerBand,
+                ...(opts?.bandBackgroundColor ? { backgroundColor: opts.bandBackgroundColor } : {}),
+            },
+            fixed: true,
+        },
         React.createElement(Text, { style: styles.footerBandPage }, `Pag. ${pageNumber}`),
         React.createElement(Text, { style: styles.footerBandContact, wrap: false }, formatPhoneForPdf(phone || DEFAULT_PHONE))
     )
@@ -1214,12 +1308,14 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productDetailPage },
                         React.createElement(View, { style: { ...styles.productDetailGrid, flex: 1 } },
-                            React.createElement(View, { style: styles.productSupplementStack },
+                            React.createElement(
+                                View,
+                                { style: styles.productMoodboardStack },
                                 ...detailGallery.map((u, gi) =>
                                     React.createElement(
                                         View,
-                                        { key: `detail-${pSlug}-${gi}`, style: styles.productSupplementImageBox },
-                                        React.createElement(ProductImage, { url: u, fallback: product?.name, detail: true })
+                                        { key: `detail-${pSlug}-${gi}`, style: styles.productMoodboardCell },
+                                        React.createElement(ProductImage, { url: u, fallback: product?.name, moodboard: true })
                                     )
                                 ),
                             ),
@@ -1260,58 +1356,36 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
             return productPages;
         }),
 
-        // PAGINA FINALĂ: contact + bandă tip copertă (ierarhie vizuală ca în broșurile de referință)
+        // PAGINA FINALĂ: copertă spate full-bleed (fără antet alb tip document)
         ...((): React.ReactElement[] => {
             return [
                 React.createElement(
                     Page,
-                    { size: 'A4', style: styles.page, key: 'contact-final' },
-                    renderPageHeader('CONTACT'),
+                    { size: 'A4', style: { ...styles.page, backgroundColor: BACK_COVER_SOLID }, key: 'contact-final' },
                     React.createElement(
                         View,
-                        { style: styles.contactPage },
+                        { style: styles.contactBackOuter },
                         React.createElement(
                             View,
-                            { style: { width: '100%' } },
-                            React.createElement(
-                                View,
-                                { style: styles.contactWordmark },
-                                React.createElement(Text, { style: styles.contactBrandName }, 'TehnicAgro Supply'),
-                                React.createElement(Text, { style: styles.contactBrandTag }, 'Selecție tehnică pentru mecanizare agricolă')
-                            ),
-                            React.createElement(Text, { style: styles.contactTitle }, 'Date de contact'),
-                            React.createElement(Text, { style: styles.contactSubtitle }, 'Oferte, disponibilitate, clarificări tehnice'),
-                            React.createElement(View, { style: styles.contactBlock },
-                                React.createElement(View, { style: styles.contactRow },
-                                    React.createElement(Text, { style: styles.contactLabel }, 'Telefon'),
-                                    React.createElement(Text, { style: styles.contactValueNoWrap, wrap: false }, formatPhoneForPdf(config.phone || DEFAULT_PHONE))
-                                ),
-                                React.createElement(View, { style: styles.contactRow },
-                                    React.createElement(Text, { style: styles.contactLabel }, 'E-mail'),
-                                    React.createElement(Text, { style: styles.contactValue }, (config.email && String(config.email).trim()) || DEFAULT_EMAIL)
-                                ),
-                                React.createElement(View, { style: styles.contactRow },
-                                    React.createElement(Text, { style: styles.contactLabel }, 'Site'),
-                                    React.createElement(Text, { style: styles.contactValue }, PUBLIC_WEB)
-                                ),
-                                React.createElement(View, { style: styles.contactRow },
-                                    React.createElement(Text, { style: styles.contactLabel }, 'Țară'),
-                                    React.createElement(Text, { style: styles.contactValue }, 'România')
-                                )
-                            ),
-                            React.createElement(View, { style: styles.contactClosing },
-                                React.createElement(Text, { style: styles.contactClosingTitle }, 'Oferte personalizate'),
-                                React.createElement(Text, { style: styles.contactClosingText },
-                                    'Pentru ofertă personalizată (configurație, opționale, termene), ne puteți contacta la datele de mai sus.'
-                                )
-                            ),
-                            React.createElement(View, { style: styles.contactFooterBand },
-                                React.createElement(Image, { src: logoSrc, style: styles.contactLogoImg }),
-                                React.createElement(Text, { style: styles.contactDocNote }, PDF_DOCUMENTATION_NOTE)
-                            )
+                            { style: styles.contactBackTop },
+                            React.createElement(Text, { style: styles.contactBackLogo }, 'TehnicAgro Supply'),
+                            React.createElement(Text, { style: styles.contactBackTagline }, 'Selecție tehnică · mecanizare agricolă · România')
+                        ),
+                        React.createElement(
+                            View,
+                            { style: styles.contactBackMiddle },
+                            React.createElement(Text, { style: styles.contactBackHeadline }, 'PREGĂTIȚI PENTRU CAMPANIA URMĂTOARE.')
+                        ),
+                        React.createElement(
+                            View,
+                            { style: styles.contactBackBottom },
+                            React.createElement(Text, { style: styles.contactBackLine }, formatPhoneForPdf(config.phone || DEFAULT_PHONE)),
+                            React.createElement(Text, { style: styles.contactBackLine }, (config.email && String(config.email).trim()) || DEFAULT_EMAIL),
+                            React.createElement(Text, { style: styles.contactBackLineMuted }, PUBLIC_WEB),
+                            React.createElement(Text, { style: styles.contactBackNote }, PDF_DOCUMENTATION_NOTE)
                         )
                     ),
-                    renderPageFooter(currentPage += 1, config.phone)
+                    renderPageFooter(currentPage += 1, config.phone, { bandBackgroundColor: BACK_COVER_SOLID })
                 ),
             ];
         })()
