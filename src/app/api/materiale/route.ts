@@ -980,14 +980,18 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     activePrograms.length > 0 &&
                     React.createElement(View, { style: styles.fundingBox },
                         React.createElement(Text, { style: styles.fundingTitle }, 'Finanțare — informare generală'),
-                        React.createElement(Text, { style: styles.fundingText }, `${activePrograms[0].title || ''} (${activePrograms[0].maxGrant || 'condiții în ghidul oficial'}). Text orientativ; eligibilitatea se stabilește doar după reglementările în vigoare și dosarul dumneavoastră — nu întocmim noi dosarul.`)
+                        React.createElement(
+                            Text,
+                            { style: styles.fundingText },
+                            `${activePrograms[0].title || ''}${activePrograms[0].maxGrant ? ` (${activePrograms[0].maxGrant})` : ''}. Informație orientativă; eligibilitatea se confirmă exclusiv în ghidurile oficiale și în documentația fermei.`
+                        )
                     );
 
                 const kicker = [secTitle.toUpperCase(), product?.brand].filter(Boolean).join(' · ');
                 const introBullets = [
-                    'Alegerea modelului ține cont de lățime de lucru, necesarul de putere și tipul exploatației.',
-                    'Consultați datele producătorului pentru adâncime, consum și cerințe de întreținere.',
-                    'Informațiile despre fonduri au caracter orientativ și se confirmă în dosar.',
+                    'Destinată lucrărilor conservative, cu utilizare posibilă în semănat direct, mini-till sau convențional, în funcție de configurație.',
+                    'Configurația optimă se stabilește după lățimea de lucru, numărul de rânduri, puterea tractorului și nivelul de rest vegetal.',
+                    'Eligibilitatea pentru programele de sprijin se verifică separat, în ghidurile și condițiile oficiale ale campaniei în vigoare.',
                 ];
 
                 const overviewPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-overview-${pSlug}` },
@@ -1000,13 +1004,6 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                 )
                             ),
                         React.createElement(View, { style: styles.productOverviewGrid },
-                            React.createElement(View, { style: styles.productMainCol },
-                                React.createElement(View, { style: { ...styles.catalogImageCol, width: '100%', marginRight: 0 } },
-                                    React.createElement(View, { style: styles.productMainImageBox },
-                                        React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true })
-                                    )
-                                )
-                            ),
                             React.createElement(View, { style: styles.productRightCol },
                                 React.createElement(Text, { style: styles.productCategoryKicker }, kicker),
                                 React.createElement(Text, { style: styles.productModelHero }, product?.name || 'Utilaj agricol'),
@@ -1019,7 +1016,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                     React.createElement(
                                         Text,
                                         { style: styles.productSheetDisclaimer },
-                                        'Informații sintetizate și prezentate de TehnicAgro Supply. Parametrii tehnici pot fi detaliați în oferta comercială.'
+                                        'Prezentare tehnică sintetică redactată pentru această broșură. Parametrii finali se validează pe configurația ofertată.'
                                     )
                                 ),
                                 ...renderProductMetaOnly(product)
@@ -1034,7 +1031,13 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     renderPageFooter(currentPage += 1, config.phone)
                 );
 
-                const detailGallery = extraGallery.length > 0 ? extraGallery : [product?.imageSrc].filter(Boolean) as string[];
+                const detailGallery = (
+                    extraGallery.length >= 2
+                        ? extraGallery.slice(0, 2)
+                        : extraGallery.length === 1
+                          ? [extraGallery[0], product?.imageSrc].filter(Boolean)
+                          : [product?.imageSrc].filter(Boolean)
+                ) as string[];
                 const detailPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-detail-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productDetailPage },
@@ -1047,12 +1050,6 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                         React.createElement(ProductImage, { url: u, fallback: product?.name, detail: true })
                                     )
                                 ),
-                                detailGallery.length === 1 &&
-                                    React.createElement(
-                                        View,
-                                        { key: `detail-empty-${pSlug}`, style: styles.productSupplementEmpty },
-                                        React.createElement(Text, { style: styles.placeholderText }, 'Spațiu rezervat pentru imagine suplimentară')
-                                    )
                             ),
                             React.createElement(View, { style: styles.productRightCol },
                                 renderUnifiedTechnicalSpecs(product)
