@@ -466,7 +466,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 180,
         marginBottom: 15,
-        borderRadius: 0,
         borderWidth: 0,
         padding: 0,
         overflow: 'hidden' as const,
