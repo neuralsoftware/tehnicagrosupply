@@ -23,6 +23,7 @@ import {
     PDF_COMPANY,
     PDF_DOCUMENTATION_NOTE,
     PDF_BRAND_CARDS,
+    getCategoryPdfCopy,
 } from '@/data/pdf-materiale-copy';
 import React from 'react';
 
@@ -817,6 +818,27 @@ function getRelevantFundingPrograms(products: DynamicProduct[]) {
     return Array.from(picked.values()).slice(0, 3);
 }
 
+function getProfessionalProductLead(product: DynamicProduct): string {
+    if (product.slug === 'multisem-ads') {
+        return 'Avers-Agro Multisem ADS este o semănătoare proiectată pentru lucrări conservative, cu utilizare posibilă în semănat direct, mini-till sau convențional, în funcție de configurația echipată. Ansamblul de brăzdare cu dublu disc, presiunea ridicată pe brăzdar și suspensia paralelogram urmăresc pătrunderea constantă în rest vegetal și menținerea unei adâncimi de semănat stabile.';
+    }
+    return product.longDescription || product.description || 'Prezentare tehnică în curs de actualizare.';
+}
+
+function getProfessionalIntroBullets(product: DynamicProduct): string[] {
+    if (product.slug === 'multisem-ads') {
+        return [
+            'Configurația se alege în funcție de lățimea de lucru, numărul de rânduri, puterea tractorului și nivelul de rest vegetal din câmp.',
+            'Stabilitatea la adâncime, copierea terenului și contactul sămânță-sol sunt criteriile principale urmărite în exploatare.',
+            'Parametrii de lucru, echiparea și eligibilitatea pentru scheme de sprijin se confirmă separat, pe modelul ofertat.',
+        ];
+    }
+    return [
+        'Configurația finală se stabilește în raport cu lățimea de lucru, puterea tractorului și condițiile de exploatare.',
+        'Datele tehnice complete, opționalele și cerințele de utilizare se validează pe modelul ofertat.',
+    ];
+}
+
 const renderPageHeader = (title: string) => (
     React.createElement(View, { style: styles.header, fixed: true },
         React.createElement(View, { style: styles.headerWordmark },
@@ -911,10 +933,23 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                           React.createElement(
                               Text,
                               { style: styles.mainText },
-                              'Broșura include exclusiv producătorii și programele orientative relevante pentru utilajele selectate. Am redus intenționat această secțiune la o singură pagină pentru a păstra documentul scurt, clar și comercial.'
+                              productsToDisplay.length === 1
+                                  ? `Selecția curentă este construită în jurul modelului ${productsToDisplay[0].name}, încadrat în categoria ${categoryDisplayName(productsToDisplay[0].category, categoriesFromDb).toLowerCase()}. Prezentarea sintetizează datele relevante de produs, producător și compatibilitate orientativă cu programele de sprijin aplicabile.`
+                                  : 'Selecția curentă reunește produse configurate pentru utilizări complementare în fermă. Pagina de față rezumă producătorii incluși și programele de sprijin care pot avea relevanță orientativă pentru utilajele prezentate.'
                           ),
                           React.createElement(View, { style: styles.contextGrid },
                               React.createElement(View, { style: styles.contextLeftCol },
+                                  ...(() => {
+                                      const first = productsToDisplay[0];
+                                      if (!first) return [];
+                                      const copy = getCategoryPdfCopy(first.category);
+                                      return [
+                                          renderAccentSectionTitle('ctx-cat', `Categorie: ${categoryDisplayName(first.category, categoriesFromDb)}`),
+                                          ...copy.paragraphs.slice(0, 2).map((p, i) =>
+                                              React.createElement(Text, { key: `ctx-cat-p-${i}`, style: styles.mainText }, p)
+                                          ),
+                                      ];
+                                  })(),
                                   renderAccentSectionTitle('ctx-brands', 'Producători selectați'),
                                   ...brandCardsSelected.map((card, ci) =>
                                       React.createElement(View, { key: `ctx-brand-${ci}`, style: styles.compactBrandCard },
@@ -961,7 +996,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                 const progList = (product?.category && (FUNDING_PROGRAMS as any)[product.category]) || [];
                 const activePrograms = Array.isArray(progList) ? progList.filter((p: any) => p.status === 'active').slice(0, 1) : [];
 
-                const descText = product?.longDescription || product?.description || 'Descriere în curs de actualizare.';
+                const descText = getProfessionalProductLead(product);
                 const secTitle = categoryDisplayName(catName, categoriesFromDb);
                 const extraGallery = (
                     Array.isArray(product.gallery)
@@ -988,11 +1023,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     );
 
                 const kicker = [secTitle.toUpperCase(), product?.brand].filter(Boolean).join(' · ');
-                const introBullets = [
-                    'Destinată lucrărilor conservative, cu utilizare posibilă în semănat direct, mini-till sau convențional, în funcție de configurație.',
-                    'Configurația optimă se stabilește după lățimea de lucru, numărul de rânduri, puterea tractorului și nivelul de rest vegetal.',
-                    'Eligibilitatea pentru programele de sprijin se verifică separat, în ghidurile și condițiile oficiale ale campaniei în vigoare.',
-                ];
+                const introBullets = getProfessionalIntroBullets(product);
 
                 const overviewPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-overview-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
