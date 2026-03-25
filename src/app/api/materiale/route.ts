@@ -76,6 +76,8 @@ const COLORS = {
     white: '#ffffff',
     border: '#e2e8f0',
     gold: '#8a6d2e',
+    /** Accent pentru titluri tip „catalog producător” (echivalent stil portocaliu din broșurile de referință) */
+    brochureAccent: '#2d6a4f',
 };
 
 /** Contact real (ca pe site); PDF nu folosește adrese sau mail inventate */
@@ -92,19 +94,72 @@ const LINE_HEIGHT = 1.6;
 // PDF Styles
 const styles = StyleSheet.create({
     page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Roboto' },
-    cover: { flex: 1, backgroundColor: COLORS.primaryDark, padding: 0 },
-    coverHero: { height: '46%', backgroundColor: COLORS.primaryDark, justifyContent: 'center', alignItems: 'center', paddingHorizontal: MARGIN },
-    coverBrandBlock: { alignItems: 'center' },
-    coverBrandName: { fontSize: 26, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.white, letterSpacing: 1 },
-    coverBrandTag: { fontSize: 10, color: '#bbf7d0', marginTop: 8, letterSpacing: 0.8, textTransform: 'uppercase' as const },
-    coverEdition: { fontSize: 8, color: '#86efac', marginTop: 14, letterSpacing: 1.5, textTransform: 'uppercase' as const },
-    coverRule: { width: 160, height: 2, backgroundColor: '#86efac', marginTop: 18, opacity: 0.95 },
-    coverContent: { padding: MARGIN, flex: 1, justifyContent: 'center', alignItems: 'center', textAlign: 'center' },
-    coverTitle: { fontSize: 30, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.white, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 14, textAlign: 'center', maxWidth: '100%' },
-    coverSubtitle: { fontSize: 12, color: '#d1fae5', letterSpacing: 1.4, marginBottom: 14, textTransform: 'uppercase', textAlign: 'center', paddingHorizontal: 20, fontFamily: 'Roboto', fontWeight: 500 },
-    coverSlogan: { fontSize: 10, color: COLORS.white, opacity: 0.88, lineHeight: 1.6, paddingHorizontal: 40, textAlign: 'center' },
-    coverFooter: { position: 'absolute', bottom: 36, left: MARGIN, right: MARGIN, textAlign: 'center' },
-    coverFooterLink: { fontSize: 9, color: COLORS.white, opacity: 0.65, letterSpacing: 0.5 },
+    /** Copertă tip broșură: zonă color stânga + zonă albă dreapta */
+    cover: { flex: 1, flexDirection: 'row', backgroundColor: COLORS.white, padding: 0 },
+    coverLeftPanel: {
+        width: '42%',
+        backgroundColor: COLORS.primaryDark,
+        paddingTop: MARGIN + 8,
+        paddingBottom: MARGIN,
+        paddingHorizontal: 22,
+        justifyContent: 'flex-start' as const,
+    },
+    coverRightPanel: {
+        flex: 1,
+        paddingTop: MARGIN + 12,
+        paddingBottom: MARGIN,
+        paddingHorizontal: MARGIN,
+        justifyContent: 'center' as const,
+    },
+    coverBrandBlock: { alignItems: 'flex-start' as const },
+    coverBrandName: { fontSize: 22, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.white, letterSpacing: 1.2 },
+    coverBrandTag: { fontSize: 9, color: '#bbf7d0', marginTop: 10, letterSpacing: 1, textTransform: 'uppercase' as const, lineHeight: 1.35 },
+    coverEdition: { fontSize: 8, color: '#86efac', marginTop: 20, letterSpacing: 1.2, textTransform: 'uppercase' as const },
+    coverRule: { width: 100, height: 2, backgroundColor: '#86efac', marginTop: 16, opacity: 0.95 },
+    coverWebHint: { fontSize: 8, color: COLORS.white, opacity: 0.75, letterSpacing: 0.4 },
+    coverTitle: {
+        fontSize: 26,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.primaryDark,
+        letterSpacing: 1.2,
+        textTransform: 'uppercase' as const,
+        marginBottom: 12,
+        textAlign: 'left' as const,
+        maxWidth: '100%',
+    },
+    coverSubtitle: {
+        fontSize: 10,
+        color: COLORS.brochureAccent,
+        letterSpacing: 1.5,
+        marginBottom: 14,
+        textTransform: 'uppercase' as const,
+        textAlign: 'left' as const,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        lineHeight: 1.4,
+    },
+    coverSlogan: {
+        fontSize: 9.5,
+        color: COLORS.textMuted,
+        lineHeight: 1.55,
+        textAlign: 'left' as const,
+        marginBottom: 8,
+    },
+    coverFooterBar: {
+        backgroundColor: '#0f172a',
+        paddingVertical: 12,
+        paddingHorizontal: MARGIN,
+        alignItems: 'center' as const,
+        width: '100%',
+    },
+    coverFooterBarText: {
+        fontSize: 8,
+        color: COLORS.white,
+        letterSpacing: 1.6,
+        textTransform: 'uppercase' as const,
+        textAlign: 'center' as const,
+    },
     header: { position: 'absolute', top: 28, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 2, borderBottomColor: '#dcfce7', paddingBottom: 10, minHeight: 46 },
     headerWordmark: { justifyContent: 'center' },
     headerBrandName: { fontSize: 11, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, letterSpacing: 0.5 },
@@ -114,12 +169,12 @@ const styles = StyleSheet.create({
     footerPage: { fontSize: 7.5, color: COLORS.textSubtle, letterSpacing: 0.6 },
     footerContact: { fontSize: 7.5, color: COLORS.textMuted, fontFamily: 'Roboto', fontWeight: 'normal' },
     sectionTitle: { fontSize: 22, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 22, letterSpacing: -0.3 },
-    subsectionTitle: { fontSize: 12, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, marginBottom: 10, marginTop: 6 },
-    categoryIntroAccent: { height: 3, backgroundColor: COLORS.primary, marginBottom: 14, width: '100%' },
+    subsectionTitle: { fontSize: 12, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, marginBottom: 10, marginTop: 6 },
+    categoryIntroAccent: { height: 3, backgroundColor: COLORS.brochureAccent, marginBottom: 14, width: '100%' },
     mainText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 15, textAlign: 'justify' },
     bulletText: { fontSize: 11, color: COLORS.textMuted, lineHeight: LINE_HEIGHT, marginBottom: 8, marginLeft: 15 },
     introHighlight: { fontSize: 13, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 500, lineHeight: 1.5, marginBottom: 20 },
-    categoryTitle: { fontSize: 20, color: COLORS.text, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: -0.2, marginBottom: 12 },
+    categoryTitle: { fontSize: 20, color: COLORS.primaryDark, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: -0.2, marginBottom: 12 },
     productLayout: { paddingTop: HEADER_BLOCK + 10, paddingRight: MARGIN, paddingBottom: FOOTER_BLOCK + 28, paddingLeft: MARGIN },
     badgeRow: { marginBottom: 8 },
     badge: { alignSelf: 'flex-start', backgroundColor: COLORS.primaryDark, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 4 },
@@ -227,17 +282,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8fafc',
     },
     specLineDetailCompact: { fontSize: 9.5, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 3 },
-    advantageBulletUnderlined: {
-        fontSize: 10,
-        color: COLORS.text,
-        lineHeight: 1.45,
-        marginBottom: 9,
-        marginLeft: 10,
-        textDecoration: 'underline',
-        textDecorationColor: COLORS.primary,
-        fontFamily: 'Roboto',
-        fontWeight: 500,
-    },
     productGalleryStackBox: {
         borderWidth: 1,
         borderColor: COLORS.border,
@@ -247,12 +291,32 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     contactFooterBand: {
-        paddingTop: 16,
-        paddingBottom: 4,
-        borderTopWidth: 1,
-        borderTopColor: COLORS.border,
+        paddingTop: 20,
+        paddingBottom: 8,
         alignItems: 'center' as const,
         width: '100%',
+    },
+    contactGreenBar: {
+        backgroundColor: COLORS.primary,
+        paddingVertical: 14,
+        paddingHorizontal: 20,
+        alignItems: 'center' as const,
+        width: '100%',
+        marginTop: 8,
+    },
+    contactGreenBarMain: {
+        fontSize: 7.5,
+        color: COLORS.white,
+        letterSpacing: 0.4,
+        textAlign: 'center' as const,
+        lineHeight: 1.45,
+    },
+    contactGreenBarPage: {
+        fontSize: 8,
+        color: '#d1fae5',
+        marginTop: 6,
+        letterSpacing: 1.2,
+        textTransform: 'uppercase' as const,
     },
     contactLogoImg: { width: 160, height: 48, objectFit: 'contain' as const, marginBottom: 10 },
     contactDocNote: {
@@ -332,17 +396,40 @@ const styles = StyleSheet.create({
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
     brandLabel: { fontSize: 8.5, color: COLORS.secondary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 2.2, textTransform: 'uppercase', marginBottom: 5 },
     modelTitle: { fontSize: 18, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 10, letterSpacing: -0.4, maxWidth: '100%' },
+    productHeroRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, width: '100%' },
+    productHeroLeft: { width: '46%', paddingRight: 12 },
+    productHeroRight: { flex: 1, minWidth: 0 },
+    productCategoryKicker: {
+        fontSize: 8,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.text,
+        letterSpacing: 1.8,
+        textTransform: 'uppercase' as const,
+        marginBottom: 8,
+        lineHeight: 1.3,
+    },
+    productModelHero: {
+        fontSize: 24,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.brochureAccent,
+        letterSpacing: -0.3,
+        lineHeight: 1.08,
+        maxWidth: '100%',
+    },
+    productImageColumn: { width: '52%', alignSelf: 'flex-start' as const },
     blockTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4, marginTop: 10 },
     specItem: { flexDirection: 'row', marginBottom: 5, alignItems: 'flex-start' },
-    specDot: { width: 5, height: 5, backgroundColor: COLORS.primary, borderRadius: 2.5, marginRight: 10 },
+    specChevron: { fontSize: 11, color: COLORS.brochureAccent, marginRight: 8, lineHeight: 1.45, fontFamily: 'Roboto', fontWeight: 'bold' },
     specText: { fontSize: 9.5, color: COLORS.textMuted, flex: 1, lineHeight: 1.45 },
     verdictFundingRow: { flexDirection: 'row', alignItems: 'stretch', marginTop: 12, width: '100%' },
     verdictOrFundingHalf: { flex: 1, minWidth: 0, marginHorizontal: 4 },
     fundingBox: { backgroundColor: '#f0fdf4', padding: 12, borderRadius: 6, borderLeftWidth: 4, borderLeftColor: COLORS.accent, marginTop: 0 },
-    fundingTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: '#065f46', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 1 },
+    fundingTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, textTransform: 'uppercase', marginBottom: 6, letterSpacing: 1 },
     fundingText: { fontSize: 10, color: '#065f46', lineHeight: 1.4 },
     verdictBox: { backgroundColor: '#fffbeb', padding: 12, borderRadius: 6, borderLeftWidth: 4, borderLeftColor: '#f59e0b', marginTop: 0 },
-    verdictTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: '#92400e', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 1 },
+    verdictTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, textTransform: 'uppercase', marginBottom: 6, letterSpacing: 1 },
     verdictText: { fontSize: 9, color: '#92400e', lineHeight: 1.45, fontStyle: 'italic' },
     placeholderBox: { width: '100%', backgroundColor: '#f1f5f9', borderStyle: 'dashed', borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 6, justifyContent: 'center', alignItems: 'center', marginVertical: 20, padding: 20 },
     placeholderText: { fontSize: 9, color: '#64748b', textAlign: 'center' },
@@ -351,30 +438,58 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.white,
         padding: MARGIN,
         paddingTop: HEADER_BLOCK + 8,
-        paddingBottom: FOOTER_BLOCK + 12,
+        paddingBottom: FOOTER_BLOCK + 52,
         justifyContent: 'space-between' as const,
         flexDirection: 'column' as const,
     },
     contactTitle: {
-        fontSize: 18,
+        fontSize: 11,
         fontFamily: 'Roboto',
         fontWeight: 'bold',
-        color: COLORS.primary,
+        color: COLORS.brochureAccent,
         textAlign: 'center',
         marginBottom: 6,
-        letterSpacing: -0.2,
+        letterSpacing: 1.4,
+        textTransform: 'uppercase' as const,
         paddingHorizontal: 12,
     },
-    contactSubtitle: { fontSize: 8.5, color: COLORS.textSubtle, textAlign: 'center', marginBottom: 20, letterSpacing: 0.5 },
-    contactWordmark: { alignSelf: 'center', alignItems: 'center', marginBottom: 12 },
-    contactBrandName: { fontSize: 18, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, letterSpacing: 0.3 },
-    contactBrandTag: { fontSize: 9, color: COLORS.brandGrey, marginTop: 4 },
+    contactSubtitle: { fontSize: 8.5, color: COLORS.textSubtle, textAlign: 'center', marginBottom: 16, letterSpacing: 0.5 },
+    contactWordmark: { alignSelf: 'center', alignItems: 'center', marginBottom: 8 },
+    contactBrandName: { fontSize: 14, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primaryDark, letterSpacing: 0.5 },
+    contactBrandTag: { fontSize: 8, color: COLORS.textMuted, marginTop: 4, letterSpacing: 0.6 },
     contactBlock: { alignSelf: 'center', maxWidth: 440, width: '100%' },
     contactRow: { flexDirection: 'row', marginBottom: 8, alignItems: 'center', paddingVertical: 3, borderBottomWidth: 1, borderBottomColor: '#f4f6f8' },
     contactLabel: { fontSize: 8.5, color: COLORS.textSubtle, textTransform: 'uppercase', width: 68, letterSpacing: 0.5, marginRight: 10 },
     contactValue: { fontSize: 10.5, fontFamily: 'Roboto', fontWeight: '500', color: COLORS.text, flex: 1, lineHeight: 1.35 },
     contactValueNoWrap: { fontSize: 10.5, fontFamily: 'Roboto', fontWeight: '500', color: COLORS.text, flex: 1 },
 });
+
+function renderChevronBullet(key: string, textStyle: Record<string, unknown>, text: string) {
+    return React.createElement(
+        View,
+        { key, style: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 7 } },
+        React.createElement(Text, { style: styles.specChevron }, '›'),
+        React.createElement(Text, { style: textStyle as never }, text)
+    );
+}
+
+function renderAccentSectionTitle(key: string, title: string) {
+    return React.createElement(
+        View,
+        { key, style: { flexDirection: 'row', alignItems: 'center', marginBottom: 10, marginTop: 2 } },
+        React.createElement(View, { style: { width: 3, height: 13, backgroundColor: COLORS.brochureAccent, marginRight: 10 } }),
+        React.createElement(Text, {
+            style: {
+                fontSize: 10,
+                fontFamily: 'Roboto',
+                fontWeight: 'bold',
+                color: COLORS.brochureAccent,
+                letterSpacing: 1.3,
+                textTransform: 'uppercase' as const,
+            },
+        }, title)
+    );
+}
 
 // Helpers
 const ProductImage = ({
@@ -514,14 +629,12 @@ function renderProductMetaOnly(product: DynamicProduct): React.ReactElement[] {
 /** O singură casetă: specificații din catalog + detalii din JSON, fără denumire „extinse” separată */
 function renderUnifiedTechnicalSpecs(product: DynamicProduct): React.ReactElement {
     const parts: React.ReactElement[] = [];
-    parts.push(
-        React.createElement(Text, { key: 'utt', style: { ...styles.blockTitle, marginTop: 2, marginBottom: 6 } }, 'Specificații tehnice')
-    );
+    parts.push(renderAccentSectionTitle('utt', 'Specificații tehnice'));
     if (Array.isArray(product.specs) && product.specs.length > 0) {
         product.specs.forEach((spec, i) => {
             parts.push(
                 React.createElement(View, { key: `sp-${i}`, style: styles.specItem },
-                    React.createElement(View, { style: styles.specDot }),
+                    React.createElement(Text, { style: styles.specChevron }, '›'),
                     React.createElement(Text, { style: styles.specText }, spec || '')
                 )
             );
@@ -612,24 +725,33 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
     const categories = Object.keys(byCategory);
 
     return React.createElement(Document, { title: config.title || 'TehnicAgro Supply — catalog selecție' },
-        // PAGINA 1: COPERTĂ PREMIUM
+        // PAGINA 1: COPERTĂ (structură tip broșură producător: bandă brand + zonă titlu)
         React.createElement(Page, { size: 'A4', style: styles.page },
-            React.createElement(View, { style: styles.cover },
-                React.createElement(View, { style: styles.coverHero },
-                    React.createElement(View, { style: styles.coverBrandBlock },
-                        React.createElement(Text, { style: styles.coverBrandName }, 'TehnicAgro Supply'),
-                        React.createElement(Text, { style: styles.coverBrandTag }, 'Utilaje agricole · selecție tehnică · România'),
-                        React.createElement(View, { style: styles.coverRule }),
-                        React.createElement(Text, { style: styles.coverEdition }, 'Document comercial · 2026')
+            React.createElement(View, { style: { flex: 1, flexDirection: 'column' } },
+                React.createElement(View, { style: { flex: 1, flexDirection: 'row', minHeight: 0 } },
+                    React.createElement(
+                        View,
+                        { style: { ...styles.coverLeftPanel, justifyContent: 'space-between' } },
+                        React.createElement(View, { style: styles.coverBrandBlock },
+                            React.createElement(Text, { style: styles.coverBrandName }, 'TehnicAgro Supply'),
+                            React.createElement(Text, { style: styles.coverBrandTag }, 'Utilaje agricole · selecție tehnică · România'),
+                            React.createElement(View, { style: styles.coverRule }),
+                            React.createElement(Text, { style: styles.coverEdition }, 'Document comercial · selecție')
+                        ),
+                        React.createElement(Text, { style: styles.coverWebHint }, PUBLIC_WEB)
+                    ),
+                    React.createElement(View, { style: styles.coverRightPanel },
+                        React.createElement(Text, { style: styles.coverTitle }, 'Catalog selecție'),
+                        React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Mecanizare agricolă'),
+                        React.createElement(Text, { style: styles.coverSlogan },
+                            'Conținut redactat de TehnicAgro Supply pe baza documentației tehnice a echipamentelor incluse. Nu înlocuiește site-urile oficiale ale producătorilor. Parametrii concrete se validează la ofertare și pe marca tractorului dumneavoastră.'
+                        )
                     )
                 ),
-                React.createElement(View, { style: styles.coverContent },
-                    React.createElement(Text, { style: styles.coverTitle }, 'CATALOG SELECȚIE'),
-                    React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Mecanizare agricolă — sinteză TehnicAgro Supply'),
-                    React.createElement(Text, { style: styles.coverSlogan }, 'Conținut exclusiv TehnicAgro Supply: informații sintetizate și adaptate din documentația tehnică a echipamentelor comercializate. Acest document nu reprezintă site-uri oficiale ale producătorilor. Pentru oferte și disponibilitate, folosiți datele din ultima pagină.'),
-                ),
-                React.createElement(View, { style: styles.coverFooter },
-                    React.createElement(Text, { style: styles.coverFooterLink }, `TEHNICAGRO SUPPLY · ${PUBLIC_WEB}`)
+                React.createElement(View, { style: styles.coverFooterBar },
+                    React.createElement(Text, { style: styles.coverFooterBarText },
+                        'Mecanizare responsabilă · selecție tehnică pentru ferme din România'
+                    )
                 )
             )
         ),
@@ -638,15 +760,16 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
         React.createElement(Page, { size: 'A4', style: styles.page },
             renderPageHeader('PROFIL COMPANIE'),
             React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 48, paddingHorizontal: MARGIN, flex: 1 } },
-                React.createElement(Text, { style: styles.sectionTitle }, PDF_COMPANY.title),
+                React.createElement(View, { style: { alignItems: 'center', marginBottom: 16 } },
+                    React.createElement(Text, { style: { fontSize: 9, color: COLORS.brochureAccent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 } }, 'TehnicAgro Supply'),
+                    React.createElement(Text, { style: { fontSize: 13, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primaryDark, textAlign: 'center', textTransform: 'uppercase', lineHeight: 1.35, maxWidth: 440 } }, PDF_COMPANY.title)
+                ),
                 React.createElement(Text, { style: styles.introHighlight }, PDF_COMPANY.lead),
                 React.createElement(Text, { style: styles.mainText }, PDF_COMPANY.p2),
                 React.createElement(Text, { style: styles.mainText }, PDF_COMPANY.p3),
-                React.createElement(Text, { style: styles.subsectionTitle }, 'Ce puteți aștepta de la noi'),
-                ...PDF_COMPANY.bullets.map((b) =>
-                    React.createElement(Text, { key: b, style: styles.bulletText }, `• ${b}`)
-                ),
-                React.createElement(Text, { style: styles.mainText }, PDF_COMPANY.closing)
+                renderAccentSectionTitle('expect', 'Ce puteți aștepta de la noi'),
+                ...PDF_COMPANY.bullets.map((b, i) => renderChevronBullet(`cmp-b-${i}`, styles.mainText as Record<string, unknown>, b)),
+                React.createElement(Text, { style: { ...styles.mainText, marginTop: 12 } }, PDF_COMPANY.closing)
             ),
             renderPageFooter(currentPage += 1, config.phone)
         ),
@@ -658,7 +781,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                   React.createElement(Page, { size: 'A4', style: styles.page, key: 'brands-i' },
                       renderPageHeader(brandCardsSelected.length > 2 ? 'PRODUCĂTORI · I' : 'PRODUCĂTORI'),
                       React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 40, paddingHorizontal: MARGIN, flex: 1 } },
-                          React.createElement(Text, { style: styles.sectionTitle }, PDF_BRANDS_INTRO.title),
+                          renderAccentSectionTitle('brands-h', PDF_BRANDS_INTRO.title),
                           React.createElement(
                               Text,
                               { style: styles.mainText },
@@ -721,20 +844,14 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     ),
                     ...(copy.advantageBullets && copy.advantageBullets.length > 0
                         ? [
-                              React.createElement(Text, { key: 'adv-title', style: styles.subsectionTitle }, copy.advantagesSectionTitle || 'Avantaje tehnice'),
+                              renderAccentSectionTitle('adv-title', copy.advantagesSectionTitle || 'Avantaje tehnice'),
                               ...copy.advantageBullets.map((b, i) =>
-                                  React.createElement(
-                                      Text,
-                                      { key: `adv-${i}`, style: styles.advantageBulletUnderlined },
-                                      `• ${b}`
-                                  )
+                                  renderChevronBullet(`adv-${i}`, { ...styles.mainText, fontFamily: 'Roboto', fontWeight: '500' }, b)
                               ),
                           ]
                         : []),
-                    React.createElement(Text, { style: styles.subsectionTitle }, 'Aspecte utile în această secțiune'),
-                    ...copy.bullets.map((b, i) =>
-                        React.createElement(Text, { key: `cb${i}`, style: styles.bulletText }, `• ${b}`)
-                    )
+                    renderAccentSectionTitle('aspects', 'Aspecte utile în această secțiune'),
+                    ...copy.bullets.map((b, i) => renderChevronBullet(`cb${i}`, styles.mainText as Record<string, unknown>, b))
                 ),
                 renderPageFooter(currentPage += 1, config.phone)
             );
@@ -744,17 +861,17 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     ? React.createElement(Page, { size: 'A4', style: styles.page, key: `intro-prog-${catName}` },
                           renderPageHeader(`${displayCat.toUpperCase()} · CADRU`),
                           React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 40, paddingHorizontal: MARGIN, flex: 1 } },
-                              React.createElement(Text, { style: styles.categoryTitle }, `${displayCat} — context programe`),
+                              renderAccentSectionTitle('cat-prog', `${displayCat} — context programe`),
                               React.createElement(Text, { style: styles.mainText },
                                   'Rezumat informativ despre cadrul european și național care poate fi relevant pentru această categorie de utilaje și pentru practicile asociate. Nu înlocuiește ghidurile APIA / AFIR și nu constituie consultanță pentru depunerea cererii; verificați sursele oficiale pentru campania în curs.'
                               ),
                               ...subsectionBlocks.flatMap((sub, si) => [
-                                  React.createElement(Text, { key: `sst-${si}`, style: styles.subsectionTitle }, sub.title),
+                                  renderAccentSectionTitle(`sst-${si}`, sub.title),
                                   ...sub.paragraphs.map((p, pi) =>
                                       React.createElement(Text, { key: `ssp-${si}-${pi}`, style: styles.mainText }, p)
                                   ),
                                   ...(sub.bullets || []).map((b, bi) =>
-                                      React.createElement(Text, { key: `ssb-${si}-${bi}`, style: styles.bulletText }, `• ${b}`)
+                                      renderChevronBullet(`ssb-${si}-${bi}`, styles.mainText as Record<string, unknown>, b)
                                   ),
                               ])
                           ),
@@ -789,6 +906,8 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                         React.createElement(Text, { style: styles.fundingText }, `${activePrograms[0].title || ''} (${activePrograms[0].maxGrant || 'condiții în ghidul oficial'}). Text orientativ; eligibilitatea se stabilește doar după reglementările în vigoare și dosarul dumneavoastră — nu întocmim noi dosarul.`)
                     );
 
+                const kicker = [secTitle.toUpperCase(), product?.brand].filter(Boolean).join(' · ');
+
                 return React.createElement(Page, { size: 'A4', style: styles.page, key: `p-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productLayout },
@@ -798,28 +917,35 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                     React.createElement(Text, { style: styles.badgeText }, product.badge)
                                 )
                             ),
-                        React.createElement(View, { style: styles.catalogRow },
-                            React.createElement(View, { style: styles.catalogImageCol },
-                                React.createElement(View, { style: styles.productMainImageBox },
-                                    React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true })
-                                ),
-                                ...extraGallery.map((u, gi) =>
-                                    React.createElement(
-                                        View,
-                                        { key: `gstack-${pSlug}-${gi}`, style: styles.productGalleryStackBox },
-                                        React.createElement(ProductImage, { url: u, fallback: product?.name, catalogStack: true })
-                                    )
-                                )
+                        React.createElement(View, { style: styles.productHeroRow },
+                            React.createElement(View, { style: styles.productHeroLeft },
+                                React.createElement(Text, { style: styles.productCategoryKicker }, kicker),
+                                React.createElement(Text, { style: styles.productModelHero }, product?.name || 'Utilaj agricol')
                             ),
-                            React.createElement(View, { style: styles.catalogTextCol },
-                                React.createElement(Text, { style: styles.brandLabel }, product?.brand || 'TEHNICAGRO'),
-                                React.createElement(Text, { style: styles.modelTitle }, product?.name || 'Utilaj Agricol'),
-                                React.createElement(View, { style: styles.narrativeSpecsBox },
+                            React.createElement(View, { style: styles.productHeroRight },
+                                renderAccentSectionTitle('princ', 'Prezentare tehnică'),
+                                React.createElement(View, { style: { ...styles.narrativeSpecsBox, marginTop: 4 } },
                                     React.createElement(Text, { style: styles.productSheetBody }, descText),
                                     React.createElement(
                                         Text,
                                         { style: styles.productSheetDisclaimer },
                                         'Informații sintetizate și prezentate de TehnicAgro Supply. Parametrii tehnici pot fi detaliați în oferta comercială.'
+                                    )
+                                )
+                            )
+                        ),
+                        React.createElement(View, { style: { width: '100%', marginBottom: 6 } },
+                            React.createElement(View, { style: styles.productImageColumn },
+                                React.createElement(View, { style: { ...styles.catalogImageCol, width: '100%', marginRight: 0 } },
+                                    React.createElement(View, { style: styles.productMainImageBox },
+                                        React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true })
+                                    ),
+                                    ...extraGallery.map((u, gi) =>
+                                        React.createElement(
+                                            View,
+                                            { key: `gstack-${pSlug}-${gi}`, style: styles.productGalleryStackBox },
+                                            React.createElement(ProductImage, { url: u, fallback: product?.name, catalogStack: true })
+                                        )
                                     )
                                 )
                             )
@@ -851,49 +977,72 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
             return [introPageMain, ...(introPagePrograms ? [introPagePrograms] : []), ...productPages];
         }),
 
-        // PAGINA FINALĂ: CONTACT (fără „buton” — PDF tipărit, nu interfață web)
-        React.createElement(Page, { size: 'A4', style: styles.page },
-            renderPageHeader('CONTACT'),
-            React.createElement(View, { style: styles.contactPage },
-                React.createElement(View, { style: { width: '100%' } },
-                    React.createElement(View, { style: styles.contactWordmark },
-                        React.createElement(Text, { style: styles.contactBrandName }, 'TehnicAgro Supply'),
-                        React.createElement(Text, { style: styles.contactBrandTag }, 'Selecție tehnică · materiale comerciale')
-                    ),
-                    React.createElement(Text, { style: styles.contactTitle }, 'Date de contact'),
-                    React.createElement(Text, { style: styles.contactSubtitle }, 'Oferte, disponibilitate, clarificări tehnice'),
-                    React.createElement(View, { style: styles.contactBlock },
-                        React.createElement(View, { style: styles.contactRow },
-                            React.createElement(Text, { style: styles.contactLabel }, 'Telefon'),
-                            React.createElement(Text, { style: styles.contactValueNoWrap, wrap: false }, formatPhoneForPdf(config.phone || DEFAULT_PHONE))
+        // PAGINA FINALĂ: contact + bandă tip copertă (ierarhie vizuală ca în broșurile de referință)
+        ...((): React.ReactElement[] => {
+            const contactPg = currentPage + 1;
+            return [
+                React.createElement(
+                    Page,
+                    { size: 'A4', style: styles.page, key: 'contact-final' },
+                    renderPageHeader('CONTACT'),
+                    React.createElement(
+                        View,
+                        { style: styles.contactPage },
+                        React.createElement(
+                            View,
+                            { style: { width: '100%' } },
+                            React.createElement(
+                                View,
+                                { style: styles.contactWordmark },
+                                React.createElement(Text, { style: styles.contactBrandName }, 'TehnicAgro Supply'),
+                                React.createElement(Text, { style: styles.contactBrandTag }, 'Selecție tehnică pentru mecanizare agricolă')
+                            ),
+                            React.createElement(Text, { style: styles.contactTitle }, 'Date de contact'),
+                            React.createElement(Text, { style: styles.contactSubtitle }, 'Oferte, disponibilitate, clarificări tehnice'),
+                            React.createElement(View, { style: styles.contactBlock },
+                                React.createElement(View, { style: styles.contactRow },
+                                    React.createElement(Text, { style: styles.contactLabel }, 'Telefon'),
+                                    React.createElement(Text, { style: styles.contactValueNoWrap, wrap: false }, formatPhoneForPdf(config.phone || DEFAULT_PHONE))
+                                ),
+                                React.createElement(View, { style: styles.contactRow },
+                                    React.createElement(Text, { style: styles.contactLabel }, 'E-mail'),
+                                    React.createElement(Text, { style: styles.contactValue }, (config.email && String(config.email).trim()) || DEFAULT_EMAIL)
+                                ),
+                                React.createElement(View, { style: styles.contactRow },
+                                    React.createElement(Text, { style: styles.contactLabel }, 'Site'),
+                                    React.createElement(Text, { style: styles.contactValue }, PUBLIC_WEB)
+                                ),
+                                React.createElement(View, { style: styles.contactRow },
+                                    React.createElement(Text, { style: styles.contactLabel }, 'Țară'),
+                                    React.createElement(Text, { style: styles.contactValue }, 'România')
+                                )
+                            ),
+                            React.createElement(View, { style: styles.contactClosing },
+                                React.createElement(Text, { style: styles.contactClosingTitle }, 'Oferte personalizate'),
+                                React.createElement(Text, { style: styles.contactClosingText },
+                                    'Pentru o ofertă adaptată exploatației dumneavoastră (configurație utilaj, opționale, termene), ne puteți contacta la telefon sau e-mailul de mai sus. Acest PDF este document static; nu include elemente apăsabile — discutăm oferta direct pe canalele reale de comunicare.'
+                                )
+                            ),
+                            React.createElement(View, { style: styles.contactFooterBand },
+                                React.createElement(Image, { src: logoSrc, style: styles.contactLogoImg }),
+                                React.createElement(Text, { style: styles.contactDocNote }, PDF_DOCUMENTATION_NOTE)
+                            )
                         ),
-                        React.createElement(View, { style: styles.contactRow },
-                            React.createElement(Text, { style: styles.contactLabel }, 'E-mail'),
-                            React.createElement(Text, { style: styles.contactValue }, (config.email && String(config.email).trim()) || DEFAULT_EMAIL)
-                        ),
-                        React.createElement(View, { style: styles.contactRow },
-                            React.createElement(Text, { style: styles.contactLabel }, 'Site'),
-                            React.createElement(Text, { style: styles.contactValue }, PUBLIC_WEB)
-                        ),
-                        React.createElement(View, { style: styles.contactRow },
-                            React.createElement(Text, { style: styles.contactLabel }, 'Țară'),
-                            React.createElement(Text, { style: styles.contactValue }, 'România')
+                        React.createElement(
+                            View,
+                            { style: styles.contactGreenBar },
+                            React.createElement(
+                                Text,
+                                { style: styles.contactGreenBarMain },
+                                `${formatPhoneForPdf(config.phone || DEFAULT_PHONE)} · ${(config.email && String(config.email).trim()) || DEFAULT_EMAIL} · ${PUBLIC_WEB} · România`
+                            ),
+                            React.createElement(Text, { style: styles.contactGreenBarPage }, `TehnicAgro Supply · document selecție · pag. ${contactPg}`)
                         )
                     ),
-                    React.createElement(View, { style: styles.contactClosing },
-                        React.createElement(Text, { style: styles.contactClosingTitle }, 'Oferte personalizate'),
-                        React.createElement(Text, { style: styles.contactClosingText },
-                            'Pentru o ofertă adaptată exploatației dumneavoastră (configurație utilaj, opționale, termene), ne puteți contacta la telefon sau e-mailul de mai sus. Acest PDF este document static; nu include elemente apăsabile — discutăm oferta direct pe canalele reale de comunicare.'
-                        )
-                    )
+                    renderPageFooter(currentPage += 1, config.phone)
                 ),
-                React.createElement(View, { style: styles.contactFooterBand },
-                    React.createElement(Image, { src: logoSrc, style: styles.contactLogoImg }),
-                    React.createElement(Text, { style: styles.contactDocNote }, PDF_DOCUMENTATION_NOTE)
-                )
-            ),
-            renderPageFooter(currentPage += 1, config.phone)
-        )
+            ];
+        })()
     );
 }
 
