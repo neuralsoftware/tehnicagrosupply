@@ -176,8 +176,26 @@ const styles = StyleSheet.create({
     introHighlight: { fontSize: 13, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 500, lineHeight: 1.5, marginBottom: 20 },
     categoryTitle: { fontSize: 20, color: COLORS.primaryDark, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: -0.2, marginBottom: 12 },
     productLayout: { paddingTop: HEADER_BLOCK + 10, paddingRight: MARGIN, paddingBottom: FOOTER_BLOCK + 28, paddingLeft: MARGIN },
+    productOverviewPage: {
+        paddingTop: HEADER_BLOCK + 10,
+        paddingRight: MARGIN,
+        paddingBottom: FOOTER_BLOCK + 18,
+        paddingLeft: MARGIN,
+        flex: 1,
+    },
+    productDetailPage: {
+        paddingTop: HEADER_BLOCK + 10,
+        paddingRight: MARGIN,
+        paddingBottom: FOOTER_BLOCK + 18,
+        paddingLeft: MARGIN,
+        flex: 1,
+    },
     badgeRow: { marginBottom: 8 },
     badge: { alignSelf: 'flex-start', backgroundColor: COLORS.primaryDark, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 4 },
+    productOverviewGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%' },
+    productDetailGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%' },
+    productMainCol: { width: '42%', marginRight: 16 },
+    productRightCol: { flex: 1, minWidth: 0 },
     catalogRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
     catalogImageCol: {
         width: '36%',
@@ -289,6 +307,25 @@ const styles = StyleSheet.create({
         padding: 6,
         backgroundColor: COLORS.white,
         marginTop: 8,
+    },
+    productSupplementStack: { width: '42%', marginRight: 16 },
+    productSupplementImageBox: {
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        padding: 6,
+        backgroundColor: COLORS.white,
+        marginBottom: 12,
+    },
+    productSupplementEmpty: {
+        minHeight: 154,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        backgroundColor: COLORS.bgLight,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
     },
     contactFooterBand: {
         paddingTop: 20,
@@ -417,6 +454,14 @@ const styles = StyleSheet.create({
         letterSpacing: -0.3,
         lineHeight: 1.08,
         maxWidth: '100%',
+    },
+    productIntroBox: {
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        padding: 12,
+        backgroundColor: '#f8fafc',
+        marginTop: 8,
     },
     productImageColumn: { width: '52%', alignSelf: 'flex-start' as const },
     blockTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4, marginTop: 10 },
@@ -879,8 +924,8 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                       )
                     : null;
 
-            // 2. Produse: o singură fișă — specificații unificate, verdict și finanțare la final; bandă opțională de imagini fără titlu
-            const productPages = catProducts.map((product, idx) => {
+            // 2. Produse: paginare controlată, simetrică
+            const productPages = catProducts.flatMap((product, idx) => {
                 const progList = (product?.category && (FUNDING_PROGRAMS as any)[product.category]) || [];
                 const activePrograms = Array.isArray(progList) ? progList.filter((p: any) => p.status === 'active').slice(0, 1) : [];
 
@@ -888,7 +933,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                 const secTitle = categoryDisplayName(catName, categoriesFromDb);
                 const extraGallery = (
                     Array.isArray(product.gallery)
-                        ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 4)
+                        ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 2)
                         : []
                 ) as string[];
                 const pSlug = product?.slug || `p-${catName}-${idx}`;
@@ -908,50 +953,66 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
 
                 const kicker = [secTitle.toUpperCase(), product?.brand].filter(Boolean).join(' · ');
 
-                return React.createElement(Page, { size: 'A4', style: styles.page, key: `p-${pSlug}` },
+                const overviewPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-overview-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
-                    React.createElement(View, { style: styles.productLayout },
+                    React.createElement(View, { style: styles.productOverviewPage },
                         product?.badge &&
                             React.createElement(View, { style: styles.badgeRow },
                                 React.createElement(View, { style: styles.badge },
                                     React.createElement(Text, { style: styles.badgeText }, product.badge)
                                 )
                             ),
-                        React.createElement(View, { style: styles.productHeroRow },
-                            React.createElement(View, { style: styles.productHeroLeft },
-                                React.createElement(Text, { style: styles.productCategoryKicker }, kicker),
-                                React.createElement(Text, { style: styles.productModelHero }, product?.name || 'Utilaj agricol')
+                        React.createElement(View, { style: styles.productOverviewGrid },
+                            React.createElement(View, { style: styles.productMainCol },
+                                React.createElement(View, { style: { ...styles.catalogImageCol, width: '100%', marginRight: 0 } },
+                                    React.createElement(View, { style: styles.productMainImageBox },
+                                        React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true })
+                                    )
+                                )
                             ),
-                            React.createElement(View, { style: styles.productHeroRight },
-                                renderAccentSectionTitle('princ', 'Prezentare tehnică'),
-                                React.createElement(View, { style: { ...styles.narrativeSpecsBox, marginTop: 4 } },
+                            React.createElement(View, { style: styles.productRightCol },
+                                React.createElement(Text, { style: styles.productCategoryKicker }, kicker),
+                                React.createElement(Text, { style: styles.productModelHero }, product?.name || 'Utilaj agricol'),
+                                renderAccentSectionTitle(`princ-${pSlug}`, 'Prezentare tehnică'),
+                                React.createElement(View, { style: styles.productIntroBox },
                                     React.createElement(Text, { style: styles.productSheetBody }, descText),
                                     React.createElement(
                                         Text,
                                         { style: styles.productSheetDisclaimer },
                                         'Informații sintetizate și prezentate de TehnicAgro Supply. Parametrii tehnici pot fi detaliați în oferta comercială.'
                                     )
-                                )
+                                ),
+                                ...renderProductMetaOnly(product)
                             )
-                        ),
-                        React.createElement(View, { style: { width: '100%', marginBottom: 6 } },
-                            React.createElement(View, { style: styles.productImageColumn },
-                                React.createElement(View, { style: { ...styles.catalogImageCol, width: '100%', marginRight: 0 } },
-                                    React.createElement(View, { style: styles.productMainImageBox },
-                                        React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true })
-                                    ),
-                                    ...extraGallery.map((u, gi) =>
-                                        React.createElement(
-                                            View,
-                                            { key: `gstack-${pSlug}-${gi}`, style: styles.productGalleryStackBox },
-                                            React.createElement(ProductImage, { url: u, fallback: product?.name, catalogStack: true })
-                                        )
+                        )
+                    ),
+                    renderPageFooter(currentPage += 1, config.phone)
+                );
+
+                const detailGallery = extraGallery.length > 0 ? extraGallery : [product?.imageSrc].filter(Boolean) as string[];
+                const detailPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-detail-${pSlug}` },
+                    renderPageHeader(secTitle.toUpperCase()),
+                    React.createElement(View, { style: styles.productDetailPage },
+                        React.createElement(View, { style: styles.productDetailGrid },
+                            React.createElement(View, { style: styles.productSupplementStack },
+                                ...detailGallery.map((u, gi) =>
+                                    React.createElement(
+                                        View,
+                                        { key: `detail-${pSlug}-${gi}`, style: styles.productSupplementImageBox },
+                                        React.createElement(ProductImage, { url: u, fallback: product?.name, catalogStack: true })
                                     )
-                                )
+                                ),
+                                detailGallery.length === 1 &&
+                                    React.createElement(
+                                        View,
+                                        { key: `detail-empty-${pSlug}`, style: styles.productSupplementEmpty },
+                                        React.createElement(Text, { style: styles.placeholderText }, 'Spațiu rezervat pentru imagine suplimentară')
+                                    )
+                            ),
+                            React.createElement(View, { style: styles.productRightCol },
+                                renderUnifiedTechnicalSpecs(product)
                             )
                         ),
-                        renderUnifiedTechnicalSpecs(product),
-                        ...renderProductMetaOnly(product),
                         (verdictEl || fundingEl) &&
                             React.createElement(
                                 View,
@@ -972,6 +1033,8 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     ),
                     renderPageFooter(currentPage += 1, config.phone)
                 );
+
+                return [overviewPage, detailPage];
             });
 
             return [introPageMain, ...(introPagePrograms ? [introPagePrograms] : []), ...productPages];
