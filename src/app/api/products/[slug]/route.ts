@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getProducts, saveProduct, deleteProduct } from '@/lib/products-store';
+import { getProducts, saveProduct, deleteProduct, DynamicProduct } from '@/lib/products-store';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ slug: string }> }) {
     try {
         const body = await request.json();
-        const { adminAuth, ...updates } = body;
+        const { adminAuth, siteCatalogOnly, ...updates } = body;
         const { slug } = await params;
 
         // AUTH VERIFICATION
@@ -19,7 +19,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        await saveProduct({ ...updates, slug });
+        await saveProduct({ ...updates, slug } as DynamicProduct, {
+            siteCatalogOnly: Boolean(siteCatalogOnly),
+        });
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });

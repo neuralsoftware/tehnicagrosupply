@@ -79,18 +79,7 @@ export default async function ProductPage({ params }: PageProps) {
                 detailedSpecs={product.detailedSpecs}
                 expertVerdict={product.expertVerdict}
                 ctaLabel="Solicită Ofertă Tehnică"
-                gallery={product.gallery}
-                manufacturerUrl={product.manufacturerUrl}
-                referenceLinks={product.referenceLinks}
             />
-
-            {product.longDescription && (
-                <section className="max-w-4xl mx-auto px-4 py-12 border-t border-zinc-100">
-                    <div className="prose prose-zinc max-w-none text-zinc-600 leading-relaxed whitespace-pre-line">
-                        {product.longDescription}
-                    </div>
-                </section>
-            )}
 
             {product.videoUrl && (
                 <section className="max-w-4xl mx-auto px-4 pb-12">

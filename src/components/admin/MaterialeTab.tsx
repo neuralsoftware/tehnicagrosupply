@@ -136,10 +136,14 @@ export function MaterialeTab({ adminAuth, allProducts }: Props) {
     return (
         <div className="space-y-6 max-w-4xl">
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6 shadow-xl">
-                <div className="flex justify-between items-center">
+                <div className="space-y-2">
                     <h3 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
                         <FileText className="w-4 h-4 text-ea-green-500" /> Configurare Broșură
                     </h3>
+                    <p className="text-[10px] text-zinc-500 leading-relaxed max-w-2xl">
+                        Poze extra, text lung și linkuri pe produs se editează în tab-ul <strong className="text-zinc-400">Date broșură</strong>. Aici
+                        compui layout-ul PDF și selectezi produsele; conținutul detaliat vine din acel tab.
+                    </p>
                 </div>
 
                 {/* Template bar */}

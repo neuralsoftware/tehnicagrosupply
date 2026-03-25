@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { Category, DynamicProduct } from '@/lib/products-store';
-import { Package, FolderOpen, FileText, Landmark } from 'lucide-react';
+import { Package, FolderOpen, FileText, Landmark, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { CatalogTab } from '@/components/admin/CatalogTab';
 import { CategoriiTab } from '@/components/admin/CategoriiTab';
 import { ProgrameTab } from '@/components/admin/ProgrameTab';
 import { MaterialeTab } from '@/components/admin/MaterialeTab';
+import { BrochuraTab } from '@/components/admin/BrochuraTab';
 
-type Tab = 'catalog' | 'categorii' | 'programe' | 'materiale';
+type Tab = 'catalog' | 'brochura' | 'categorii' | 'programe' | 'materiale';
 
 const DEFAULT_CATEGORIES: Category[] = [
     { slug: 'pregatire-sol', name: 'Pregătire Sol', status: 'active', createdAt: '' },
@@ -125,6 +126,7 @@ export default function AdminPage() {
 
     const TABS = [
         { id: 'catalog', label: 'Catalog Utilaje', icon: <Package className="w-4 h-4" /> },
+        { id: 'brochura', label: 'Date broșură', icon: <BookOpen className="w-4 h-4" /> },
         { id: 'categorii', label: 'Categorii', icon: <FolderOpen className="w-4 h-4" /> },
         { id: 'programe', label: 'Programe APIA/AFIR', icon: <Landmark className="w-4 h-4" /> },
         { id: 'materiale', label: 'Materiale Publicitare', icon: <FileText className="w-4 h-4" /> },
@@ -153,7 +155,8 @@ export default function AdminPage() {
                             key={tab.id}
                             onClick={() => {
                                 setActiveTab(tab.id as Tab);
-                                setRefreshKey(k => k + 1); // forțează remount = date fresh
+                                setRefreshKey((k) => k + 1);
+                                fetchProducts();
                             }}
                             className={`flex items-center gap-2 px-5 py-3 text-[11px] font-black uppercase tracking-widest border-b-2 transition-all ${activeTab === tab.id ? 'border-ea-green-500 text-ea-green-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}
                         >
@@ -166,6 +169,9 @@ export default function AdminPage() {
             <div className="max-w-[1400px] mx-auto px-6 py-8">
                 {activeTab === 'catalog' && (
                     <CatalogTab key={refreshKey} adminAuth={adminAuth} categories={categories} />
+                )}
+                {activeTab === 'brochura' && (
+                    <BrochuraTab key={refreshKey} adminAuth={adminAuth} allProducts={allProducts} />
                 )}
                 {activeTab === 'categorii' && (
                     <CategoriiTab key={refreshKey} adminAuth={adminAuth} onCategoriesChange={setCategories} />

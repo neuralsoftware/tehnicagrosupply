@@ -18,7 +18,7 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { adminAuth, ...product } = body;
+        const { adminAuth, siteCatalogOnly, ...product } = body;
 
         // AUTH VERIFICATION
         const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         if (!product.slug || !product.name || !product.category) {
             return NextResponse.json({ error: 'Slug, name, and category are required' }, { status: 400 });
         }
-        await saveProduct(product as DynamicProduct);
+        await saveProduct(product as DynamicProduct, { siteCatalogOnly: Boolean(siteCatalogOnly) });
         return NextResponse.json({ success: true, product });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to save product' }, { status: 500 });

@@ -1,7 +1,18 @@
 import path from 'path';
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
-import { getProducts, getCategories, saveBrochure, getBrochures, Brochure, DynamicProduct, Category } from '@/lib/products-store';
+import {
+    getProducts,
+    getCategories,
+    saveBrochure,
+    getBrochures,
+    Brochure,
+    DynamicProduct,
+    Category,
+    ProductBrochureProfile,
+    getBrochureProfilesMap,
+    mergeProductForPdf,
+} from '@/lib/products-store';
 import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps, Image, Font } from '@react-pdf/renderer';
 import { FUNDING_PROGRAMS } from '@/data/funding-programs';
 import { CATEGORIES as CATEGORY_LABELS } from '@/data/products';
@@ -437,8 +448,13 @@ export async function POST(request: Request) {
         const authOk = (adminAuth || '').trim() === serverPass || (request.headers.get('x-admin-auth') || '').trim() === serverPass;
         if (!authOk) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const [all, categories] = await Promise.all([getProducts(), getCategories()]);
-        const selected = (productSlugs || []).map((s: string) => all.find(p => p.slug === s)).filter(Boolean) as DynamicProduct[];
+        const all: DynamicProduct[] = await getProducts();
+        const categories: Category[] = await getCategories();
+        const brochureProfiles: Record<string, ProductBrochureProfile> = await getBrochureProfilesMap();
+        const selected: DynamicProduct[] = (productSlugs || [])
+            .map((s: string) => all.find((p: DynamicProduct) => p.slug === s))
+            .filter((p: DynamicProduct | undefined): p is DynamicProduct => Boolean(p))
+            .map((p: DynamicProduct) => mergeProductForPdf(p, brochureProfiles));
         if (selected.length === 0) return NextResponse.json({ error: 'Selectează produse valide' }, { status: 400 });
 
         // PDF Generation
@@ -464,7 +480,7 @@ export async function POST(request: Request) {
             subtitle: config?.subtitle, 
             publicUrl: blob.url, 
             createdAt: new Date().toISOString(), 
-            productSlugs: selected.map(p => p.slug), 
+            productSlugs: selected.map((p: DynamicProduct) => p.slug), 
             config: config || {} 
         };
         await saveBrochure(data);

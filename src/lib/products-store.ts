@@ -12,6 +12,7 @@ import { PRODUCTS as STATIC_PRODUCTS } from '@/data/products';
 const PRODUCTS_BLOB_KEY = 'catalog/products.json';
 const CATEGORIES_BLOB_KEY = 'catalog/categories.json';
 const MATERIALE_BLOB_KEY = 'catalog/materiale.json';
+const BROCHURE_PROFILES_BLOB_KEY = 'catalog/brochure-profiles.json';
 
 export interface ProductReferenceLink {
     label: string;
@@ -29,11 +30,14 @@ export interface DynamicProduct {
     description: string;
     longDescription?: string;
     imageSrc: string;
-    /** Imagini suplimentare (URL Blob sau absolute), pentru site și PDF */
+    /**
+     * @deprecated Pentru PDF folosiți `ProductBrochureProfile` (tab „Date broșură”).
+     * Rămân în blob doar ca fallback la generare PDF pentru date vechi.
+     */
     gallery?: string[];
-    /** Site oficial producător / fișă tehnică principală */
+    /** @deprecated Vezi profil broșură */
     manufacturerUrl?: string;
-    /** Linkuri suplimentare (manual, catalog PDF, etc.) */
+    /** @deprecated Vezi profil broșură */
     referenceLinks?: ProductReferenceLink[];
     specs: string[];
     specIcons?: { icon: string; label: string; value: string }[];
@@ -66,6 +70,17 @@ export interface Brochure {
     createdAt: string;
     productSlugs: string[];
     config: Record<string, any>;
+}
+
+/** Conținut bogat doar pentru broșuri PDF — nu este folosit pe site public */
+export interface ProductBrochureProfile {
+    slug: string;
+    gallery?: string[];
+    manufacturerUrl?: string;
+    referenceLinks?: ProductReferenceLink[];
+    /** Text principal în PDF (înlocuiește descrierea lungă a produsului în broșură) */
+    brochureDescription?: string;
+    updatedAt: string;
 }
 
 // Helper: read JSON from Blob
@@ -118,13 +133,30 @@ export async function getProductBySlug(slug: string): Promise<DynamicProduct | n
     return products.find(p => p.slug === slug) || null;
 }
 
-export async function saveProduct(product: DynamicProduct): Promise<void> {
+export async function saveProduct(
+    product: DynamicProduct,
+    options?: { siteCatalogOnly?: boolean }
+): Promise<void> {
     const current = await readBlob<DynamicProduct[]>(PRODUCTS_BLOB_KEY, []);
     const idx = current.findIndex(p => p.slug === product.slug);
+    const now = new Date().toISOString();
+    const base = idx >= 0 ? { ...current[idx] } : {};
+    const merged: DynamicProduct = {
+        ...(base as DynamicProduct),
+        ...product,
+        slug: product.slug,
+        updatedAt: now,
+    };
+    if (!merged.createdAt) merged.createdAt = idx >= 0 ? (base as DynamicProduct).createdAt || now : now;
+    if (options?.siteCatalogOnly) {
+        delete (merged as Partial<DynamicProduct>).gallery;
+        delete (merged as Partial<DynamicProduct>).manufacturerUrl;
+        delete (merged as Partial<DynamicProduct>).referenceLinks;
+    }
     if (idx >= 0) {
-        current[idx] = { ...current[idx], ...product, slug: product.slug, updatedAt: new Date().toISOString() };
+        current[idx] = merged;
     } else {
-        current.push({ ...product, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+        current.push(merged);
     }
     await writeBlob(PRODUCTS_BLOB_KEY, current);
 }
@@ -132,6 +164,55 @@ export async function saveProduct(product: DynamicProduct): Promise<void> {
 export async function deleteProduct(slug: string): Promise<void> {
     const current = await readBlob<DynamicProduct[]>(PRODUCTS_BLOB_KEY, []);
     await writeBlob(PRODUCTS_BLOB_KEY, current.filter(p => p.slug !== slug));
+    await deleteBrochureProfile(slug);
+}
+
+// ── BROCHURE PRODUCT PROFILES (PDF-only enrichment) ───────
+
+export async function getBrochureProfilesMap(): Promise<Record<string, ProductBrochureProfile>> {
+    return await readBlob<Record<string, ProductBrochureProfile>>(BROCHURE_PROFILES_BLOB_KEY, {});
+}
+
+export async function saveBrochureProfile(
+    slug: string,
+    patch: Partial<Omit<ProductBrochureProfile, 'slug' | 'updatedAt'>>
+): Promise<void> {
+    const map = await readBlob<Record<string, ProductBrochureProfile>>(BROCHURE_PROFILES_BLOB_KEY, {});
+    const prev = map[slug];
+    map[slug] = {
+        ...prev,
+        ...patch,
+        slug,
+        updatedAt: new Date().toISOString(),
+    };
+    await writeBlob(BROCHURE_PROFILES_BLOB_KEY, map);
+}
+
+export async function deleteBrochureProfile(slug: string): Promise<void> {
+    const map = await readBlob<Record<string, ProductBrochureProfile>>(BROCHURE_PROFILES_BLOB_KEY, {});
+    delete map[slug];
+    await writeBlob(BROCHURE_PROFILES_BLOB_KEY, map);
+}
+
+/** Combinație produs + profil broșură pentru randare PDF */
+export function mergeProductForPdf(
+    product: DynamicProduct,
+    profiles: Record<string, ProductBrochureProfile>
+): DynamicProduct {
+    const bp = profiles[product.slug];
+    if (!bp) {
+        return {
+            ...product,
+            longDescription: product.longDescription || product.description,
+        };
+    }
+    return {
+        ...product,
+        gallery: bp.gallery !== undefined ? bp.gallery : product.gallery,
+        manufacturerUrl: bp.manufacturerUrl !== undefined ? bp.manufacturerUrl : product.manufacturerUrl,
+        referenceLinks: bp.referenceLinks !== undefined ? bp.referenceLinks : product.referenceLinks,
+        longDescription: bp.brochureDescription ?? product.longDescription ?? product.description,
+    };
 }
 
 // ── CATEGORIES ────────────────────────────────────────────
