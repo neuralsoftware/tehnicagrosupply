@@ -316,11 +316,12 @@ const styles = StyleSheet.create({
     },
     productOverviewHeroRow: {
         flexDirection: 'row' as const,
+        flexWrap: 'nowrap' as const,
         alignItems: 'flex-start' as const,
         width: '100%',
     },
-    /** Stânga 45% / dreapta 55% — fără suprapunere (flexbox strict) */
-    productOverviewTitleCol: { width: '45%', minWidth: 0, paddingRight: 8 },
+    /** Stânga 60% titlu / dreapta 40% principiu — mai mult spațiu pentru cuvinte lungi */
+    productOverviewTitleCol: { width: '60%', minWidth: 0, paddingRight: 8 },
     productOverviewCategory: {
         fontSize: 11,
         fontFamily: 'Roboto',
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
         lineHeight: 1.25,
     },
     productOverviewGiant: {
-        fontSize: 68,
+        fontSize: 55,
         fontFamily: 'Roboto',
         fontWeight: 'bold',
         color: COLORS.brochureAccent,
@@ -340,7 +341,7 @@ const styles = StyleSheet.create({
         letterSpacing: -1.2,
         textTransform: 'uppercase' as const,
     },
-    productOverviewPrincipleCol: { width: '55%', minWidth: 0, paddingLeft: 20 },
+    productOverviewPrincipleCol: { width: '40%', minWidth: 0, paddingLeft: 20 },
     productOverviewPrincipleTitle: {
         fontSize: 10,
         fontFamily: 'Roboto',
