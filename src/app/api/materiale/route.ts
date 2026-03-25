@@ -236,12 +236,75 @@ const styles = StyleSheet.create({
     },
     categoryTitle: { fontSize: 20, color: COLORS.primaryDark, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: -0.2, marginBottom: 12 },
     productLayout: { paddingTop: HEADER_BLOCK + 10, paddingRight: MARGIN, paddingBottom: FOOTER_BLOCK + 28, paddingLeft: MARGIN },
-    productOverviewPage: {
-        paddingTop: HEADER_BLOCK + 8,
-        paddingRight: MARGIN,
-        paddingBottom: FOOTER_BLOCK + 10,
-        paddingLeft: MARGIN,
+    /** Pagina 1 produs — layout tip PA 5000: zonă text sus, imagine full-bleed jos */
+    productOverviewShell: {
         flex: 1,
+        flexDirection: 'column' as const,
+        minHeight: 0,
+    },
+    productOverviewTop: {
+        flex: 1,
+        minHeight: 0,
+        paddingLeft: MARGIN,
+        paddingRight: MARGIN,
+        paddingTop: HEADER_BLOCK + 6,
+        paddingBottom: 10,
+    },
+    productOverviewHeroRow: {
+        flexDirection: 'row' as const,
+        alignItems: 'flex-start' as const,
+        width: '100%',
+    },
+    productOverviewTitleCol: { flex: 1, minWidth: 0, paddingRight: 14 },
+    productOverviewCategory: {
+        fontSize: 11,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.text,
+        textTransform: 'uppercase' as const,
+        letterSpacing: 1.3,
+        marginBottom: 8,
+        lineHeight: 1.25,
+    },
+    productOverviewGiant: {
+        fontSize: 64,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.brochureAccent,
+        lineHeight: 0.98,
+        letterSpacing: -1.2,
+        textTransform: 'uppercase' as const,
+    },
+    productOverviewPrincipleCol: { width: '40%', minWidth: 176 },
+    productOverviewPrincipleTitle: {
+        fontSize: 10,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.text,
+        textTransform: 'uppercase' as const,
+        letterSpacing: 1.2,
+        marginBottom: 8,
+    },
+    productOverviewPrincipleRow: { flexDirection: 'row' as const, alignItems: 'flex-start' as const },
+    productOverviewPrincipleChevron: {
+        fontSize: 11,
+        color: COLORS.brochureAccent,
+        marginRight: 6,
+        lineHeight: 1.4,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+    },
+    productOverviewPrincipleBody: {
+        flex: 1,
+        fontSize: 9,
+        color: COLORS.textMuted,
+        lineHeight: 1.42,
+        textAlign: 'justify' as const,
+    },
+    productOverviewImageBleed: {
+        width: '100%',
+        height: 412,
+        flexShrink: 0,
     },
     productDetailPage: {
         paddingTop: HEADER_BLOCK + 8,
@@ -260,13 +323,6 @@ const styles = StyleSheet.create({
     productHeroTitleCol: { width: '44%', paddingRight: 18 },
     productHeroTextCol: { flex: 1, minWidth: 0 },
     productHeroImageStage: { width: '100%', marginTop: 6 },
-    productOverviewImageFrame: {
-        flex: 1,
-        minHeight: 0,
-        backgroundColor: '#f1f5f9',
-        borderRadius: 14,
-        padding: 16,
-    },
     catalogRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
     catalogImageCol: {
         width: '36%',
@@ -508,26 +564,6 @@ const styles = StyleSheet.create({
     productHeroRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, width: '100%' },
     productHeroLeft: { width: '46%', paddingRight: 12 },
     productHeroRight: { flex: 1, minWidth: 0 },
-    productCategoryKicker: {
-        fontSize: 8,
-        fontFamily: 'Roboto',
-        fontWeight: 'bold',
-        color: COLORS.text,
-        letterSpacing: 1.8,
-        textTransform: 'uppercase' as const,
-        marginBottom: 8,
-        lineHeight: 1.3,
-    },
-    productModelHero: {
-        fontSize: 36,
-        fontFamily: 'Roboto',
-        fontWeight: 'bold',
-        color: COLORS.brochureAccent,
-        letterSpacing: -0.5,
-        lineHeight: 1.05,
-        maxWidth: '100%',
-        marginBottom: 2,
-    },
     productIntroBox: {
         marginTop: 6,
     },
@@ -545,20 +581,6 @@ const styles = StyleSheet.create({
         color: COLORS.textMuted,
         lineHeight: 1.35,
         marginTop: 2,
-    },
-    heroPrinciple: {
-        fontSize: 11,
-        color: COLORS.textMuted,
-        letterSpacing: 0.3,
-        lineHeight: 1.4,
-        marginTop: 8,
-    },
-    heroAccentRule: {
-        width: 60,
-        height: 3,
-        backgroundColor: COLORS.brochureAccent,
-        marginTop: 14,
-        marginBottom: 18,
     },
     productImageColumn: { width: '52%', alignSelf: 'flex-start' as const },
     blockTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4, marginTop: 10 },
@@ -707,6 +729,7 @@ const ProductImage = ({
     catalog,
     hero,
     detail,
+    immersive,
     /** Aceeași înălțime ca imaginea principală catalog (coloană stângă) */
     catalogStack,
     compact,
@@ -718,32 +741,50 @@ const ProductImage = ({
     catalog?: boolean;
     hero?: boolean;
     detail?: boolean;
+    immersive?: boolean;
     catalogStack?: boolean;
     compact?: boolean;
     galleryThumb?: boolean;
     stripThumb?: boolean;
 }) => {
     if (!url) {
-        const h = stripThumb ? 56 : galleryThumb ? 80 : compact ? 72 : hero ? 410 : detail ? 160 : catalog || catalogStack ? 200 : 220;
-        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
+        const h = stripThumb
+            ? 56
+            : galleryThumb
+              ? 80
+              : compact
+                ? 72
+                : immersive
+                  ? 412
+                  : hero
+                    ? 410
+                    : detail
+                      ? 160
+                      : catalog || catalogStack
+                        ? 200
+                        : 220;
+        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || immersive || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
     }
     const absolute = resolvePublicUrl(url);
-    const safeJpgUrl = `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=jpg&w=800`;
+    const wSrv = hero || immersive ? 1400 : 800;
+    const safeJpgUrl = `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=jpg&w=${wSrv}`;
     const imgStyle = stripThumb
         ? { width: '100%', height: 56, objectFit: 'contain' as const }
         : galleryThumb
           ? { width: '100%', height: 80, objectFit: 'contain' as const }
           : compact
             ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
-            : hero
-              ? { width: '100%', height: 410, objectFit: 'contain' as const }
-              : detail
-                ? { width: '100%', height: 160, objectFit: 'contain' as const }
-            : catalog || catalogStack
-              ? { width: '100%', height: 200, objectFit: 'contain' as const }
-              : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
+            : immersive
+              ? { width: '100%', height: '100%', objectFit: 'cover' as const }
+              : hero
+                ? { width: '100%', height: 410, objectFit: 'contain' as const }
+                : detail
+                  ? { width: '100%', height: 160, objectFit: 'contain' as const }
+                  : catalog || catalogStack
+                    ? { width: '100%', height: 200, objectFit: 'contain' as const }
+                    : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
     return React.createElement(Image, { src: safeJpgUrl, style: imgStyle });
 };
 
@@ -899,6 +940,41 @@ function pdfCatalogLogoSrc(config: { logoDataUri?: string }): string {
     return pdfCatalogLogoUrl();
 }
 
+/** Etichetă scurtă de categorie (stil „TYING MACHINE” din broșurile producător) */
+const PDF_CATEGORY_HERO_LABEL: Record<string, string> = {
+    'pregatire-sol': 'PREGĂTIRE SOL',
+    'semanat-fertilizat': 'SEMĂNĂTOARE',
+    'recoltare-logistica': 'RECOLTARE & LOGISTICĂ',
+    'protectia-plantelor': 'PROTECȚIA PLANTELOR',
+    viticol: 'VITICOL',
+    legumicol: 'LEGUMICOL',
+};
+
+function getProductOverviewCategoryLabel(catSlug: string, secTitle: string): string {
+    return PDF_CATEGORY_HERO_LABEL[catSlug] || secTitle.toUpperCase();
+}
+
+/** Una sau două linii de titlu foarte mare (ex. MULTISEM / ADS), fără duplicarea mărcii în stânga */
+function getProductHeroGiantLines(product: DynamicProduct): string[] {
+    if (product.slug === 'multisem-ads') {
+        return ['MULTISEM', 'ADS'];
+    }
+    const brand = (product.brand || '').trim();
+    let rest = (product.name || 'UTILAJ').trim();
+    if (brand && rest.toLowerCase().startsWith(`${brand.toLowerCase()} `)) {
+        rest = rest.slice(brand.length).trim();
+    }
+    const parts = rest.split(/\s+/).filter(Boolean);
+    if (parts.length >= 3) {
+        const mid = Math.ceil(parts.length / 2);
+        return [parts.slice(0, mid).join(' ').toUpperCase(), parts.slice(mid).join(' ').toUpperCase()];
+    }
+    if (parts.length === 2) {
+        return [parts[0].toUpperCase(), parts[1].toUpperCase()];
+    }
+    return [rest.toUpperCase()];
+}
+
 function getProfessionalProductLead(product: DynamicProduct): string {
     if (product.slug === 'multisem-ads') {
         return 'Avers-Agro Multisem ADS este o semănătoare proiectată pentru lucrări conservative, cu utilizare posibilă în semănat direct, mini-till sau convențional, în funcție de configurația echipată. Ansamblul de brăzdare cu dublu disc, presiunea ridicată pe brăzdar și suspensia paralelogram urmăresc pătrunderea constantă în rest vegetal și menținerea unei adâncimi de semănat stabile.';
@@ -918,16 +994,6 @@ function getProfessionalIntroBullets(product: DynamicProduct): string[] {
         'Configurația finală se stabilește în raport cu lățimea de lucru, puterea tractorului și condițiile de exploatare.',
         'Datele tehnice complete, opționalele și cerințele de utilizare se validează pe modelul ofertat.',
     ];
-}
-
-function getProductPrinciple(product: DynamicProduct): string {
-    if (product.slug === 'multisem-ads') {
-        return 'Semănătoare conservativă de precizie — semănat direct, mini-till, convențional';
-    }
-    const desc = product.description || product.longDescription || '';
-    const firstSentence = desc.split(/\.\s/)[0];
-    if (firstSentence && firstSentence.length > 10) return firstSentence + (firstSentence.endsWith('.') ? '' : '.');
-    return product.name || 'Utilaj agricol de înaltă performanță';
 }
 
 const renderPageHeader = (title: string) => (
@@ -1049,30 +1115,57 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                         )
                     );
 
-                const kicker = [secTitle.toUpperCase(), product?.brand].filter(Boolean).join(' · ');
                 const introBullets = getProfessionalIntroBullets(product);
+                const categoryHero = getProductOverviewCategoryLabel(catName, secTitle);
+                const giantLines = getProductHeroGiantLines(product);
 
-                const principle = getProductPrinciple(product);
-
-                // ═══ PAGINA 1 PRODUS: HERO SPLASH ═══
-                // Vertical: kicker → titlu mare → tagline → linie accent → imagine dominantă
+                // ═══ PAGINA 1 PRODUS: stil PA 5000 — text sus (stânga titlu masiv + dreapta Principiu), imagine full-bleed jos ═══
                 const overviewPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-overview-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
-                    React.createElement(View, { style: styles.productOverviewPage },
-                        product?.badge &&
-                            React.createElement(View, { style: styles.badgeRow },
-                                React.createElement(View, { style: styles.badge },
-                                    React.createElement(Text, { style: styles.badgeText }, product.badge)
-                                )
-                            ),
-                        React.createElement(Text, { style: styles.productCategoryKicker }, kicker),
-                        React.createElement(Text, { style: styles.productModelHero }, product?.name || 'Utilaj agricol'),
-                        React.createElement(Text, { style: (styles as any).heroPrinciple }, principle),
-                        React.createElement(View, { style: (styles as any).heroAccentRule }),
+                    React.createElement(
+                        View,
+                        { style: { flex: 1, flexDirection: 'column', minHeight: 0 } },
                         React.createElement(
                             View,
-                            { style: styles.productOverviewImageFrame },
-                            React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, hero: true })
+                            { style: styles.productOverviewShell },
+                            React.createElement(
+                                View,
+                                { style: styles.productOverviewTop },
+                                product?.badge &&
+                                    React.createElement(View, { style: styles.badgeRow },
+                                        React.createElement(View, { style: styles.badge },
+                                            React.createElement(Text, { style: styles.badgeText }, product.badge)
+                                        )
+                                    ),
+                                React.createElement(
+                                    View,
+                                    { style: styles.productOverviewHeroRow },
+                                    React.createElement(
+                                        View,
+                                        { style: styles.productOverviewTitleCol },
+                                        React.createElement(Text, { style: styles.productOverviewCategory }, categoryHero),
+                                        ...giantLines.map((line, li) =>
+                                            React.createElement(Text, { key: `g-${pSlug}-${li}`, style: styles.productOverviewGiant }, line)
+                                        )
+                                    ),
+                                    React.createElement(
+                                        View,
+                                        { style: styles.productOverviewPrincipleCol },
+                                        React.createElement(Text, { style: styles.productOverviewPrincipleTitle }, 'PRINCIPIU'),
+                                        React.createElement(
+                                            View,
+                                            { style: styles.productOverviewPrincipleRow },
+                                            React.createElement(Text, { style: styles.productOverviewPrincipleChevron }, '›'),
+                                            React.createElement(Text, { style: styles.productOverviewPrincipleBody }, descText)
+                                        )
+                                    )
+                                )
+                            ),
+                            React.createElement(
+                                View,
+                                { style: styles.productOverviewImageBleed },
+                                React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, immersive: true })
+                            )
                         )
                     ),
                     renderPageFooter(currentPage += 1, config.phone)
