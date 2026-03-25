@@ -85,11 +85,16 @@ const PUBLIC_WEB = 'tehnicagrosupply.ro';
 // DTP Layout Constants — spațiu pentru header/footer fixe, fără suprapuneri
 const MARGIN = 48;
 const HEADER_BLOCK = 72;
-const FOOTER_BLOCK = 64;
+/** Spațiu rezervat deasupra benzii footer (conținut nu intră sub bandă) */
+const FOOTER_BLOCK = 52;
+/** Bandă solidă subsol — pag. și contact, ca în broșurile tip PA 5000 */
+const FOOTER_BAND_HEIGHT = 36;
+/** Accent secțiuni „curate” pagina 2 produs */
+const PDF_SECTION_ACCENT = '#064e3b';
 
 // PDF Styles
 const styles = StyleSheet.create({
-    page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Roboto' },
+    page: { backgroundColor: COLORS.white, padding: 0, fontFamily: 'Roboto', flexDirection: 'column' as const },
     /** Copertă tip broșură: zonă color stânga + zonă albă dreapta */
     cover: { flex: 1, flexDirection: 'row', backgroundColor: COLORS.white, padding: 0 },
     coverLeftPanel: {
@@ -161,9 +166,20 @@ const styles = StyleSheet.create({
     headerBrandName: { fontSize: 11, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primary, letterSpacing: 0.5 },
     headerBrandTag: { fontSize: 7, color: COLORS.brandGrey, marginTop: 2, letterSpacing: 0.3 },
     headerTitle: { fontSize: 8, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 1, fontFamily: 'Roboto', fontWeight: 'bold', flex: 1, flexShrink: 1, marginLeft: 14, textAlign: 'right', maxWidth: 280 },
-    footer: { position: 'absolute', bottom: 22, left: MARGIN, right: MARGIN, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#e8eef3', paddingTop: 8, minHeight: 32 },
-    footerPage: { fontSize: 7.5, color: COLORS.textSubtle, letterSpacing: 0.6 },
-    footerContact: { fontSize: 7.5, color: COLORS.textMuted, fontFamily: 'Roboto', fontWeight: 'normal' },
+    footerBand: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: FOOTER_BAND_HEIGHT,
+        backgroundColor: COLORS.primaryDark,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: MARGIN,
+    },
+    footerBandPage: { fontSize: 8, color: COLORS.white, letterSpacing: 0.8, fontFamily: 'Roboto', fontWeight: 'bold' },
+    footerBandContact: { fontSize: 8, color: '#e2e8f0', fontFamily: 'Roboto', fontWeight: 'normal' },
     sectionTitle: { fontSize: 22, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 22, letterSpacing: -0.3 },
     subsectionTitle: { fontSize: 12, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, marginBottom: 10, marginTop: 6 },
     categoryIntroAccent: { height: 3, backgroundColor: COLORS.brochureAccent, marginBottom: 14, width: '100%' },
@@ -267,11 +283,11 @@ const styles = StyleSheet.create({
         lineHeight: 1.25,
     },
     productOverviewGiant: {
-        fontSize: 64,
+        fontSize: 68,
         fontFamily: 'Roboto',
         fontWeight: 'bold',
         color: COLORS.brochureAccent,
-        lineHeight: 0.98,
+        lineHeight: 0.85,
         letterSpacing: -1.2,
         textTransform: 'uppercase' as const,
     },
@@ -301,10 +317,18 @@ const styles = StyleSheet.create({
         lineHeight: 1.42,
         textAlign: 'justify' as const,
     },
-    productOverviewImageBleed: {
-        width: '100%',
-        height: 412,
-        flexShrink: 0,
+    /** Imagine produs pag. 1: margini fizice stânga/dreapta/jos; banda footer se suprapune pe ultimele px */
+    productOverviewImageAbsolute: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 456,
+    },
+    productPageRelativeWrap: {
+        flex: 1,
+        position: 'relative' as const,
+        minHeight: 0,
     },
     productDetailPage: {
         paddingTop: HEADER_BLOCK + 8,
@@ -411,11 +435,9 @@ const styles = StyleSheet.create({
     },
     unifiedSpecsBox: {
         marginTop: 6,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        borderRadius: 6,
-        padding: 8,
-        backgroundColor: '#f8fafc',
+        paddingTop: 4,
+        paddingBottom: 6,
+        paddingHorizontal: 0,
     },
     narrativeSpecsBox: {
         marginTop: 4,
@@ -460,28 +482,6 @@ const styles = StyleSheet.create({
         paddingBottom: 8,
         alignItems: 'center' as const,
         width: '100%',
-    },
-    contactGreenBar: {
-        backgroundColor: COLORS.primary,
-        paddingVertical: 14,
-        paddingHorizontal: 20,
-        alignItems: 'center' as const,
-        width: '100%',
-        marginTop: 8,
-    },
-    contactGreenBarMain: {
-        fontSize: 7.5,
-        color: COLORS.white,
-        letterSpacing: 0.4,
-        textAlign: 'center' as const,
-        lineHeight: 1.45,
-    },
-    contactGreenBarPage: {
-        fontSize: 8,
-        color: '#d1fae5',
-        marginTop: 6,
-        letterSpacing: 1.2,
-        textTransform: 'uppercase' as const,
     },
     contactLogoImg: { width: 160, height: 48, objectFit: 'contain' as const, marginBottom: 10 },
     contactDocNote: {
@@ -683,11 +683,39 @@ function renderChevronBullet(
     );
 }
 
+type SectionTitleVariant = 'pill' | 'leftRule';
+
 function renderAccentSectionTitle(
     key: string,
     title: string,
-    spacing?: { marginTop?: number; marginBottom?: number }
+    spacing?: { marginTop?: number; marginBottom?: number },
+    variant: SectionTitleVariant = 'pill'
 ) {
+    if (variant === 'leftRule') {
+        return React.createElement(
+            View,
+            {
+                key,
+                style: {
+                    marginBottom: spacing?.marginBottom ?? 6,
+                    marginTop: spacing?.marginTop ?? 2,
+                    borderLeftWidth: 2,
+                    borderLeftColor: PDF_SECTION_ACCENT,
+                    paddingLeft: 8,
+                },
+            },
+            React.createElement(Text, {
+                style: {
+                    fontSize: 10,
+                    fontFamily: 'Roboto',
+                    fontWeight: 'bold',
+                    color: COLORS.brochureAccent,
+                    letterSpacing: 1.3,
+                    textTransform: 'uppercase' as const,
+                },
+            }, title)
+        );
+    }
     return React.createElement(
         View,
         {
@@ -755,7 +783,7 @@ const ProductImage = ({
               : compact
                 ? 72
                 : immersive
-                  ? 412
+                  ? 456
                   : hero
                     ? 410
                     : detail
@@ -887,7 +915,7 @@ function renderProductMetaOnly(product: DynamicProduct): React.ReactElement[] {
 /** O singură casetă: specificații din catalog + detalii din JSON, fără denumire „extinse” separată */
 function renderUnifiedTechnicalSpecs(product: DynamicProduct): React.ReactElement {
     const parts: React.ReactElement[] = [];
-    parts.push(renderAccentSectionTitle('utt', 'Specificații tehnice'));
+    parts.push(renderAccentSectionTitle('utt', 'Specificații tehnice', undefined, 'leftRule'));
     if (Array.isArray(product.specs) && product.specs.length > 0) {
         product.specs.forEach((spec, i) => {
             parts.push(
@@ -1007,9 +1035,11 @@ const renderPageHeader = (title: string) => (
 );
 
 const renderPageFooter = (pageNumber: number, phone?: string) => (
-    React.createElement(View, { style: styles.footer, fixed: true },
-        React.createElement(Text, { style: styles.footerPage }, `TehnicAgro Supply · document selecție · pag. ${pageNumber}`),
-        React.createElement(Text, { style: styles.footerContact, wrap: false }, formatPhoneForPdf(phone || DEFAULT_PHONE))
+    React.createElement(
+        View,
+        { style: styles.footerBand, fixed: true },
+        React.createElement(Text, { style: styles.footerBandPage }, `Pag. ${pageNumber}`),
+        React.createElement(Text, { style: styles.footerBandContact, wrap: false }, formatPhoneForPdf(phone || DEFAULT_PHONE))
     )
 );
 
@@ -1124,7 +1154,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(
                         View,
-                        { style: { flex: 1, flexDirection: 'column', minHeight: 0 } },
+                        { style: styles.productPageRelativeWrap },
                         React.createElement(
                             View,
                             { style: styles.productOverviewShell },
@@ -1160,12 +1190,12 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                         )
                                     )
                                 )
-                            ),
-                            React.createElement(
-                                View,
-                                { style: styles.productOverviewImageBleed },
-                                React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, immersive: true })
                             )
+                        ),
+                        React.createElement(
+                            View,
+                            { style: styles.productOverviewImageAbsolute },
+                            React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, immersive: true })
                         )
                     ),
                     renderPageFooter(currentPage += 1, config.phone)
@@ -1194,7 +1224,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                 ),
                             ),
                             React.createElement(View, { style: styles.productRightCol },
-                                renderAccentSectionTitle(`desc-${pSlug}`, 'Prezentare tehnică'),
+                                renderAccentSectionTitle(`desc-${pSlug}`, 'Prezentare tehnică', undefined, 'leftRule'),
                                 React.createElement(Text, { style: styles.productSheetBody }, descText),
                                 ...introBullets.slice(0, 2).map((line, bi) =>
                                     renderChevronBullet(`intro-${pSlug}-${bi}`, styles.productIntroBullets as Record<string, unknown>, line)
@@ -1232,7 +1262,6 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
 
         // PAGINA FINALĂ: contact + bandă tip copertă (ierarhie vizuală ca în broșurile de referință)
         ...((): React.ReactElement[] => {
-            const contactPg = currentPage + 1;
             return [
                 React.createElement(
                     Page,
@@ -1280,16 +1309,6 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                 React.createElement(Image, { src: logoSrc, style: styles.contactLogoImg }),
                                 React.createElement(Text, { style: styles.contactDocNote }, PDF_DOCUMENTATION_NOTE)
                             )
-                        ),
-                        React.createElement(
-                            View,
-                            { style: styles.contactGreenBar },
-                            React.createElement(
-                                Text,
-                                { style: styles.contactGreenBarMain },
-                                `${formatPhoneForPdf(config.phone || DEFAULT_PHONE)} · ${(config.email && String(config.email).trim()) || DEFAULT_EMAIL} · ${PUBLIC_WEB} · România`
-                            ),
-                            React.createElement(Text, { style: styles.contactGreenBarPage }, `TehnicAgro Supply · document selecție · pag. ${contactPg}`)
                         )
                     ),
                     renderPageFooter(currentPage += 1, config.phone)
@@ -1361,7 +1380,14 @@ export async function POST(request: Request) {
 export async function GET() {
     try {
         const list = await getBrochures();
-        return NextResponse.json({ brochures: list });
+        return NextResponse.json(
+            { brochures: list },
+            {
+                headers: {
+                    'Cache-Control': 'no-store, max-age=0, must-revalidate',
+                },
+            }
+        );
     } catch (err: any) {
         console.error('GET error:', err.stack || err);
         return NextResponse.json({ error: 'Failed to fetch brochures' }, { status: 500 });

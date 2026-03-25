@@ -103,11 +103,26 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
         setSelectedSlugs(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]);
 
     const loadHistory = async () => {
-        const res = await fetch('/api/materiale');
+        const res = await fetch('/api/materiale', { cache: 'no-store' });
         const data = await res.json();
         setHistory(data.brochures || []);
         setHistoryLoaded(true);
     };
+
+    useEffect(() => {
+        if (!tabVisible || !adminAuth.trim()) return;
+        let cancelled = false;
+        (async () => {
+            const res = await fetch('/api/materiale', { cache: 'no-store' });
+            const data = await res.json().catch(() => ({}));
+            if (cancelled || !res.ok) return;
+            setHistory((data as { brochures?: Brochure[] }).brochures || []);
+            setHistoryLoaded(true);
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [tabVisible, adminAuth]);
 
     const applyTemplate = (key: string) => {
         const t = TEMPLATES[key];
@@ -166,8 +181,8 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                 else alert((data as { error?: string }).error || 'Eroare la ștergere.');
                 return;
             }
-            setHistory((prev) => prev.filter((x) => x.id !== b.id));
             setResult((prev) => (prev?.id === b.id ? null : prev));
+            await loadHistory();
         } catch (err) {
             alert('Eroare rețea: ' + String(err));
         } finally {
