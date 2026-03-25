@@ -240,7 +240,10 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
                             </label>
                             <p className="text-[10px] text-zinc-600 leading-relaxed">
                                 Un singur câmp pentru pagina principală a producătorului. Mai jos, „Adaugă link” adaugă rânduri extra
-                                (etichetă + URL), ex. catalog PDF, fișă DE, video — fiecare cu nume propriu în broșură.
+                                (etichetă + URL). În PDF aceste adrese apar ca listă scurtă de referință —{' '}
+                                <strong className="text-zinc-500">nu se citește automat</strong> conținutul site-ului la generarea
+                                broșurii. Ca să aduci text din web în document, folosește mai jos „Preluare din link” și „Pune în text
+                                PDF”.
                             </p>
                             <input
                                 value={draft.manufacturerUrl || ''}

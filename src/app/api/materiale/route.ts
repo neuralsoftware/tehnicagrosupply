@@ -112,16 +112,33 @@ const styles = StyleSheet.create({
     productLayout: { paddingTop: HEADER_BLOCK + 10, paddingRight: MARGIN, paddingBottom: FOOTER_BLOCK + 28, paddingLeft: MARGIN },
     badgeRow: { marginBottom: 8 },
     badge: { alignSelf: 'flex-start', backgroundColor: COLORS.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 2 },
-    catalogRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 14 },
-    catalogImageCol: { width: '40%', padding: 8, marginRight: 10, borderWidth: 1, borderColor: COLORS.border, borderRadius: 4, backgroundColor: '#fafafa' },
-    catalogTextCol: { width: '54%', flexGrow: 1 },
-    catalogDesc: { fontSize: 9, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 10, textAlign: 'left' },
+    catalogRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
+    catalogImageCol: { width: '36%', padding: 6, marginRight: 12, borderWidth: 1, borderColor: COLORS.border, borderRadius: 4, backgroundColor: '#fafafa' },
+    catalogTextCol: { flex: 1, minWidth: 0 },
+    catalogDesc: { fontSize: 9.5, color: COLORS.textMuted, lineHeight: 1.4, marginBottom: 8, textAlign: 'left' },
+    pdfLinkSection: {
+        marginBottom: 8,
+        padding: 8,
+        backgroundColor: '#f1f5f9',
+        borderRadius: 3,
+        borderLeftWidth: 3,
+        borderLeftColor: COLORS.primary,
+    },
+    pdfLinkSectionTitle: {
+        fontSize: 7.5,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.textMuted,
+        marginBottom: 4,
+        textTransform: 'uppercase',
+        letterSpacing: 0.6,
+    },
+    pdfLinkLine: { fontSize: 7, color: COLORS.text, lineHeight: 1.35, marginBottom: 2 },
     catalogSpecsWrap: { marginTop: 4 },
     productMetaStrip: { fontSize: 8.5, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', marginBottom: 8, lineHeight: 1.35 },
     specDetailBlock: { marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: COLORS.border },
     specDetailGroup: { fontSize: 8, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.textMuted, marginBottom: 4, marginTop: 6 },
     specDetailLine: { fontSize: 7.5, color: COLORS.textMuted, lineHeight: 1.35, marginBottom: 2 },
-    linkRow: { marginTop: 8, fontSize: 7.5, color: COLORS.primary },
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
     brandLabel: { fontSize: 9, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 },
     modelTitle: { fontSize: 17, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 8, letterSpacing: -0.3, maxWidth: '100%' },
@@ -178,24 +195,89 @@ function categoryDisplayName(slug: string, categoriesFromDb: Category[]): string
     return c?.name || CATEGORY_LABELS[slug] || slug;
 }
 
+/** Titluri din JSON (ex. Performanta_si_Dimensiuni) → text lizibil în PDF */
+function humanizeSpecGroupKey(group: string): string {
+    return String(group).replace(/_/g, ' ').trim();
+}
+
+/** Suportă string, obiecte imbricate și array-uri de rânduri (ex. variante ADS 3/4/6) — evită [object Object] */
+function formatSpecValueForPdf(val: unknown): string {
+    if (val == null) return '';
+    if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') {
+        return String(val).trim();
+    }
+    if (Array.isArray(val)) {
+        return val
+            .map((item) => formatSpecValueForPdf(item))
+            .filter(Boolean)
+            .join(' · ');
+    }
+    if (typeof val === 'object') {
+        return Object.entries(val as Record<string, unknown>)
+            .filter(([, v]) => v != null && String(v).trim() !== '')
+            .map(([k, v]) => `${k}: ${formatSpecValueForPdf(v)}`)
+            .join(' · ');
+    }
+    return '';
+}
+
 function detailedSpecBlocks(product: DynamicProduct, maxLines: number): { group: string; lines: string[] }[] {
     const ds = product.detailedSpecs;
     if (!ds || typeof ds !== 'object') return [];
     const blocks: { group: string; lines: string[] }[] = [];
     let count = 0;
-    for (const [group, kv] of Object.entries(ds as Record<string, Record<string, string>>)) {
+
+    for (const [group, raw] of Object.entries(ds as Record<string, unknown>)) {
         if (count >= maxLines) break;
-        if (!kv || typeof kv !== 'object') continue;
+        if (raw == null) continue;
         const lines: string[] = [];
-        for (const [k, v] of Object.entries(kv)) {
-            if (count >= maxLines) break;
-            if (v == null || String(v).trim() === '') continue;
-            lines.push(`${k}: ${String(v).trim()}`);
-            count += 1;
+
+        if (Array.isArray(raw)) {
+            for (let i = 0; i < raw.length && count < maxLines; i++) {
+                const item = raw[i];
+                const line = formatSpecValueForPdf(item);
+                if (!line) continue;
+                lines.push(line);
+                count += 1;
+            }
+        } else if (typeof raw === 'object') {
+            for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+                if (count >= maxLines) break;
+                const formatted = formatSpecValueForPdf(v);
+                if (!formatted) continue;
+                lines.push(`${k}: ${formatted}`);
+                count += 1;
+            }
         }
-        if (lines.length > 0) blocks.push({ group, lines });
+
+        if (lines.length > 0) {
+            blocks.push({ group: humanizeSpecGroupKey(group), lines });
+        }
     }
     return blocks;
+}
+
+/** Linkuri din profil broșură: afișare compactă; nu înlocuiește textul — conținutul bogat e din «Text detaliat» + import */
+function renderPdfLinkSection(product: DynamicProduct): React.ReactElement | null {
+    const m = product.manufacturerUrl?.trim();
+    const refs = (product.referenceLinks || []).filter((l) => l?.url?.trim());
+    if (!m && refs.length === 0) return null;
+    const kids: React.ReactNode[] = [
+        React.createElement(Text, { key: 'tl', style: styles.pdfLinkSectionTitle }, 'Resurse web (referință)'),
+    ];
+    if (m) {
+        kids.push(React.createElement(Text, { key: 'm', style: styles.pdfLinkLine }, `Producător / fișă: ${m}`));
+    }
+    refs.slice(0, 5).forEach((l, i) => {
+        kids.push(
+            React.createElement(
+                Text,
+                { key: `r${i}`, style: styles.pdfLinkLine },
+                `${l.label || 'Link'}: ${l.url.trim()}`
+            )
+        );
+    });
+    return React.createElement(View, { style: styles.pdfLinkSection }, ...kids);
 }
 
 function renderProductExtraBlocks(product: DynamicProduct): React.ReactElement[] {
@@ -206,7 +288,7 @@ function renderProductExtraBlocks(product: DynamicProduct): React.ReactElement[]
     if (parts.length > 0) {
         out.push(React.createElement(Text, { key: 'meta', style: styles.productMetaStrip, wrap: false }, parts.join(' · ')));
     }
-    const dsBlocks = detailedSpecBlocks(product, 18);
+    const dsBlocks = detailedSpecBlocks(product, 28);
     if (dsBlocks.length === 0) return out;
     const inner: React.ReactElement[] = [];
     inner.push(React.createElement(Text, { key: 'dt', style: styles.blockTitle }, 'Date extinse (producător)'));
@@ -358,19 +440,15 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                         React.createElement(View, { style: styles.catalogRow },
                             React.createElement(View, { style: styles.catalogImageCol },
                                 React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true }),
-                                ...(Array.isArray(product.gallery) ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 3) : []).map((u, gi) =>
+                                ...(Array.isArray(product.gallery) ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 4) : []).map((u, gi) =>
                                     React.createElement(ProductImage, { key: `gal-${gi}`, url: u, fallback: product?.name, catalog: true, compact: true })
-                                ),
-                                product.manufacturerUrl &&
-                                    React.createElement(Text, { style: styles.linkRow }, `Producător / fișă: ${product.manufacturerUrl}`),
-                                ...(Array.isArray(product.referenceLinks) ? product.referenceLinks.filter((l) => l?.url).slice(0, 3) : []).map((l, ri) =>
-                                    React.createElement(Text, { key: `rl-${ri}`, style: styles.linkRow }, `${l.label || 'Referință'}: ${l.url}`)
                                 )
                             ),
                             React.createElement(View, { style: styles.catalogTextCol },
                                 React.createElement(Text, { style: styles.brandLabel }, product?.brand || 'TEHNICAGRO'),
                                 React.createElement(Text, { style: styles.modelTitle }, product?.name || 'Utilaj Agricol'),
                                 React.createElement(Text, { style: styles.catalogDesc }, descText),
+                                renderPdfLinkSection(product),
                                 React.createElement(View, { style: styles.catalogSpecsWrap },
                                     React.createElement(Text, { style: styles.blockTitle }, 'Specificații tehnice'),
                                     Array.isArray(product?.specs) && product.specs.length > 0
