@@ -86,7 +86,6 @@ const PUBLIC_WEB = 'tehnicagrosupply.ro';
 const MARGIN = 48;
 const HEADER_BLOCK = 72;
 const FOOTER_BLOCK = 64;
-const LINE_HEIGHT = 1.6;
 
 // PDF Styles
 const styles = StyleSheet.create({
@@ -170,7 +169,67 @@ const styles = StyleSheet.create({
     categoryIntroAccent: { height: 3, backgroundColor: COLORS.brochureAccent, marginBottom: 14, width: '100%' },
     mainText: { fontSize: 10, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 10, textAlign: 'justify' },
     bulletText: { fontSize: 10, color: COLORS.textMuted, lineHeight: 1.45, marginBottom: 5, marginLeft: 15 },
-    introHighlight: { fontSize: 11.5, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 500, lineHeight: 1.4, marginBottom: 14 },
+    /** Pagina „Profil companie”: ritm uniform — același corp, aceleași spațieri */
+    companyPageInner: {
+        paddingTop: HEADER_BLOCK + 8,
+        paddingBottom: FOOTER_BLOCK + 12,
+        paddingHorizontal: MARGIN,
+        flex: 1,
+    },
+    companyHeaderBlock: { marginBottom: 10, alignItems: 'flex-start' as const, width: '100%' },
+    companyEyebrow: {
+        fontSize: 8,
+        color: COLORS.brochureAccent,
+        letterSpacing: 1.4,
+        textTransform: 'uppercase' as const,
+        marginBottom: 6,
+    },
+    companyDocTitle: {
+        fontSize: 12,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.primaryDark,
+        textAlign: 'left' as const,
+        textTransform: 'uppercase' as const,
+        lineHeight: 1.35,
+    },
+    companyLead: {
+        fontSize: 10,
+        fontFamily: 'Roboto',
+        fontWeight: 500,
+        color: COLORS.primaryDark,
+        lineHeight: 1.45,
+        marginBottom: 8,
+        textAlign: 'justify' as const,
+    },
+    companyBody: {
+        fontSize: 10,
+        color: COLORS.textMuted,
+        lineHeight: 1.45,
+        marginBottom: 8,
+        textAlign: 'justify' as const,
+    },
+    companyClosing: {
+        fontSize: 10,
+        color: COLORS.textSubtle,
+        lineHeight: 1.45,
+        marginTop: 8,
+        marginBottom: 0,
+        textAlign: 'justify' as const,
+    },
+    companyBulletText: {
+        fontSize: 10,
+        color: COLORS.textMuted,
+        lineHeight: 1.45,
+    },
+    companyListChevron: {
+        fontSize: 10,
+        color: COLORS.brochureAccent,
+        marginRight: 6,
+        lineHeight: 1.45,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+    },
     categoryTitle: { fontSize: 20, color: COLORS.primaryDark, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: -0.2, marginBottom: 12 },
     productLayout: { paddingTop: HEADER_BLOCK + 10, paddingRight: MARGIN, paddingBottom: FOOTER_BLOCK + 28, paddingLeft: MARGIN },
     productOverviewPage: {
@@ -583,19 +642,37 @@ const styles = StyleSheet.create({
     programCardText: { fontSize: 8.5, color: '#166534', lineHeight: 1.4, textAlign: 'justify' as const },
 });
 
-function renderChevronBullet(key: string, textStyle: Record<string, unknown>, text: string) {
+function renderChevronBullet(
+    key: string,
+    textStyle: Record<string, unknown>,
+    text: string,
+    rowMarginBottom = 4,
+    chevronStyle?: typeof styles.specChevron
+) {
     return React.createElement(
         View,
-        { key, style: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 4 } },
-        React.createElement(Text, { style: styles.specChevron }, '›'),
+        { key, style: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: rowMarginBottom } },
+        React.createElement(Text, { style: chevronStyle || styles.specChevron }, '›'),
         React.createElement(Text, { style: textStyle as never }, text)
     );
 }
 
-function renderAccentSectionTitle(key: string, title: string) {
+function renderAccentSectionTitle(
+    key: string,
+    title: string,
+    spacing?: { marginTop?: number; marginBottom?: number }
+) {
     return React.createElement(
         View,
-        { key, style: { flexDirection: 'row', alignItems: 'center', marginBottom: 6, marginTop: 2 } },
+        {
+            key,
+            style: {
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: spacing?.marginBottom ?? 6,
+                marginTop: spacing?.marginTop ?? 2,
+            },
+        },
         React.createElement(View, { style: { width: 3, height: 13, backgroundColor: COLORS.brochureAccent, marginRight: 10 } }),
         React.createElement(Text, {
             style: {
@@ -904,20 +981,22 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
             )
         ),
 
-        // PAGINA 2: PROFIL COMPANIE
+        // PAGINA 2: PROFIL COMPANIE (tipografie uniformă, aliniere stânga, spațieri fixe)
         React.createElement(Page, { size: 'A4', style: styles.page },
             renderPageHeader('PROFIL COMPANIE'),
-            React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 48, paddingHorizontal: MARGIN, flex: 1 } },
-                React.createElement(View, { style: { alignItems: 'center', marginBottom: 16 } },
-                    React.createElement(Text, { style: { fontSize: 9, color: COLORS.brochureAccent, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8 } }, 'TehnicAgro Supply'),
-                    React.createElement(Text, { style: { fontSize: 13, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.primaryDark, textAlign: 'center', textTransform: 'uppercase', lineHeight: 1.35, maxWidth: 440 } }, PDF_COMPANY.title)
+            React.createElement(View, { style: styles.companyPageInner },
+                React.createElement(View, { style: styles.companyHeaderBlock },
+                    React.createElement(Text, { style: styles.companyEyebrow }, 'TehnicAgro Supply'),
+                    React.createElement(Text, { style: styles.companyDocTitle }, PDF_COMPANY.title)
                 ),
-                React.createElement(Text, { style: styles.introHighlight }, PDF_COMPANY.lead),
-                React.createElement(Text, { style: styles.mainText }, PDF_COMPANY.p2),
-                React.createElement(Text, { style: styles.mainText }, PDF_COMPANY.p3),
-                renderAccentSectionTitle('expect', 'Ce puteți aștepta de la noi'),
-                ...PDF_COMPANY.bullets.map((b, i) => renderChevronBullet(`cmp-b-${i}`, styles.mainText as Record<string, unknown>, b)),
-                React.createElement(Text, { style: { ...styles.mainText, marginTop: 12 } }, PDF_COMPANY.closing)
+                React.createElement(Text, { style: styles.companyLead }, PDF_COMPANY.lead),
+                React.createElement(Text, { style: styles.companyBody }, PDF_COMPANY.p2),
+                React.createElement(Text, { style: styles.companyBody }, PDF_COMPANY.p3),
+                renderAccentSectionTitle('expect', 'Ce puteți aștepta de la noi', { marginTop: 8, marginBottom: 5 }),
+                ...PDF_COMPANY.bullets.map((b, i) =>
+                    renderChevronBullet(`cmp-b-${i}`, styles.companyBulletText as Record<string, unknown>, b, 3, styles.companyListChevron)
+                ),
+                React.createElement(Text, { style: styles.companyClosing }, PDF_COMPANY.closing)
             ),
             renderPageFooter(currentPage += 1, config.phone)
         ),
