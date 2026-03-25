@@ -3,6 +3,8 @@
  * Folosit pentru „import din link” în admin; rezultatul e previzualizare — utilizatorul confirmă.
  */
 
+import { PRODUCT_IMPORT_REPERE, type ImportReperRule } from '@/data/product-import-repere';
+
 function decodeBasicEntities(s: string): string {
     return s
         .replace(/&amp;/gi, '&')
@@ -73,6 +75,71 @@ export function htmlToPlainTextExcerpt(html: string, maxLen: number): string {
 }
 
 export type AiEnrichment = { summary: string; bullets: string[] };
+
+export type RepereEnrichment = AiEnrichment & { ruleId: string };
+
+export function normalizeForReperMatch(s: string): string {
+    return s
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+}
+
+function reperRuleMatches(rule: ImportReperRule, hostNorm: string, haystack: string): boolean {
+    if (rule.hostMustIncludeAll?.length) {
+        if (!rule.hostMustIncludeAll.every((f) => hostNorm.includes(normalizeForReperMatch(f)))) {
+            return false;
+        }
+    } else if (rule.hostFragments?.length) {
+        if (!rule.hostFragments.some((f) => hostNorm.includes(normalizeForReperMatch(f)))) {
+            return false;
+        }
+    }
+
+    if (rule.allTextFragments?.length) {
+        if (!rule.allTextFragments.every((f) => haystack.includes(normalizeForReperMatch(f)))) {
+            return false;
+        }
+    }
+
+    if (rule.anyTextFragments?.length) {
+        if (!rule.anyTextFragments.some((f) => haystack.includes(normalizeForReperMatch(f)))) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Potrivește URL-ul și textul extras cu reguli locale (fără cost API).
+ * Prima regulă din listă care se potrivește produce textul de context.
+ */
+export function enrichSourceWithRepere(
+    pageUrl: string,
+    meta: { title?: string; description?: string },
+    excerpt: string
+): RepereEnrichment | null {
+    let hostNorm = '';
+    try {
+        hostNorm = normalizeForReperMatch(new URL(pageUrl).hostname.replace(/^www\./i, ''));
+    } catch {
+        return null;
+    }
+
+    const haystack = normalizeForReperMatch(
+        [pageUrl, meta.title, meta.description, excerpt].filter(Boolean).join(' ')
+    );
+
+    for (const rule of PRODUCT_IMPORT_REPERE) {
+        if (!reperRuleMatches(rule, hostNorm, haystack)) continue;
+        const summary = rule.summary.trim();
+        const bullets = rule.bullets.map((b) => b.trim()).filter(Boolean).slice(0, 8);
+        if (!summary && bullets.length === 0) continue;
+        return { summary, bullets, ruleId: rule.id };
+    }
+    return null;
+}
 
 export async function enrichSourceWithOpenAI(text: string): Promise<AiEnrichment | null> {
     const key = process.env.OPENAI_API_KEY?.trim();

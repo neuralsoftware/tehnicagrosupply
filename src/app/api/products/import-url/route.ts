@@ -3,6 +3,7 @@ import {
     extractMetadataFromHtml,
     htmlToPlainTextExcerpt,
     enrichSourceWithOpenAI,
+    enrichSourceWithRepere,
 } from '@/lib/product-source-import';
 
 export const maxDuration = 60;
@@ -88,6 +89,8 @@ export async function POST(request: Request) {
         const meta = extractMetadataFromHtml(html, target.href);
         const excerpt = htmlToPlainTextExcerpt(html, 12000);
 
+        const repere = enrichSourceWithRepere(target.href, meta, excerpt);
+
         let ai = null as { summary: string; bullets: string[] } | null;
         if (useAi && process.env.OPENAI_API_KEY) {
             try {
@@ -104,6 +107,7 @@ export async function POST(request: Request) {
             description: meta.description,
             imageUrl: meta.imageUrl,
             excerptPreview: excerpt.slice(0, 800),
+            repere,
             ai,
             aiAvailable: Boolean(process.env.OPENAI_API_KEY),
         });

@@ -10,6 +10,7 @@ type ImportPreviewResult = {
     description?: string;
     imageUrl?: string;
     excerptPreview?: string;
+    repere?: { summary: string; bullets: string[]; ruleId: string } | null;
     ai?: { summary: string; bullets: string[] } | null;
     aiAvailable?: boolean;
     error?: string;
@@ -362,9 +363,10 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                     <label className="text-[10px] text-zinc-400 uppercase font-black tracking-widest">Preluare din link (previzualizare)</label>
                 </div>
                 <p className="text-[10px] text-zinc-500 leading-relaxed">
-                    Citește titlu și scurtă descriere din pagina web. Bifează <strong className="text-zinc-400">Cu AI</strong> dacă pe server există cheia OpenAI
-                    (variabila <code className="text-ea-green-500/90">OPENAI_API_KEY</code> — o pune echipa tehnică la deploy); obții atunci un rezumat și puncte
-                    suplimentare. Verifică mereu textul înainte de Salvare.
+                    Citește titlu și scurtă descriere din pagina web. <strong className="text-zinc-400">Fără cost:</strong> dacă URL-ul sau textul se potrivesc cu reperele
+                    noastre fixe (producători, tipuri de lucru), apare o sugestie de context TehnicAgro — poți apăsa „Aplică în descriere”. Opțional: bifează{' '}
+                    <strong className="text-zinc-400">Cu AI</strong> doar dacă pe server există <code className="text-ea-green-500/90">OPENAI_API_KEY</code>.
+                    Verifică mereu textul înainte de Salvare.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2">
                     <input
@@ -387,9 +389,15 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                         Citește pagina
                     </button>
                 </div>
-                {importPreview?.title && (
+                {importPreview &&
+                    (importPreview.title ||
+                        importPreview.description ||
+                        importPreview.imageUrl ||
+                        importPreview.repere) && (
                     <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 space-y-3 text-xs">
-                        <div className="text-white font-bold">{importPreview.title}</div>
+                        {importPreview.title && (
+                            <div className="text-white font-bold">{importPreview.title}</div>
+                        )}
                         {importPreview.description && (
                             <p className="text-zinc-400 leading-relaxed line-clamp-4">{importPreview.description}</p>
                         )}
@@ -483,6 +491,44 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                 Meta descriere (SEO)
                             </button>
                         </div>
+                        {importPreview.repere &&
+                            (importPreview.repere.summary || (importPreview.repere.bullets?.length ?? 0) > 0) && (
+                                <div className="pt-3 border-t border-zinc-800 space-y-2">
+                                    <div className="text-[10px] font-black uppercase text-sky-400">
+                                        Context TehnicAgro (repere fixe){' '}
+                                        <span className="text-zinc-600 font-mono normal-case">
+                                            [{importPreview.repere.ruleId}]
+                                        </span>
+                                    </div>
+                                    {importPreview.repere.summary && (
+                                        <p className="text-zinc-300 leading-relaxed">{importPreview.repere.summary}</p>
+                                    )}
+                                    <ul className="list-disc list-inside text-zinc-400 space-y-1">
+                                        {(importPreview.repere.bullets || []).map((b, i) => (
+                                            <li key={i}>{b}</li>
+                                        ))}
+                                    </ul>
+                                    <div className="flex flex-wrap gap-2">
+                                        <button
+                                            type="button"
+                                            className="px-3 py-2 bg-sky-900/40 rounded-lg text-[10px] font-black uppercase text-sky-200 hover:bg-sky-900/60"
+                                            onClick={() =>
+                                                setEditing((p) => ({
+                                                    ...p,
+                                                    longDescription: [
+                                                        importPreview.repere?.summary,
+                                                        (importPreview.repere?.bullets || []).map((x) => `• ${x}`).join('\n'),
+                                                    ]
+                                                        .filter(Boolean)
+                                                        .join('\n\n'),
+                                                }))
+                                            }
+                                        >
+                                            Aplică repere în descriere lungă
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         {importPreview.ai && (importPreview.ai.summary || (importPreview.ai.bullets?.length ?? 0) > 0) && (
                             <div className="pt-3 border-t border-zinc-800 space-y-2">
                                 <div className="text-[10px] font-black uppercase text-ea-green-400">Sugestie AI</div>
@@ -516,7 +562,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                             <p className="text-[10px] text-amber-500/90">AI indisponibil: lipsește OPENAI_API_KEY pe server.</p>
                         )}
                     </div>
-                )}
+                    )}
             </div>
 
             <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800">

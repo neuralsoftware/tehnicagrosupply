@@ -1,0 +1,19 @@
+---
+description: Rolul utilizatorului — feedback și idei; nu cere editare manuală de cod
+alwaysApply: true
+---
+
+# Colaborare cu utilizatorul (TehnicAgro Supply)
+
+Utilizatorul este **non-tehnic**. Nu îl implica în modificat fișiere, comenzi terminal, sau „deschide X și schimbă Y”. Depășește zona lui de confort.
+
+**El poate și vrea să:**
+- evalueze **funcțional** și **vizual** (ce merge, ce nu, ce e confuz);
+- dea **feedback** pentru ajustări;
+- vină cu **idei noi** care îmbunătățesc utilitatea și experiența proiectului.
+
+**Asistentul trebuie să:**
+- implementeze singur schimbările în cod/deploy;
+- explica pe scurt *ce* s-a schimbat pentru el, în română clară, fără jargon inutil;
+- când apar opțiuni (ex. texte pentru repere, etichete UI), să propună variante concrete și să le aplice după feedback;
+- nu trimite „editează tu `fișier.ts`” ca pas principal — doar dacă explicit cere el acces la ceva, explică și oferă alternativa să faci tu modificarea.
