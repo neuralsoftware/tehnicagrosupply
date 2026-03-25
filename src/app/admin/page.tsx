@@ -30,7 +30,6 @@ export default function AdminPage() {
     const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
     const [allProducts, setAllProducts] = useState<DynamicProduct[]>([]);
     const [adminAuth, setAdminAuth] = useState('');
-    const [refreshKey, setRefreshKey] = useState(0);
 
     const fetchProducts = async () => {
         try {
@@ -73,10 +72,12 @@ export default function AdminPage() {
         }
         setCheckingAuth(false);
 
-        // Auto-refresh data when user returns to this tab/window
-        const onFocus = () => setRefreshKey(k => k + 1);
-        window.addEventListener('focus', onFocus);
-        return () => window.removeEventListener('focus', onFocus);
+        // Reîmprospătează lista de produse când revii pe tab-ul browserului — fără remount (nu pierzi formularele).
+        const onVisibility = () => {
+            if (document.visibilityState === 'visible') fetchProducts();
+        };
+        document.addEventListener('visibilitychange', onVisibility);
+        return () => document.removeEventListener('visibilitychange', onVisibility);
     }, []);
 
     if (checkingAuth) {
@@ -155,7 +156,6 @@ export default function AdminPage() {
                             key={tab.id}
                             onClick={() => {
                                 setActiveTab(tab.id as Tab);
-                                setRefreshKey((k) => k + 1);
                                 fetchProducts();
                             }}
                             className={`flex items-center gap-2 px-5 py-3 text-[11px] font-black uppercase tracking-widest border-b-2 transition-all ${activeTab === tab.id ? 'border-ea-green-500 text-ea-green-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'}`}
@@ -167,21 +167,22 @@ export default function AdminPage() {
             </div>
 
             <div className="max-w-[1400px] mx-auto px-6 py-8">
-                {activeTab === 'catalog' && (
-                    <CatalogTab key={refreshKey} adminAuth={adminAuth} categories={categories} />
-                )}
-                {activeTab === 'brochura' && (
-                    <BrochuraTab key={refreshKey} adminAuth={adminAuth} allProducts={allProducts} />
-                )}
-                {activeTab === 'categorii' && (
-                    <CategoriiTab key={refreshKey} adminAuth={adminAuth} onCategoriesChange={setCategories} />
-                )}
-                {activeTab === 'programe' && (
-                    <ProgrameTab key={refreshKey} adminAuth={adminAuth} />
-                )}
-                {activeTab === 'materiale' && (
-                    <MaterialeTab key={refreshKey} adminAuth={adminAuth} allProducts={allProducts} />
-                )}
+                {/* Tab-urile rămân montate (hidden) ca să nu se piardă textul la schimbarea tab-ului sau la revenirea din alt tab browser */}
+                <div className={activeTab === 'catalog' ? 'block' : 'hidden'}>
+                    <CatalogTab adminAuth={adminAuth} categories={categories} />
+                </div>
+                <div className={activeTab === 'brochura' ? 'block' : 'hidden'}>
+                    <BrochuraTab adminAuth={adminAuth} allProducts={allProducts} />
+                </div>
+                <div className={activeTab === 'categorii' ? 'block' : 'hidden'}>
+                    <CategoriiTab adminAuth={adminAuth} onCategoriesChange={setCategories} />
+                </div>
+                <div className={activeTab === 'programe' ? 'block' : 'hidden'}>
+                    <ProgrameTab adminAuth={adminAuth} />
+                </div>
+                <div className={activeTab === 'materiale' ? 'block' : 'hidden'}>
+                    <MaterialeTab adminAuth={adminAuth} allProducts={allProducts} />
+                </div>
             </div>
         </div>
     );

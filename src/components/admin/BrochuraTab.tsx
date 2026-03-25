@@ -238,6 +238,10 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
                             <label className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">
                                 Link producător / fișă tehnică (PDF)
                             </label>
+                            <p className="text-[10px] text-zinc-600 leading-relaxed">
+                                Un singur câmp pentru pagina principală a producătorului. Mai jos, „Adaugă link” adaugă rânduri extra
+                                (etichetă + URL), ex. catalog PDF, fișă DE, video — fiecare cu nume propriu în broșură.
+                            </p>
                             <input
                                 value={draft.manufacturerUrl || ''}
                                 onChange={(e) =>
