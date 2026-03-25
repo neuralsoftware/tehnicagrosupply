@@ -29,8 +29,8 @@ const CATEGORY_SEO: Record<string, { title: string; description: string; keyword
     },
     'semanat-fertilizat': {
         title: 'Semănătoare No-Till & Fertilizat | Avers-Agro | TehnicAgro Supply',
-        description: 'Semănători directe No-Till eligibile APIA PD-04. Avers-Agro Green Plains ADS — 190 kg presiune brăzdar, suspensie paralelogram. Calculează subvenția fermei tale.',
-        keywords: ['semanatoare no-till', 'semanatoare directa', 'avers agro green plains', 'semanatoare apia pd-04', 'semanatoare no-till pret', 'semanatoare directa romania'],
+        description: 'Semănători directe No-Till eligibile APIA PD-04. Avers-Agro Multisem ADS — 190 kg presiune brăzdar, suspensie paralelogram. Calculează subvenția fermei tale.',
+        keywords: ['semanatoare no-till', 'semanatoare directa', 'avers agro multisem ads', 'semanatoare apia pd-04', 'semanatoare no-till pret', 'semanatoare directa romania'],
     },
     'protectia-plantelor': {
         title: 'Utilaje Protecția Plantelor Agricole | TehnicAgro Supply',

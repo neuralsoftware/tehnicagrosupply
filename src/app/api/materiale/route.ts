@@ -12,6 +12,7 @@ import {
     ProductBrochureProfile,
     getBrochureProfilesMap,
     mergeProductForPdf,
+    normalizeLegacyProductSlug,
 } from '@/lib/products-store';
 import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps, Image, Font } from '@react-pdf/renderer';
 import { FUNDING_PROGRAMS } from '@/data/funding-programs';
@@ -19,7 +20,7 @@ import { CATEGORIES as CATEGORY_LABELS } from '@/data/products';
 import {
     PDF_COMPANY,
     PDF_BRANDS_INTRO,
-    PDF_BRANDS_SOURCE_NOTE,
+    PDF_DOCUMENTATION_NOTE,
     PDF_BRAND_CARDS,
     getCategoryPdfCopy,
 } from '@/data/pdf-materiale-copy';
@@ -206,6 +207,59 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8fafc',
         marginTop: 4,
     },
+    unifiedSpecsBox: {
+        marginTop: 6,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        padding: 10,
+        backgroundColor: '#f8fafc',
+    },
+    specLineDetailCompact: { fontSize: 7.5, color: COLORS.textMuted, lineHeight: 1.32, marginBottom: 2 },
+    advantageBulletUnderlined: {
+        fontSize: 10,
+        color: COLORS.text,
+        lineHeight: 1.45,
+        marginBottom: 9,
+        marginLeft: 10,
+        textDecoration: 'underline',
+        textDecorationColor: COLORS.primary,
+        fontFamily: 'Roboto',
+        fontWeight: 500,
+    },
+    productGalleryStrip: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        marginTop: 12,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: COLORS.border,
+    },
+    productGalleryThumbCell: {
+        width: '23%',
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 6,
+        padding: 4,
+        backgroundColor: COLORS.white,
+        marginBottom: 6,
+    },
+    contactFooterBand: {
+        marginTop: 28,
+        paddingTop: 20,
+        borderTopWidth: 1,
+        borderTopColor: COLORS.border,
+        alignItems: 'center' as const,
+    },
+    contactLogoImg: { width: 130, height: 40, objectFit: 'contain' as const, marginBottom: 12 },
+    contactDocNote: {
+        fontSize: 7.5,
+        color: COLORS.textSubtle,
+        lineHeight: 1.45,
+        textAlign: 'center' as const,
+        maxWidth: 420,
+    },
     brandPageCard: {
         marginBottom: 14,
         padding: 14,
@@ -288,6 +342,7 @@ const styles = StyleSheet.create({
         paddingTop: HEADER_BLOCK + 8,
         paddingBottom: FOOTER_BLOCK + 12,
         justifyContent: 'flex-start' as const,
+        flexDirection: 'column' as const,
     },
     contactTitle: {
         fontSize: 22,
@@ -317,28 +372,33 @@ const ProductImage = ({
     catalog,
     compact,
     galleryThumb,
+    stripThumb,
 }: {
     url?: string;
     fallback?: string;
     catalog?: boolean;
     compact?: boolean;
     galleryThumb?: boolean;
+    /** Miniaturi bandă sub fișa produsului */
+    stripThumb?: boolean;
 }) => {
     if (!url) {
-        const h = galleryThumb ? 80 : compact ? 72 : catalog ? 200 : 220;
-        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || galleryThumb ? 0 : 14 } },
+        const h = stripThumb ? 56 : galleryThumb ? 80 : compact ? 72 : catalog ? 200 : 220;
+        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || galleryThumb || stripThumb ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
     }
     const absolute = resolvePublicUrl(url);
     const safeJpgUrl = `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=jpg&w=800`;
-    const imgStyle = galleryThumb
-        ? { width: '100%', height: 80, objectFit: 'contain' as const }
-        : compact
-          ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
-          : catalog
-            ? { width: '100%', height: 200, objectFit: 'contain' as const }
-            : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
+    const imgStyle = stripThumb
+        ? { width: '100%', height: 56, objectFit: 'contain' as const }
+        : galleryThumb
+          ? { width: '100%', height: 80, objectFit: 'contain' as const }
+          : compact
+            ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
+            : catalog
+              ? { width: '100%', height: 200, objectFit: 'contain' as const }
+              : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
     return React.createElement(Image, { src: safeJpgUrl, style: imgStyle });
 };
 
@@ -429,14 +489,6 @@ function flattenDetailedSpecLines(product: DynamicProduct): SpecPdfLine[] {
     return out;
 }
 
-function specLinesToElements(lines: SpecPdfLine[], keyBase: string): React.ReactElement[] {
-    return lines.map((sl, i) =>
-        sl.kind === 'group'
-            ? React.createElement(Text, { key: `${keyBase}-g-${i}`, style: styles.specDetailGroup }, sl.text)
-            : React.createElement(Text, { key: `${keyBase}-l-${i}`, style: styles.specDetailLine }, sl.text)
-    );
-}
-
 /** Indicativ preț / eligibilitate — rămâne pe pagina principală produs */
 function renderProductMetaOnly(product: DynamicProduct): React.ReactElement[] {
     const parts: string[] = [];
@@ -446,20 +498,46 @@ function renderProductMetaOnly(product: DynamicProduct): React.ReactElement[] {
     return [React.createElement(Text, { key: 'meta', style: styles.productMetaStrip }, parts.join(' · '))];
 }
 
-/** Coloană dreaptă: poze suplimentare în casete, pe verticală */
-function renderSupplementaryGalleryColumn(urls: string[], productName: string | undefined, keyBase: string): React.ReactElement {
-    return React.createElement(
-        View,
-        { style: styles.zigZagGalleryCol },
-        React.createElement(Text, { style: styles.zigZagGalleryTitle }, 'Imagini suplimentare'),
-        ...urls.map((u, i) =>
-            React.createElement(
-                View,
-                { key: `${keyBase}-gcol-${i}`, style: styles.zigZagGalleryThumb },
-                React.createElement(ProductImage, { url: u, fallback: productName, galleryThumb: true })
-            )
-        )
+/** O singură casetă: specificații din catalog + detalii din JSON, fără denumire „extinse” separată */
+function renderUnifiedTechnicalSpecs(product: DynamicProduct): React.ReactElement {
+    const parts: React.ReactElement[] = [];
+    parts.push(
+        React.createElement(Text, { key: 'utt', style: { ...styles.blockTitle, marginTop: 2, marginBottom: 6 } }, 'Specificații tehnice')
     );
+    if (Array.isArray(product.specs) && product.specs.length > 0) {
+        product.specs.forEach((spec, i) => {
+            parts.push(
+                React.createElement(View, { key: `sp-${i}`, style: styles.specItem },
+                    React.createElement(View, { style: styles.specDot }),
+                    React.createElement(Text, { style: styles.specText }, spec || '')
+                )
+            );
+        });
+    }
+    const detLines = flattenDetailedSpecLines(product);
+    if (detLines.length > 0) {
+        if (product.specs?.length) {
+            parts.push(React.createElement(View, { key: 'sp-div', style: { height: 8 } }));
+        }
+        detLines.forEach((sl, i) => {
+            parts.push(
+                sl.kind === 'group'
+                    ? React.createElement(Text, { key: `dg-${i}`, style: styles.specDetailGroup }, sl.text)
+                    : React.createElement(Text, { key: `dl-${i}`, style: styles.specLineDetailCompact }, sl.text)
+            );
+        });
+    }
+    if (parts.length === 1) {
+        parts.push(
+            React.createElement(Text, { key: 'ph', style: { ...styles.specText, fontStyle: 'italic' } }, 'Date tehnice complete la cerere.')
+        );
+    }
+    return React.createElement(View, { style: styles.unifiedSpecsBox }, ...parts);
+}
+
+function pdfCatalogLogoUrl(): string {
+    const absolute = resolvePublicUrl('/logos/tehnicagro-supply-logo-catalog.png');
+    return `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=png&w=320`;
 }
 
 const renderPageHeader = (title: string) => (
@@ -533,7 +611,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
             renderPageFooter(currentPage += 1, config.phone)
         ),
 
-        // PAGINA 3–4: PRODUCĂTORI (două foi — spațiu pentru fișe complete + notă documentare)
+        // PAGINA 3–4: PRODUCĂTORI (două foi; nota „documentare” este pe ultima pagină)
         React.createElement(Page, { size: 'A4', style: styles.page },
             renderPageHeader('PRODUCĂTORI · I'),
             React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 40, paddingHorizontal: MARGIN, flex: 1 } },
@@ -562,10 +640,6 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                             React.createElement(Text, { key: `bp2-${ci}-${pi}`, style: styles.mainText }, para)
                         )
                     )
-                ),
-                React.createElement(View, { style: styles.brandSourceBox },
-                    React.createElement(Text, { style: { ...styles.subsectionTitle, marginTop: 0 } }, 'Documentare și completări'),
-                    React.createElement(Text, { style: styles.brandSourceText }, PDF_BRANDS_SOURCE_NOTE)
                 )
             ),
             renderPageFooter(currentPage += 1, config.phone)
@@ -593,6 +667,18 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     ...introParagraphs.map((p, i) =>
                         React.createElement(Text, { key: `cp${i}`, style: styles.mainText }, p)
                     ),
+                    ...(copy.advantageBullets && copy.advantageBullets.length > 0
+                        ? [
+                              React.createElement(Text, { key: 'adv-title', style: styles.subsectionTitle }, copy.advantagesSectionTitle || 'Avantaje tehnice'),
+                              ...copy.advantageBullets.map((b, i) =>
+                                  React.createElement(
+                                      Text,
+                                      { key: `adv-${i}`, style: styles.advantageBulletUnderlined },
+                                      `• ${b}`
+                                  )
+                              ),
+                          ]
+                        : []),
                     React.createElement(Text, { style: styles.subsectionTitle }, 'Aspecte utile în această secțiune'),
                     ...copy.bullets.map((b, i) =>
                         React.createElement(Text, { key: `cb${i}`, style: styles.bulletText }, `• ${b}`)
@@ -624,11 +710,8 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                       )
                     : null;
 
-            // 2. Produsele: pag. A = imagine stânga + text dreapta; pag. B+ = zig-zag (spec stânga / galerie dreapta) + foi doar pentru specificații extinse
-            const SPEC_LINES_WITH_GALLERY = 18;
-            const SPEC_LINES_FULL_PAGE = 34;
-
-            const productPages = catProducts.flatMap((product, idx) => {
+            // 2. Produse: o singură fișă — specificații unificate, verdict și finanțare la final; bandă opțională de imagini fără titlu
+            const productPages = catProducts.map((product, idx) => {
                 const progList = (product?.category && (FUNDING_PROGRAMS as any)[product.category]) || [];
                 const activePrograms = Array.isArray(progList) ? progList.filter((p: any) => p.status === 'active').slice(0, 1) : [];
 
@@ -636,17 +719,12 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                 const secTitle = categoryDisplayName(catName, categoriesFromDb);
                 const extraGallery = (
                     Array.isArray(product.gallery)
-                        ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 6)
+                        ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 4)
                         : []
                 ) as string[];
                 const pSlug = product?.slug || `p-${catName}-${idx}`;
-                let specRemaining = flattenDetailedSpecLines(product);
-                const hasGallery = extraGallery.length > 0;
-                const hasSpecs = specRemaining.length > 0;
 
-                const mainPage = React.createElement(
-                    Page,
-                    { size: 'A4', style: styles.page, key: `p1-${pSlug}` },
+                return React.createElement(Page, { size: 'A4', style: styles.page, key: `p-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productLayout },
                         product?.badge &&
@@ -670,16 +748,8 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                     { style: styles.pdfDisclaimer },
                                     'Informații sintetizate și prezentate de TehnicAgro Supply. Parametrii tehnici pot fi detaliați în oferta comercială.'
                                 ),
-                                React.createElement(View, { style: styles.catalogSpecsWrap },
-                                    React.createElement(Text, { style: styles.blockTitle }, 'Specificații tehnice'),
-                                    Array.isArray(product?.specs) && product.specs.length > 0
-                                        ? product.specs.slice(0, 8).map((spec, i) =>
-                                            React.createElement(View, { key: i, style: styles.specItem },
-                                                React.createElement(View, { style: styles.specDot }),
-                                                React.createElement(Text, { style: styles.specText }, spec || '')
-                                            ))
-                                        : React.createElement(Text, { style: { ...styles.specText, fontStyle: 'italic' } }, 'Contactați-ne pentru tabelul complet de specificații.')
-                                ),
+                                renderUnifiedTechnicalSpecs(product),
+                                ...renderProductMetaOnly(product),
                                 product?.expertVerdict &&
                                     React.createElement(View, { style: styles.verdictBox },
                                         React.createElement(Text, { style: styles.verdictTitle }, 'Verdictul expertului tehnic'),
@@ -689,76 +759,24 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                     React.createElement(View, { style: styles.fundingBox },
                                         React.createElement(Text, { style: styles.fundingTitle }, 'Finanțare — informare generală'),
                                         React.createElement(Text, { style: styles.fundingText }, `${activePrograms[0].title || ''} (${activePrograms[0].maxGrant || 'condiții în ghidul oficial'}). Text orientativ; eligibilitatea se stabilește doar după reglementările în vigoare și dosarul dumneavoastră — nu întocmim noi dosarul.`)
-                                    ),
-                                ...renderProductMetaOnly(product)
+                                    )
                             )
-                        )
+                        ),
+                        extraGallery.length > 0 &&
+                            React.createElement(
+                                View,
+                                { style: styles.productGalleryStrip },
+                                ...extraGallery.map((u, gi) =>
+                                    React.createElement(
+                                        View,
+                                        { key: `gst-${pSlug}-${gi}`, style: styles.productGalleryThumbCell },
+                                        React.createElement(ProductImage, { url: u, fallback: product?.name, stripThumb: true })
+                                    )
+                                )
+                            )
                     ),
                     renderPageFooter(currentPage += 1, config.phone)
                 );
-
-                const extraPages: React.ReactElement[] = [];
-
-                if (hasGallery) {
-                    const chunk0 = specRemaining.slice(0, SPEC_LINES_WITH_GALLERY);
-                    specRemaining = specRemaining.slice(SPEC_LINES_WITH_GALLERY);
-                    extraPages.push(
-                        React.createElement(Page, { key: `pzz-${pSlug}`, size: 'A4', style: styles.page },
-                            renderPageHeader(secTitle.toUpperCase()),
-                            React.createElement(View, { style: styles.productContLayout },
-                                React.createElement(Text, { style: styles.productContHead }, `${product?.name || 'Produs'} — specificații detaliate și imagini`),
-                                React.createElement(View, { style: styles.zigZagRow },
-                                    React.createElement(View, { style: styles.zigZagSpecsCol },
-                                        React.createElement(View, { style: styles.zigZagSpecsBox },
-                                            React.createElement(Text, { style: { ...styles.blockTitle, marginTop: 0 } }, 'Specificații extinse'),
-                                            ...(chunk0.length > 0
-                                                ? specLinesToElements(chunk0, `zz-${pSlug}`)
-                                                : [
-                                                      React.createElement(
-                                                          Text,
-                                                          { key: 'zz-placeholder', style: styles.mainText },
-                                                          'Tabelul complet cu parametri urmează pe paginile următoare (dacă există). Alăturat: imagini suplimentare pentru identificarea configurației vizuale a modelului.'
-                                                      ),
-                                                  ])
-                                        )
-                                    ),
-                                    renderSupplementaryGalleryColumn(extraGallery, product?.name, pSlug)
-                                )
-                            ),
-                            renderPageFooter(currentPage += 1, config.phone)
-                        )
-                    );
-                }
-
-                let specCont = 0;
-                while (specRemaining.length > 0) {
-                    const take = specRemaining.slice(0, SPEC_LINES_FULL_PAGE);
-                    specRemaining = specRemaining.slice(SPEC_LINES_FULL_PAGE);
-                    const titleExt =
-                        specCont === 0 && !hasGallery
-                            ? 'Specificații extinse'
-                            : 'Specificații extinse (continuare)';
-                    extraPages.push(
-                        React.createElement(Page, { key: `pspec-${pSlug}-${specCont}`, size: 'A4', style: styles.page },
-                            renderPageHeader(secTitle.toUpperCase()),
-                            React.createElement(View, { style: styles.productContLayout },
-                                React.createElement(Text, { style: styles.productContHead }, product?.name || 'Produs'),
-                                React.createElement(View, { style: styles.specFullWidthBox },
-                                    React.createElement(Text, { style: { ...styles.blockTitle, marginTop: 0 } }, titleExt),
-                                    ...specLinesToElements(take, `sp-${pSlug}-${specCont}`)
-                                )
-                            ),
-                            renderPageFooter(currentPage += 1, config.phone)
-                        )
-                    );
-                    specCont += 1;
-                }
-
-                if (!hasGallery && !hasSpecs) {
-                    return [mainPage];
-                }
-
-                return [mainPage, ...extraPages];
             });
 
             return [introPageMain, ...(introPagePrograms ? [introPagePrograms] : []), ...productPages];
@@ -797,6 +815,10 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     React.createElement(Text, { style: styles.contactClosingText },
                         'Pentru o ofertă adaptată exploatației dumneavoastră (configurație utilaj, opționale, termene), ne puteți contacta la telefon sau e-mailul de mai sus. Acest PDF este document static; nu include elemente apăsabile — discutăm oferta direct pe canalele reale de comunicare.'
                     )
+                ),
+                React.createElement(View, { style: styles.contactFooterBand },
+                    React.createElement(Image, { src: pdfCatalogLogoUrl(), style: styles.contactLogoImg }),
+                    React.createElement(Text, { style: styles.contactDocNote }, PDF_DOCUMENTATION_NOTE)
                 )
             ),
             renderPageFooter(currentPage += 1, config.phone)
@@ -818,7 +840,8 @@ export async function POST(request: Request) {
         const categories: Category[] = await getCategories();
         const brochureProfiles: Record<string, ProductBrochureProfile> = await getBrochureProfilesMap();
         const selected: DynamicProduct[] = (productSlugs || [])
-            .map((s: string) => all.find((p: DynamicProduct) => p.slug === s))
+            .map((s: string) => normalizeLegacyProductSlug(String(s).trim()))
+            .map((slug: string) => all.find((p: DynamicProduct) => p.slug === slug))
             .filter((p: DynamicProduct | undefined): p is DynamicProduct => Boolean(p))
             .map((p: DynamicProduct) => mergeProductForPdf(p, brochureProfiles));
         if (selected.length === 0) return NextResponse.json({ error: 'Selectează produse valide' }, { status: 400 });

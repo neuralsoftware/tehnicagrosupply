@@ -2,7 +2,7 @@
 // To add a new product: create a .json file in src/data/products/[category]/
 // Dynamic products (added from Admin) are stored in Vercel Blob via products-store.ts
 
-import greenPlainsAds from './products/semanat-fertilizat/green-plains-ads.json';
+import multisemAds from './products/semanat-fertilizat/multisem-ads.json';
 import chainDiscKse680 from './products/pregatire-sol/chain-disc-kse-680.json';
 import powerbank from './products/recoltare-logistica/powerbank.json';
 import booster from './products/recoltare-logistica/booster.json';
@@ -34,7 +34,7 @@ export interface Product {
 
 // Static products — existente, neschimbate
 export const PRODUCTS: Product[] = [
-    greenPlainsAds as Product,
+    multisemAds as Product,
     chainDiscKse680 as Product,
     powerbank as Product,
     booster as Product,

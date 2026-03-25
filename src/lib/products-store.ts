@@ -14,6 +14,33 @@ const CATEGORIES_BLOB_KEY = 'catalog/categories.json';
 const MATERIALE_BLOB_KEY = 'catalog/materiale.json';
 const BROCHURE_PROFILES_BLOB_KEY = 'catalog/brochure-profiles.json';
 
+/** Slug-uri vechi salvate în Blob / istoric → slug canonic din cod (redirect URL în next.config). */
+const LEGACY_PRODUCT_SLUGS: Record<string, string> = {
+    'green-plains-ads': 'multisem-ads',
+};
+
+export function normalizeLegacyProductSlug(slug: string): string {
+    return LEGACY_PRODUCT_SLUGS[slug] || slug;
+}
+
+function normalizeDynamicProductRow(p: DynamicProduct): DynamicProduct {
+    const ns = normalizeLegacyProductSlug(p.slug);
+    if (ns === p.slug) return p;
+    let id = p.id;
+    if (p.id === 'avers-agro-green-plains-ads') id = 'avers-agro-multisem-ads';
+    return { ...p, slug: ns, id };
+}
+
+/** După remap, pot exista două rânduri cu același slug — păstrăm cel mai recent. */
+function dedupeDynamicProductsBySlug(products: DynamicProduct[]): DynamicProduct[] {
+    const bySlug = new Map<string, DynamicProduct>();
+    for (const p of products) {
+        const cur = bySlug.get(p.slug);
+        if (!cur || p.updatedAt > cur.updatedAt) bySlug.set(p.slug, p);
+    }
+    return Array.from(bySlug.values());
+}
+
 export interface ProductReferenceLink {
     label: string;
     url: string;
@@ -112,7 +139,8 @@ async function writeBlob<T>(key: string, data: T): Promise<string> {
 // ── PRODUCTS ──────────────────────────────────────────────
 
 export async function getProducts(): Promise<DynamicProduct[]> {
-    const dynamic = await readBlob<DynamicProduct[]>(PRODUCTS_BLOB_KEY, []);
+    const rawDynamic = await readBlob<DynamicProduct[]>(PRODUCTS_BLOB_KEY, []);
+    const dynamic = dedupeDynamicProductsBySlug(rawDynamic.map(normalizeDynamicProductRow));
     // Merge: static products converted to DynamicProduct shape, dynamic override
     const staticConverted: DynamicProduct[] = STATIC_PRODUCTS.map(p => ({
         ...p,
@@ -130,15 +158,17 @@ export async function getProducts(): Promise<DynamicProduct[]> {
 
 export async function getProductBySlug(slug: string): Promise<DynamicProduct | null> {
     const products = await getProducts();
-    return products.find(p => p.slug === slug) || null;
+    const canonical = normalizeLegacyProductSlug(slug);
+    return products.find(p => p.slug === canonical) || null;
 }
 
 export async function saveProduct(
     product: DynamicProduct,
     options?: { siteCatalogOnly?: boolean }
 ): Promise<void> {
+    product = normalizeDynamicProductRow(product);
     const current = await readBlob<DynamicProduct[]>(PRODUCTS_BLOB_KEY, []);
-    const idx = current.findIndex(p => p.slug === product.slug);
+    const idx = current.findIndex(p => normalizeLegacyProductSlug(p.slug) === product.slug);
     const now = new Date().toISOString();
     const base = idx >= 0 ? { ...current[idx] } : {};
     const merged: DynamicProduct = {
@@ -162,22 +192,38 @@ export async function saveProduct(
 }
 
 export async function deleteProduct(slug: string): Promise<void> {
+    const canonical = normalizeLegacyProductSlug(slug);
     const current = await readBlob<DynamicProduct[]>(PRODUCTS_BLOB_KEY, []);
-    await writeBlob(PRODUCTS_BLOB_KEY, current.filter(p => p.slug !== slug));
-    await deleteBrochureProfile(slug);
+    await writeBlob(
+        PRODUCTS_BLOB_KEY,
+        current.filter(p => normalizeLegacyProductSlug(p.slug) !== canonical)
+    );
+    await deleteBrochureProfile(canonical);
 }
 
 // ── BROCHURE PRODUCT PROFILES (PDF-only enrichment) ───────
 
 export async function getBrochureProfilesMap(): Promise<Record<string, ProductBrochureProfile>> {
-    return await readBlob<Record<string, ProductBrochureProfile>>(BROCHURE_PROFILES_BLOB_KEY, {});
+    const raw = await readBlob<Record<string, ProductBrochureProfile>>(BROCHURE_PROFILES_BLOB_KEY, {});
+    const out: Record<string, ProductBrochureProfile> = {};
+    for (const [key, prof] of Object.entries(raw)) {
+        const ns = normalizeLegacyProductSlug(key);
+        const prev = out[ns];
+        const next = { ...prof, slug: ns };
+        if (!prev || (prev.updatedAt || '') < (next.updatedAt || '')) out[ns] = next;
+    }
+    return out;
 }
 
 export async function saveBrochureProfile(
     slug: string,
     patch: Partial<Omit<ProductBrochureProfile, 'slug' | 'updatedAt'>>
 ): Promise<void> {
+    slug = normalizeLegacyProductSlug(slug);
     const map = await readBlob<Record<string, ProductBrochureProfile>>(BROCHURE_PROFILES_BLOB_KEY, {});
+    for (const k of Object.keys(map)) {
+        if (k !== slug && normalizeLegacyProductSlug(k) === slug) delete map[k];
+    }
     const prev = map[slug];
     map[slug] = {
         ...prev,
@@ -190,7 +236,10 @@ export async function saveBrochureProfile(
 
 export async function deleteBrochureProfile(slug: string): Promise<void> {
     const map = await readBlob<Record<string, ProductBrochureProfile>>(BROCHURE_PROFILES_BLOB_KEY, {});
-    delete map[slug];
+    const target = normalizeLegacyProductSlug(slug);
+    for (const k of Object.keys(map)) {
+        if (normalizeLegacyProductSlug(k) === target) delete map[k];
+    }
     await writeBlob(BROCHURE_PROFILES_BLOB_KEY, map);
 }
 
@@ -259,7 +308,11 @@ export async function deleteCategory(slug: string): Promise<void> {
 // ── BROCHURES ─────────────────────────────────────────────
 
 export async function getBrochures(): Promise<Brochure[]> {
-    return await readBlob<Brochure[]>(MATERIALE_BLOB_KEY, []);
+    const list = await readBlob<Brochure[]>(MATERIALE_BLOB_KEY, []);
+    return list.map((b) => ({
+        ...b,
+        productSlugs: [...new Set((b.productSlugs || []).map(normalizeLegacyProductSlug))],
+    }));
 }
 
 export async function saveBrochure(brochure: Brochure): Promise<void> {

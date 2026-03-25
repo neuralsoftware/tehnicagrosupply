@@ -62,7 +62,7 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             status: 'active',
             lastVerified: '2026-03-24',
             sourceUrl: 'https://www.apia.org.ro/ro/campania-2026/eco-scheme',
-            details: 'Eligibil pentru fermieri care practică No-Till sau Mini-Till. Semănătoarea directă trebuie să nu inverseze solul. Semănătorile de tip Avers-Agro Green Plains ADS îndeplinesc toate cerințele tehnice. Plata este per hectar, indiferent de dimensiunea fermei.',
+            details: 'Eligibil pentru fermieri care practică No-Till sau Mini-Till. Semănătoarea directă trebuie să nu inverseze solul. Semănătorile Avers-Agro Multisem ADS îndeplinesc toate cerințele tehnice. Plata este per hectar, indiferent de dimensiunea fermei.',
             notes: 'Activ — cerere 2026 în curs'
         },
         {

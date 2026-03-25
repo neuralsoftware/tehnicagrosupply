@@ -6,6 +6,10 @@
 export type CategoryPdfCopy = {
   paragraphs: string[];
   bullets: string[];
+  /** Titlu secțiune avantaje (dacă există bullets) */
+  advantagesSectionTitle?: string;
+  /** Avantaje evidențiate (subliniate în PDF) — ex. semănat în miriște */
+  advantageBullets?: string[];
   /** Subsecțiuni opționale — umplu pagina de categorie (ex. tehnica solului + cadrul programe) */
   subsections?: { title: string; paragraphs: string[]; bullets?: string[] }[];
 };
@@ -30,36 +34,36 @@ export const PDF_COMPANY = {
 export const PDF_BRANDS_INTRO = {
   title: 'Portofoliu mărci — în selecția TehnicAgro Supply',
   lead:
-    'Lucrăm cu producători recunoscuți la nivel european. Fișele de mai jos nu sunt texte oficiale „copiate” de pe site-uri: sunt sinteze TehnicAgro, pe care le putem completa sau adapta după dialogul cu dumneavoastră și după datele tehnice ale modelului ales.',
+    'Producători incluși în oferta comercială TehnicAgro Supply. Fișele sunt sinteze redactionale pentru acest document; pot fi completate din datele tehnice ale modelului comandat sau din corespondența cu echipa noastră.',
 };
 
-/** Notă reutilizabilă pe pagina de mărci — fără URL-uri (cerință document comercial) */
-export const PDF_BRANDS_SOURCE_NOTE =
-  'Pentru documentare internă, echipa folosește și materiale publice ale mărcilor (secțiuni „Despre noi”, fișe PDF tehnice, traduceri). În acest PDF nu listăm adrese web către producători; orice precizare suplimentară o obțineți prin contactul din ultima pagină.';
+/** Notă la finalul broșurii (ultima pagină) — fără URL-uri în PDF */
+export const PDF_DOCUMENTATION_NOTE =
+  'Documentare și completări: informațiile din broșură pot fi aprofundate din fișe tehnice și materiale publice ale mărcilor. În acest PDF nu sunt listate adrese web ale producătorilor; pentru clarificări, folosiți datele de pe ultima pagină.';
 
 export const PDF_BRAND_CARDS: { name: string; tagline: string; paragraphs: string[] }[] = [
   {
     name: 'Fliegl Agrartechnik',
-    tagline: 'Linia de atașamente — lucrări de sol (ex. grapă cu lanțuri de discuri)',
+    tagline: 'Utilaje pentru sol și miriște — grapă lanț-disc, pregătire pat germinativ',
     paragraphs: [
-      'În portofoliul Fliegl pentru zona Agro-Center / Attachment Line ne interesează în primul rând utilajele de lucrat solul: de exemplu soluții cu lanțuri de discuri pentru tocarea și uniformizarea miriști, refacerea patului germinativ, controlul buruienilor și integrarea resturilor în stratul superficial, adesea fără inversarea profundă a solului. Greutatea pe metru liniar, viteza de lucru și reglajele hidraulice trebuie alese după tipul de sol și cantitatea de rest vegetal.',
-      'Fliegl oferă și linii large de remorci și logistică recoltă; în fișa TehnicAgro pentru această broșură ne raportăm însă la zona de cultivatoare / discuri cu lanțuri (documentație tip „disc chain harrow” / grapă lanț-disc), nu la transportul recoltei. Parametrii concreti (lățime, masă, conexiuni hidraulice) se validează pe modelul ales și pe tractorul dumneavoastră.',
+      'Fliegl Agrartechnik este recunoscut la nivel european pentru soluții de mecanizare agricolă. În segmentul de lucrat solul, gama include utilaje cu lanțuri de discuri destinate tocării și nivelării miriștii, refacerii patului germinativ, fragmentării resturilor vegetale și menținerii stratului superficial fără arătură inversă profundă acolo unde strategia agronomică permite. Parametrii operaționali (greutate pe metru liniar, viteză, reglaje hidraulice) se dimensionează în funcție de tipul de sol, umiditate și cantitatea de biomasă rămasă după recoltă.',
+      'Pe lângă cultivatoare și grapă lanț-disc, portofoliul Fliegl acoperă și echipamente de transport și logistică în lanțul post-recoltă. În această broșură accentul rămâne pe tehnologia de gestionare a solului și a miriștii (ex. grapă cu lanțuri de discuri / disc chain harrow), aliniată cerințelor de acoperire a solului și practicilor conservative.',
     ],
   },
   {
     name: 'Avers-Agro',
     tagline: 'Pregătire sol, lucrări conservative, semănat de precizie',
     paragraphs: [
-      'Oferta Avers-Agro acoperă utilaje pentru afânare, tocarea resturilor vegetale și linii de semănat adaptate lucrărilor conservative: semănat direct, mini-till sau strip-till, în funcție de model. Alegerea depinde de structura solului, de nivelul de rest vegetal și de strategia de rotație.',
-      'În practică, semănatul direct în miriște cere uniformitate la adâncime, presiune controlată la coute și evitarea compactării locale în urma deschiderii; aceste detalii sunt punctul în care se compară variante între ele, nu doar lățimea de lucru.',
+      'Avers-Agro oferă utilaje pentru afânare, prelucrarea resturilor vegetale și semănători pentru agricultură conservativă: semănat direct, mini-till sau strip-till, în funcție de configurație. Alegerea tehnică ține de structura solului, de nivelul de rest vegetal și de rotația culturilor.',
+      'Semănatul direct în miriște solicită adâncime uniformă, presiune controlată pe brăzdar și evitarea compactării locale în urma deschiderii; aceste criterii diferențiază variantele de echipament mai mult decât simpla lățime de lucru.',
     ],
   },
   {
     name: 'K-Factor',
-    tagline: 'Bunkere de câmp — transfer și stocare temporară pentru logistică la recoltă',
+    tagline: 'Bunkere de câmp — logistică între combina, câmp și transport',
     paragraphs: [
-      'K-Factor (Ucraina) este prezentă pe piață cu bunkere de reîncărcare / stocare („BOOSTER”, „POWERBANK” și serii conexe): echipamente pentru fluxul combinașului–câmp–transport, reducerea timpilor morți și păstrarea calității recoltei. În broșură ne raportăm la acest segment logistic, deschis pe site-ul public al mărcii (prezentare companie și produse), nu la utilaje de împrăștiat îngrășăminte.',
-      'Alegerea volumului util, a sistemului de descărcare și a compatibilității cu liniile din fermă trece prin datele tehnice ale modelului și prin masa tractorului de tragere / autonomie — oferta concretă din selecția TehnicAgro se discută la cerere.',
+      'K-Factor (Ucraina) produce bunkere de reîncărcare și stocare temporară („BOOSTER”, „POWERBANK” și serii conexe), destinate fluxului combina–câmp–transport: reducerea timpilor morți, menținerea ritmului de recoltă și protejarea calității recoltei. În document se prezintă acest segment logistic, distinct de echipamentele de aplicare a îngrășămintelor.',
+      'Volumul util, sistemul de descărcare și compatibilitatea cu tractorul sau cu liniile din fermă se stabilesc din fișa modelului și din masa antrenată — configurația concretă din selecția TehnicAgro Supply se validează la ofertare.',
     ],
   },
 ];
@@ -78,16 +82,24 @@ export const PDF_CATEGORY_COPY: Record<string, CategoryPdfCopy> = {
     ],
   },
   'semanat-fertilizat': {
+    advantagesSectionTitle: 'Avantaje — semănat direct în miriște',
     paragraphs: [
-      'Semănatul și fertilizarea de precizie cer uniformitate la sol, dozare controlată și, acolo unde e cazul, corelare cu hărți sau sistem GPS. Produsele din secțiune includ semănători, mașini de împrăștiat îngrășăminte și accesorii aferente.',
-      'Semănatul direct în miriște (fără arătură clasică în prealabil) este o tehnică tot mai folosită în cultura mare: reduce pierderile de apă, păstrează structura și sprijină menținerea acoperirii solului conform condiționalităților de mediu, cu condiția respectării normelor de înființare a culturii și a reglajelor utilajului.',
-      'Combinația dintre presiune la coute, viteza de mers înainte și calibrarea dozatorului decide uniformitatea în rând; orice compromis se reflectă în ritmul de creștere și poate impune refaceri locale ale rândului.',
+      'Semănatul și fertilizarea de precizie cer uniformitate la sol, dozare controlată și, acolo unde este cazul, corelare cu hărți sau GPS. Produsele din secțiune includ semănători, mașini de împrăștiat îngrășăminte și accesorii.',
+      'Semănatul direct în miriște (fără arătură clasică în prealabil) se răspândește în cultura mare: limitează pierderile de apă, păstrează structura și sprijină acoperirea solului conform condiționalităților de mediu, cu respectarea normelor de înființare și a reglajelor utilajului.',
+      'Uniformitatea în rând depinde în mod decisiv de presiunea pe brăzdar, de viteza înaintării și de calibrarea dozatorului; abaterile se reflectă în ritmul de creștere și pot impune intervenții locale pe rând.',
+    ],
+    advantageBullets: [
+      'Mai puține treceri mecanizate și economie de combustibil față de sistemele cu arat clasic repetat',
+      'Conservarea apei și a structurii solului; limitarea erodării și a tasării excesive',
+      'Menținerea resturilor vegetale la suprafață — utilă pentru cerințe de mediu și eco-scheme',
+      'Trecere progresivă spre un sistem cu mai puțină perturbare a stratului arabil',
+      'Potrivire cu semănători și fertilizare de precizie când reglajele sunt menținute în toleranță',
     ],
     bullets: [
       'Precizie la dozare și distribuție pe lățimea de lucru',
       'Întreținere și calibrare — conform manualului producătorului',
       'Combinații posibile cu tractoare din clasa de putere recomandată',
-      'Compatibilitate tehnică cu lucrările conservative (fără inversarea stratului superficial acolo unde strategia o exclude)',
+      'Compatibilitate tehnică cu lucrările conservative fără inversarea stratului superficial acolo unde strategia o exclude',
     ],
     subsections: [
       {
@@ -97,7 +109,7 @@ export const PDF_CATEGORY_COPY: Record<string, CategoryPdfCopy> = {
           'Programele cu finanțare nerambursabilă pentru investiții (ex. sesiuni AFIR) se publică ca ghiduri oficiale; tipul de utilaj eligibil, intensitatea ajutorului și termenele depind de sesiune și de categoria de beneficiar. Nu oferim consultanță juridică sau întocmire dosar — putem indica, la cerere, direcția de documentare și corespondența cu fișa tehnică a utilajului din selecția noastră.',
         ],
         bullets: [
-          'Eco-schema „agricultură conservativă” (informare PD-04 în datele admin) este relevantă acolo unde practica dumneavoastră îndeplinește condițiile din ghidul APIA — verificare obligatorie înainte de decizie',
+          'Eco-schema „agricultură conservativă” (informare PD-04 în datele admin) este relevantă acolo unde practica îndeplinește condițiile din ghidul APIA — verificare obligatorie înainte de decizie',
           'Orice sumă sau prag menționat pe o fișă de produs este orientativ; valori definitive doar în actele oficiale ale schemei pentru anul de campanie',
         ],
       },

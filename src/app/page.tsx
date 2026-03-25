@@ -22,7 +22,7 @@ export default function Home() {
                 "name": "Ce este subvenția APIA PD-04 și cum o pot accesa?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Eco-schema PD-04 oferă 56 EUR/ha pentru agricultura conservativă (No-Till, Mini-Till). Pentru a fi eligibil, trebuie să folosești utilaje care nu inversează solul și să menții resturile vegetale la suprafață. Semănătoarea Avers-Agro Green Plains îndeplinește toate cerințele."
+                    "text": "Eco-schema PD-04 oferă 56 EUR/ha pentru agricultura conservativă (No-Till, Mini-Till). Pentru a fi eligibil, trebuie să folosești utilaje care nu inversează solul și să menții resturile vegetale la suprafață. Semănătoarea Avers-Agro Multisem ADS îndeplinește toate cerințele."
                 }
             },
             {

@@ -32,7 +32,7 @@ export const BLOG_POSTS: BlogPost[] = [
       <h3>Condiția tehnică esențială: ce utilaje sunt acceptate?</h3>
       <p>PD-04 acceptă exclusiv tehnologii care <strong>nu întorc brazda</strong>. Concret, trebuie să poți demonstra că ai cultivat cu:</p>
       <ul>
-        <li>Semănătoare directă (No-Till) — ex. <a href="/utilaje/semanat-fertilizat/green-plains-ads">Avers-Agro Green Plains ADS</a></li>
+        <li>Semănătoare directă (No-Till) — ex. <a href="/utilaje/semanat-fertilizat/multisem-ads">Avers-Agro Multisem ADS</a></li>
         <li>Semănătoare cu prelucrare minimă (Mini-Till sau Strip-Till)</li>
       </ul>
       <p>Utilajele de tip grăpat cu discuri clasice (cu arat) <strong>nu îndeplinesc</strong> condiția. Asigură-te că utilajul tău este corect documentat.</p>
@@ -46,7 +46,7 @@ export const BLOG_POSTS: BlogPost[] = [
       </ol>
 
       <h3>Cum îți simplificăm noi procesul</h3>
-      <p>TehnicAgro Supply oferă consultanță tehnică gratuită pentru documentarea utilajului în dosar. <a href="/#contact">Contactează-ne</a> și îți pregătim un raport tehnic al <a href="/utilaje/semanat-fertilizat/green-plains-ads">semănătorii Avers-Agro</a> valabil ca dovadă pentru inspectorii APIA.</p>
+      <p>TehnicAgro Supply oferă consultanță tehnică gratuită pentru documentarea utilajului în dosar. <a href="/#contact">Contactează-ne</a> și îți pregătim un raport tehnic al <a href="/utilaje/semanat-fertilizat/multisem-ads">semănătorii Avers-Agro</a> valabil ca dovadă pentru inspectorii APIA.</p>
     `,
     author: 'Echipa TehnicAgro',
     date: '2026-03-10',
@@ -74,8 +74,8 @@ export const BLOG_POSTS: BlogPost[] = [
         </tbody>
       </table>
 
-      <h3>Semănătoarea Avers-Agro Green Plains ADS — specificații tehnice</h3>
-      <p>Cea mai versatilă soluție de pe piața românească: <a href="/utilaje/semanat-fertilizat/green-plains-ads">Avers-Agro Green Plains ADS</a> funcționează în No-Till, Mini-Till și convențional — deci tranziția este progresivă, nu bruscă.</p>
+      <h3>Semănătoarea Avers-Agro Multisem ADS — specificații tehnice</h3>
+      <p>Cea mai versatilă soluție de pe piața românească: <a href="/utilaje/semanat-fertilizat/multisem-ads">Avers-Agro Multisem ADS</a> funcționează în No-Till, Mini-Till și convențional — deci tranziția este progresivă, nu bruscă.</p>
       <ul>
         <li>Presiune brăzdar reglabilă până la 190 kg — penetrează orice miriște</li>
         <li>Suspensie paralelogram independent — adâncime constantă indiferent de relief</li>
@@ -111,7 +111,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
       <h3>Utilaje eligibile din portofoliul TehnicAgro</h3>
       <ul>
-        <li><strong><a href="/utilaje/semanat-fertilizat/green-plains-ads">Semănătoarea Avers-Agro Green Plains ADS</a></strong> — eligibilă categoria „Semănători"</li>
+        <li><strong><a href="/utilaje/semanat-fertilizat/multisem-ads">Semănătoarea Avers-Agro Multisem ADS</a></strong> — eligibilă categoria „Semănători"</li>
         <li><strong><a href="/utilaje/pregatire-sol/chain-disc-kse-680">Fliegl Chain Disc KSE 680</a></strong> — eligibilă categoria „Utilaje pregătire sol"</li>
         <li><strong><a href="/utilaje/recoltare-logistica/powerbank">K-Factor Powerbank</a></strong> — eligibilă categoria „Remorci agricole"</li>
       </ul>
@@ -149,7 +149,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
       <h3>Greșeala #3: Utilizarea unui utilaj neeligibil pe parcelele PD-04</h3>
       <p>PD-04 impune tehnologie care nu întoarce brazda. Dacă folosești ogorul convențional pe o parcelă declarată No-Till, pierzi integral subvenția PD-04 pentru acea suprafață și riști penalizarea la celelalte subvenții.</p>
-      <p><strong>Soluție:</strong> <a href="/utilaje/semanat-fertilizat/green-plains-ads">Semănătoarea Avers-Agro Green Plains ADS</a> este certificată pentru No-Till — poți folosi factura ca dovadă tehnică în dosar.</p>
+      <p><strong>Soluție:</strong> <a href="/utilaje/semanat-fertilizat/multisem-ads">Semănătoarea Avers-Agro Multisem ADS</a> este certificată pentru No-Till — poți folosi factura ca dovadă tehnică în dosar.</p>
 
       <h3>Greșeala #4: Ignorarea standardului GAEC 6</h3>
       <p>GAEC 6 impune acoperirea a 80% din suprafața arabilă în intervalul 15 Iunie – 30 Septembrie. Solul „negru" (neacoperit) în această perioadă duce la <strong>reducerea subvenției de bază</strong>, nu doar a eco-schemelor.</p>
@@ -197,7 +197,7 @@ export const BLOG_POSTS: BlogPost[] = [
       </ul>
 
       <h3>Potrivire cu sistemul TehnicAgro</h3>
-      <p>Combinația <a href="/utilaje/pregatire-sol/chain-disc-kse-680">Fliegl KSE 680</a> + <a href="/utilaje/semanat-fertilizat/green-plains-ads">Avers-Agro Green Plains ADS</a> formează un sistem complet de agricultură conservativă: Chain Disc-ul pregătește resturile, semănătoarea No-Till seamănă direct — două treceri în loc de cinci.</p>
+      <p>Combinația <a href="/utilaje/pregatire-sol/chain-disc-kse-680">Fliegl KSE 680</a> + <a href="/utilaje/semanat-fertilizat/multisem-ads">Avers-Agro Multisem ADS</a> formează un sistem complet de agricultură conservativă: Chain Disc-ul pregătește resturile, semănătoarea No-Till seamănă direct — două treceri în loc de cinci.</p>
       <p><a href="/#contact">Solicită o demonstrație tehnică</a> sau <a href="/#audit">calculează ROI-ul</a> pentru ferma ta.</p>
     `,
     author: 'Echipa TehnicAgro',
@@ -238,7 +238,7 @@ export const BLOG_POSTS: BlogPost[] = [
       <p><strong>Total beneficiu anual estimat: 66.640 RON / 100 ha</strong></p>
 
       <h3>Utilizajul recomandat pentru aceste economii</h3>
-      <p><a href="/utilaje/semanat-fertilizat/green-plains-ads">Semănătoarea Avers-Agro Green Plains ADS</a> este soluția care face posibil acest scenariu. Sistemul de suspensie paralelogram asigură adâncimea constantă chiar și în soluri dificile — condiție esențială pentru răsărirea uniformă în No-Till.</p>
+      <p><a href="/utilaje/semanat-fertilizat/multisem-ads">Semănătoarea Avers-Agro Multisem ADS</a> este soluția care face posibil acest scenariu. Sistemul de suspensie paralelogram asigură adâncimea constantă chiar și în soluri dificile — condiție esențială pentru răsărirea uniformă în No-Till.</p>
       <p>Calculează exact pentru ferma ta cu <a href="/#audit">Calculatorul ROI TehnicAgro</a>.</p>
     `,
     author: 'Echipa TehnicAgro',
@@ -263,7 +263,7 @@ export const BLOG_POSTS: BlogPost[] = [
         <li>Interdicția arăturii clasice cu răsturnarea brazdei.</li>
       </ul>
 
-      <p>Utilajele precum semănătoarea <strong>Avers-Agro Green Plains</strong> sunt special concepute pentru a îndeplini aceste criterii, asigurând în același timp o răsărire uniformă.</p>
+      <p>Utilajele precum semănătoarea <strong>Avers-Agro Multisem ADS</strong> sunt special concepute pentru a îndeplini aceste criterii, asigurând în același timp o răsărire uniformă.</p>
     `,
     author: 'Echipa TehnicAgro',
     date: '2026-02-15',
@@ -284,7 +284,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
       <h3>Cum te ajută tehnologia TehnicAgro să te conformezi?</h3>
       <ul>
-        <li><strong>Semănătoarele Avers-Agro Green Plains:</strong> Permit înființarea culturilor direct în miriște (No-Till), fără a deranja stratul protector de resturi vegetale.</li>
+        <li><strong>Multisem ADS (Avers-Agro):</strong> permite înființarea culturilor direct în miriște (No-Till), fără a deranja stratul protector de resturi vegetale.</li>
         <li><strong>Fliegl Chain Disc:</strong> Ideal pentru gestionarea resturilor vegetale și a culturilor verzi prin tăiere și zdrobire superficială, fără a răsturna brazda – practică permisă sub normele GAEC 6.</li>
       </ul>
 
@@ -330,7 +330,7 @@ export const BLOG_POSTS: BlogPost[] = [
       <h3>Cum Te Ajută TehnicAgro</h3>
       <p>Portofoliul nostru include utilaje eligibile pentru toate programele menționate:</p>
       <ul>
-        <li><strong>Avers-Agro Green Plains ADS:</strong> Semănătoare No-Till eligibilă PD-04 și DR-12</li>
+        <li><strong>Avers-Agro Multisem ADS:</strong> Semănătoare No-Till eligibilă PD-04 și DR-12</li>
         <li><strong>Fliegl Chain Disc KSE 680:</strong> Soluție GAEC 6 eligibilă DR-12</li>
         <li><strong>K-Factor Powerbank & Booster:</strong> Remorci de transbordare pentru eficientizarea recoltării</li>
       </ul>

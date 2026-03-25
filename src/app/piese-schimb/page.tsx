@@ -105,10 +105,10 @@ export default function PieseSchimbPage() {
             },
             {
                 "@type": "Question",
-                "name": "Furnizați brăzdare și discuri pentru semănătoarea Avers-Agro Green Plains?",
+                "name": "Furnizați brăzdare și discuri pentru semănătoarea Avers-Agro Multisem ADS?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Da. Furnizăm piese de schimb OEM și aftermarket pentru semănătoarea Avers-Agro Green Plains ADS, inclusiv brăzdare duble disc, discuri despicătoare, roți tasatoare și elemente de suspensie paralelogram. Solicitați piesa cu referința tehnică sau numărul de serie al utilajului."
+                    "text": "Da. Furnizăm piese de schimb OEM și aftermarket pentru semănătoarea Avers-Agro Multisem ADS, inclusiv brăzdare duble disc, discuri despicătoare, roți tasatoare și elemente de suspensie paralelogram. Solicitați piesa cu referința tehnică sau numărul de serie al utilajului."
                 }
             },
             {

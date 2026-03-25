@@ -16,7 +16,13 @@ const nextConfig = {
   },
   // Redirect pentru domeniu final (când va fi custom)
   async redirects() {
-    return [];
+    return [
+      {
+        source: '/utilaje/semanat-fertilizat/green-plains-ads',
+        destination: '/utilaje/semanat-fertilizat/multisem-ads',
+        permanent: true,
+      },
+    ];
   },
 };
 

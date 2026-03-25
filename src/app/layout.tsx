@@ -13,7 +13,7 @@ const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
 export const metadata: Metadata = {
     metadataBase: new URL('https://tehnicagrosupply.ro'),
     title: "Tehnicagro Supply | Utilaje Agricole No-Till & Subvenții APIA 2026",
-    description: "Soluții complete pentru agricultura conservativă. Avers-Agro Green Plains & Fliegl KSE 680. Eligibil APIA PD-04 și GAEC 6. Reducere costuri motorină.",
+    description: "Soluții complete pentru agricultura conservativă. Avers-Agro Multisem ADS & Fliegl KSE 680. Eligibil APIA PD-04 și GAEC 6. Reducere costuri motorină.",
     keywords: ["utilaje agricole", "no-till", "avers-agro", "fliegl", "subventii apia 2026", "pd-04", "gaec 6", "semanatoare directa", "grapa cu lanturi"],
     icons: {
         icon: [
@@ -90,7 +90,7 @@ export default function RootLayout({
                             "name": "TehnicAgro Supply",
                             "url": "https://tehnicagrosupply.ro",
                             "logo": "https://tehnicagrosupply.ro/logos/tehnicagro_logo_v1_1769155922952.png",
-                            "description": "Soluții complete pentru agricultura conservativă. Utilaje No-Till, Avers-Agro Green Plains \u0026 Fliegl KSE 680. Eligibil APIA PD-04 și GAEC 6.",
+                            "description": "Soluții complete pentru agricultura conservativă. Utilaje No-Till, Avers-Agro Multisem ADS \u0026 Fliegl KSE 680. Eligibil APIA PD-04 și GAEC 6.",
                             "contactPoint": {
                                 "@type": "ContactPoint",
                                 "telephone": "+40723380022",
