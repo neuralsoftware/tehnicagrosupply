@@ -41,10 +41,12 @@ export const PDF_BRANDS_INTRO = {
 export const PDF_DOCUMENTATION_NOTE =
   'Documentare și completări: informațiile din broșură pot fi aprofundate din fișe tehnice și materiale publice ale mărcilor. În acest PDF nu sunt listate adrese web ale producătorilor; pentru clarificări, folosiți datele de pe ultima pagină.';
 
-export const PDF_BRAND_CARDS: { name: string; tagline: string; paragraphs: string[] }[] = [
+/** `matchBrand`: potrivește `product.brand` din catalog (substring, case-insensitive). */
+export const PDF_BRAND_CARDS: { name: string; tagline: string; paragraphs: string[]; matchBrand: string }[] = [
   {
     name: 'Fliegl Agrartechnik',
     tagline: 'Utilaje pentru sol și miriște — grapă lanț-disc, pregătire pat germinativ',
+    matchBrand: 'Fliegl',
     paragraphs: [
       'Fliegl Agrartechnik este recunoscut la nivel european pentru soluții de mecanizare agricolă. În segmentul de lucrat solul, gama include utilaje cu lanțuri de discuri destinate tocării și nivelării miriștii, refacerii patului germinativ, fragmentării resturilor vegetale și menținerii stratului superficial fără arătură inversă profundă acolo unde strategia agronomică permite. Parametrii operaționali (greutate pe metru liniar, viteză, reglaje hidraulice) se dimensionează în funcție de tipul de sol, umiditate și cantitatea de biomasă rămasă după recoltă.',
       'Pe lângă cultivatoare și grapă lanț-disc, portofoliul Fliegl acoperă și echipamente de transport și logistică în lanțul post-recoltă. În această broșură accentul rămâne pe tehnologia de gestionare a solului și a miriștii (ex. grapă cu lanțuri de discuri / disc chain harrow), aliniată cerințelor de acoperire a solului și practicilor conservative.',
@@ -53,6 +55,7 @@ export const PDF_BRAND_CARDS: { name: string; tagline: string; paragraphs: strin
   {
     name: 'Avers-Agro',
     tagline: 'Pregătire sol, lucrări conservative, semănat de precizie',
+    matchBrand: 'Avers',
     paragraphs: [
       'Avers-Agro oferă utilaje pentru afânare, prelucrarea resturilor vegetale și semănători pentru agricultură conservativă: semănat direct, mini-till sau strip-till, în funcție de configurație. Alegerea tehnică ține de structura solului, de nivelul de rest vegetal și de rotația culturilor.',
       'Semănatul direct în miriște solicită adâncime uniformă, presiune controlată pe brăzdar și evitarea compactării locale în urma deschiderii; aceste criterii diferențiază variantele de echipament mai mult decât simpla lățime de lucru.',
@@ -61,6 +64,7 @@ export const PDF_BRAND_CARDS: { name: string; tagline: string; paragraphs: strin
   {
     name: 'K-Factor',
     tagline: 'Bunkere de câmp — logistică între combina, câmp și transport',
+    matchBrand: 'K-Factor',
     paragraphs: [
       'K-Factor (Ucraina) produce bunkere de reîncărcare și stocare temporară („BOOSTER”, „POWERBANK” și serii conexe), destinate fluxului combina–câmp–transport: reducerea timpilor morți, menținerea ritmului de recoltă și protejarea calității recoltei. În document se prezintă acest segment logistic, distinct de echipamentele de aplicare a îngrășămintelor.',
       'Volumul util, sistemul de descărcare și compatibilitatea cu tractorul sau cu liniile din fermă se stabilesc din fișa modelului și din masa antrenată — configurația concretă din selecția TehnicAgro Supply se validează la ofertare.',

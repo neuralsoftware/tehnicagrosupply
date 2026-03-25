@@ -6,7 +6,7 @@
 //   2. Dynamic products stored in Vercel Blob as a single JSON array
 //   3. This store merges both, with Blob overriding static on slug collision
 
-import { put, list } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 import { PRODUCTS as STATIC_PRODUCTS } from '@/data/products';
 
 const PRODUCTS_BLOB_KEY = 'catalog/products.json';
@@ -264,6 +264,9 @@ export function mergeProductForPdf(
     const pdfOnly = { ...merged };
     delete (pdfOnly as Partial<DynamicProduct>).manufacturerUrl;
     delete (pdfOnly as Partial<DynamicProduct>).referenceLinks;
+    if (pdfOnly.slug === 'multisem-ads' && /green\s*plains/i.test(pdfOnly.name || '')) {
+        return { ...pdfOnly, name: 'Avers-Agro Multisem ADS' };
+    }
     return pdfOnly;
 }
 
@@ -324,5 +327,16 @@ export async function saveBrochure(brochure: Brochure): Promise<void> {
 
 export async function deleteBrochure(id: string): Promise<void> {
     const current = await readBlob<Brochure[]>(MATERIALE_BLOB_KEY, []);
-    await writeBlob(MATERIALE_BLOB_KEY, current.filter(b => b.id !== id));
+    const found = current.find((b) => b.id === id);
+    if (found?.publicUrl && /blob\.vercel-storage\.com/i.test(found.publicUrl)) {
+        try {
+            await del(found.publicUrl);
+        } catch (e) {
+            console.warn('[catalog] Nu s-a putut șterge PDF-ul din Blob (istoricul JSON se actualizează oricum):', e);
+        }
+    }
+    await writeBlob(
+        MATERIALE_BLOB_KEY,
+        current.filter((b) => b.id !== id)
+    );
 }

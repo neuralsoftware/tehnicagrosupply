@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { DynamicProduct, Brochure, ProductBrochureProfile } from '@/lib/products-store';
-import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers, ImageIcon } from 'lucide-react';
+import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers, ImageIcon, Trash2 } from 'lucide-react';
 
 interface Props {
     adminAuth: string;
@@ -79,6 +79,7 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
     const [result, setResult] = useState<Brochure | null>(null);
     const [history, setHistory] = useState<Brochure[]>([]);
     const [historyLoaded, setHistoryLoaded] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [brochureProfiles, setBrochureProfiles] = useState<Record<string, ProductBrochureProfile>>({});
 
     useEffect(() => {
@@ -142,6 +143,35 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
             alert('Eroare conexiune: ' + String(err));
         } finally {
             setGenerating(false);
+        }
+    };
+
+    const removeFromHistory = async (b: Brochure) => {
+        if (
+            !window.confirm(
+                `Ștergi din istoric „${b.title}”? Fișierul PDF va fi eliminat din stocare și nu va mai fi accesibil la linkul public.`
+            )
+        ) {
+            return;
+        }
+        setDeletingId(b.id);
+        try {
+            const res = await fetch(`/api/materiale?id=${encodeURIComponent(b.id)}`, {
+                method: 'DELETE',
+                headers: { 'x-admin-auth': (adminAuth || '').trim() },
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                if (res.status === 401) alert('Sesiune expirată sau parolă incorectă.');
+                else alert((data as { error?: string }).error || 'Eroare la ștergere.');
+                return;
+            }
+            setHistory((prev) => prev.filter((x) => x.id !== b.id));
+            setResult((prev) => (prev?.id === b.id ? null : prev));
+        } catch (err) {
+            alert('Eroare rețea: ' + String(err));
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -336,16 +366,25 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                     <div className="px-5 py-8 text-center text-zinc-600 text-sm italic">Niciun document generat încă.</div>
                 ) : (
                     <div className="divide-y divide-zinc-800/30">
-                        {history.slice(0, 10).map(b => (
-                            <div key={b.id} className="px-6 py-5 flex items-center justify-between hover:bg-zinc-800/20 transition-all group">
+                        {history.map((b) => (
+                            <div key={b.id} className="px-6 py-5 flex items-center justify-between hover:bg-zinc-800/20 transition-all group gap-3">
                                 <div className="min-w-0 pr-4">
                                     <p className="text-sm font-black text-white truncate uppercase tracking-tight">{b.title}</p>
                                     <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">{new Date(b.createdAt).toLocaleString('ro-RO')} · {b.productSlugs.length} produse</p>
                                 </div>
-                                <div className="flex gap-2 shrink-0">
-                                    <a href={b.publicUrl} target="_blank" className="p-3 bg-zinc-950 hover:bg-ea-green-600/20 rounded-xl text-zinc-500 hover:text-ea-green-400 border border-zinc-800 transition-all"><Download className="w-4 h-4" /></a>
-                                    <button onClick={() => { navigator.clipboard.writeText(b.publicUrl); alert('Link copiat!'); }} className="p-3 bg-zinc-950 hover:bg-zinc-800 rounded-xl text-zinc-500 hover:text-white border border-zinc-800 transition-all"><Link2 className="w-4 h-4" /></button>
-                                    <button onClick={() => share(b.publicUrl, 'wa')} className="p-3 bg-zinc-950 hover:bg-[#25D366]/10 rounded-xl text-zinc-500 hover:text-[#25D366] border border-zinc-800 transition-all"><MessageSquare className="w-4 h-4" /></button>
+                                <div className="flex gap-2 shrink-0 flex-wrap justify-end">
+                                    <a href={b.publicUrl} target="_blank" rel="noreferrer" className="p-3 bg-zinc-950 hover:bg-ea-green-600/20 rounded-xl text-zinc-500 hover:text-ea-green-400 border border-zinc-800 transition-all"><Download className="w-4 h-4" /></a>
+                                    <button type="button" onClick={() => { navigator.clipboard.writeText(b.publicUrl); alert('Link copiat!'); }} className="p-3 bg-zinc-950 hover:bg-zinc-800 rounded-xl text-zinc-500 hover:text-white border border-zinc-800 transition-all"><Link2 className="w-4 h-4" /></button>
+                                    <button type="button" onClick={() => share(b.publicUrl, 'wa')} className="p-3 bg-zinc-950 hover:bg-[#25D366]/10 rounded-xl text-zinc-500 hover:text-[#25D366] border border-zinc-800 transition-all"><MessageSquare className="w-4 h-4" /></button>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeFromHistory(b)}
+                                        disabled={deletingId === b.id}
+                                        title="Șterge din istoric"
+                                        className="p-3 bg-zinc-950 hover:bg-red-950/60 rounded-xl text-zinc-500 hover:text-red-400 border border-zinc-800 hover:border-red-900/50 transition-all disabled:opacity-40 disabled:pointer-events-none"
+                                    >
+                                        {deletingId === b.id ? <Loader className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                    </button>
                                 </div>
                             </div>
                         ))}
