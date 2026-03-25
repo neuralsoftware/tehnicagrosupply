@@ -1,7 +1,19 @@
 'use client';
 import { useState, useCallback, useEffect } from 'react';
 import { DynamicProduct } from '@/lib/products-store';
-import { Pencil, Trash2, Plus, Check, X, Save, ChevronDown, Upload } from 'lucide-react';
+import { Pencil, Trash2, Plus, Check, X, Save, Sparkles, Loader, Link2 } from 'lucide-react';
+
+type ImportPreviewResult = {
+    success?: boolean;
+    sourceUrl?: string;
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+    excerptPreview?: string;
+    ai?: { summary: string; bullets: string[] } | null;
+    aiAvailable?: boolean;
+    error?: string;
+};
 
 const ICON_OPTIONS = ['Ruler', 'Zap', 'Weight', 'Gauge', 'ArrowRight', 'Settings', 'Truck', 'Leaf'];
 
@@ -109,6 +121,10 @@ export function CatalogTab({ adminAuth, categories }: Props) {
     const [editing, setEditing] = useState<Partial<DynamicProduct> | null>(null);
     const [saving, setSaving] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
+    const [importUrl, setImportUrl] = useState('');
+    const [importBusy, setImportBusy] = useState(false);
+    const [importPreview, setImportPreview] = useState<ImportPreviewResult | null>(null);
+    const [useAiImport, setUseAiImport] = useState(false);
 
     const load = async () => {
         const res = await fetch('/api/products', { cache: 'no-store' });
@@ -121,7 +137,8 @@ export function CatalogTab({ adminAuth, categories }: Props) {
 
     const blank = (): Partial<DynamicProduct> => ({
         id: '', slug: '', name: '', brand: '', category: '', description: '', longDescription: '',
-        imageSrc: '', specs: ['', '', ''], status: 'draft', expertVerdict: '', detailedSpecs: {},
+        imageSrc: '', gallery: [], manufacturerUrl: '', referenceLinks: [],
+        specs: ['', '', ''], status: 'draft', expertVerdict: '', detailedSpecs: {},
         metaTitle: '', metaDescription: '', videoUrl: '', badge: '',
     });
 
@@ -140,7 +157,35 @@ export function CatalogTab({ adminAuth, categories }: Props) {
         setSaving(false);
         setEditing(null);
         setImageUrl('');
+        setImportPreview(null);
+        setImportUrl('');
         load();
+    };
+
+    const runImportFromUrl = async () => {
+        if (!importUrl.trim()) {
+            alert('Introdu un URL (https://…)');
+            return;
+        }
+        setImportBusy(true);
+        setImportPreview(null);
+        try {
+            const res = await fetch('/api/products/import-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-admin-auth': adminAuth },
+                body: JSON.stringify({ url: importUrl.trim(), adminAuth, useAi: useAiImport }),
+            });
+            const data = (await res.json()) as ImportPreviewResult;
+            if (!res.ok) {
+                alert(data.error || 'Import eșuat');
+                return;
+            }
+            setImportPreview(data);
+        } catch (e) {
+            alert('Eroare rețea: ' + String(e));
+        } finally {
+            setImportBusy(false);
+        }
     };
 
     const del = async (slug: string) => {
@@ -213,6 +258,265 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                     </div>
                     <ImageOptimizer onOptimized={url => { setImageUrl(url); setEditing(p => ({ ...p, imageSrc: url })); }} adminAuth={adminAuth} filename={editing.slug || 'product'} />
                 </div>
+            </div>
+
+            <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 space-y-4">
+                <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest flex items-center gap-2">
+                    <Link2 className="w-3.5 h-3.5 text-ea-green-500" /> Galerie imagini (opțional)
+                </label>
+                <p className="text-[10px] text-zinc-600">Poze suplimentare pentru pagina produsului și PDF. Încarcă sau lipește URL după upload.</p>
+                <div className="flex flex-wrap gap-2">
+                    {(editing.gallery || []).map((gurl, gi) => (
+                        <div key={`${gurl}-${gi}`} className="relative group/thumb">
+                            <img src={gurl} alt="" className="w-20 h-20 rounded-xl object-cover border border-zinc-800" />
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setEditing((p) => ({
+                                        ...p,
+                                        gallery: (p?.gallery || []).filter((_, j) => j !== gi),
+                                    }))
+                                }
+                                className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 text-white rounded-full text-[10px] font-black opacity-0 group-hover/thumb:opacity-100 transition-opacity"
+                            >
+                                ×
+                            </button>
+                        </div>
+                    ))}
+                </div>
+                <ImageOptimizer
+                    adminAuth={adminAuth}
+                    filename={`${editing.slug || 'product'}-gal-${(editing.gallery?.length || 0) + 1}`}
+                    onOptimized={(url) =>
+                        setEditing((p) => ({ ...p, gallery: [...(p?.gallery || []), url] }))
+                    }
+                />
+            </div>
+
+            <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 space-y-3">
+                <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest">Link principal producător / fișă tehnică</label>
+                <input
+                    value={editing.manufacturerUrl || ''}
+                    onChange={(e) => setEditing((p) => ({ ...p, manufacturerUrl: e.target.value }))}
+                    placeholder="https://…"
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-xs font-mono outline-none focus:ring-1 focus:ring-ea-green-500"
+                />
+                <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mt-4">Linkuri adiționale</label>
+                {(editing.referenceLinks || []).map((row, i) => (
+                    <div key={i} className="flex gap-2 flex-wrap">
+                        <input
+                            value={row.label}
+                            onChange={(e) =>
+                                setEditing((p) => {
+                                    const ref = [...(p?.referenceLinks || [])];
+                                    ref[i] = { ...ref[i], label: e.target.value };
+                                    return { ...p, referenceLinks: ref };
+                                })
+                            }
+                            placeholder="Etichetă (ex. Catalog PDF)"
+                            className="flex-1 min-w-[120px] bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500"
+                        />
+                        <input
+                            value={row.url}
+                            onChange={(e) =>
+                                setEditing((p) => {
+                                    const ref = [...(p?.referenceLinks || [])];
+                                    ref[i] = { ...ref[i], url: e.target.value };
+                                    return { ...p, referenceLinks: ref };
+                                })
+                            }
+                            placeholder="https://…"
+                            className="flex-[2] min-w-[180px] bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-xs font-mono outline-none focus:ring-1 focus:ring-ea-green-500"
+                        />
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setEditing((p) => ({
+                                    ...p,
+                                    referenceLinks: (p?.referenceLinks || []).filter((_, j) => j !== i),
+                                }))
+                            }
+                            className="px-3 py-2 text-red-400 hover:text-red-300 text-xs font-black uppercase"
+                        >
+                            Șterge
+                        </button>
+                    </div>
+                ))}
+                <button
+                    type="button"
+                    onClick={() =>
+                        setEditing((p) => ({
+                            ...p,
+                            referenceLinks: [...(p?.referenceLinks || []), { label: '', url: '' }],
+                        }))
+                    }
+                    className="text-[10px] text-ea-green-500 font-black uppercase flex items-center gap-1"
+                >
+                    <Plus className="w-3 h-3" /> Adaugă link
+                </button>
+            </div>
+
+            <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 p-6 rounded-3xl border border-ea-green-900/40 space-y-4">
+                <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-ea-green-400" />
+                    <label className="text-[10px] text-zinc-400 uppercase font-black tracking-widest">Preluare din link (previzualizare)</label>
+                </div>
+                <p className="text-[10px] text-zinc-500 leading-relaxed">
+                    Citește titlu și scurtă descriere din pagina web. Bifează <strong className="text-zinc-400">Cu AI</strong> dacă pe server există cheia OpenAI
+                    (variabila <code className="text-ea-green-500/90">OPENAI_API_KEY</code> — o pune echipa tehnică la deploy); obții atunci un rezumat și puncte
+                    suplimentare. Verifică mereu textul înainte de Salvare.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                        value={importUrl}
+                        onChange={(e) => setImportUrl(e.target.value)}
+                        placeholder="https://site-producator.ro/model"
+                        className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-xs font-mono outline-none focus:ring-1 focus:ring-ea-green-500"
+                    />
+                    <label className="flex items-center gap-2 text-[10px] text-zinc-500 font-bold uppercase whitespace-nowrap px-2">
+                        <input type="checkbox" checked={useAiImport} onChange={(e) => setUseAiImport(e.target.checked)} className="accent-ea-green-500" />
+                        Cu AI
+                    </label>
+                    <button
+                        type="button"
+                        disabled={importBusy}
+                        onClick={runImportFromUrl}
+                        className="px-5 py-3 bg-ea-green-600 hover:bg-ea-green-500 disabled:opacity-50 text-white rounded-xl font-black uppercase text-xs flex items-center justify-center gap-2"
+                    >
+                        {importBusy ? <Loader className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        Citește pagina
+                    </button>
+                </div>
+                {importPreview?.title && (
+                    <div className="p-4 rounded-2xl bg-zinc-950/80 border border-zinc-800 space-y-3 text-xs">
+                        <div className="text-white font-bold">{importPreview.title}</div>
+                        {importPreview.description && (
+                            <p className="text-zinc-400 leading-relaxed line-clamp-4">{importPreview.description}</p>
+                        )}
+                        {importPreview.imageUrl && (
+                            <img src={importPreview.imageUrl} alt="" className="max-h-24 rounded-lg border border-zinc-800 object-contain" />
+                        )}
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                type="button"
+                                className="px-3 py-2 bg-zinc-800 rounded-lg text-[10px] font-black uppercase text-zinc-200 hover:bg-zinc-700"
+                                onClick={() =>
+                                    setEditing((p) => ({
+                                        ...p,
+                                        description: importPreview.description || p?.description,
+                                    }))
+                                }
+                            >
+                                Pune în descriere scurtă
+                            </button>
+                            <button
+                                type="button"
+                                className="px-3 py-2 bg-zinc-800 rounded-lg text-[10px] font-black uppercase text-zinc-200 hover:bg-zinc-700"
+                                onClick={() =>
+                                    setEditing((p) => ({
+                                        ...p,
+                                        longDescription: importPreview.description || p?.longDescription,
+                                    }))
+                                }
+                            >
+                                Pune în descriere lungă
+                            </button>
+                            <button
+                                type="button"
+                                className="px-3 py-2 bg-zinc-800 rounded-lg text-[10px] font-black uppercase text-zinc-200 hover:bg-zinc-700"
+                                onClick={() => {
+                                    if (importPreview.imageUrl) {
+                                        setImageUrl(importPreview.imageUrl);
+                                        setEditing((p) => ({ ...p, imageSrc: importPreview.imageUrl! }));
+                                    }
+                                }}
+                            >
+                                Imagine principală
+                            </button>
+                            <button
+                                type="button"
+                                className="px-3 py-2 bg-zinc-800 rounded-lg text-[10px] font-black uppercase text-zinc-200 hover:bg-zinc-700"
+                                onClick={() => {
+                                    if (importPreview.imageUrl) {
+                                        const u = importPreview.imageUrl;
+                                        setEditing((p) => ({ ...p, gallery: [...(p?.gallery || []), u] }));
+                                    }
+                                }}
+                            >
+                                Adaugă în galerie
+                            </button>
+                            <button
+                                type="button"
+                                className="px-3 py-2 bg-zinc-800 rounded-lg text-[10px] font-black uppercase text-zinc-200 hover:bg-zinc-700"
+                                onClick={() =>
+                                    setEditing((p) => ({
+                                        ...p,
+                                        manufacturerUrl: importPreview.sourceUrl || p?.manufacturerUrl,
+                                    }))
+                                }
+                            >
+                                Link producător = sursă
+                            </button>
+                            <button
+                                type="button"
+                                className="px-3 py-2 bg-zinc-800 rounded-lg text-[10px] font-black uppercase text-zinc-200 hover:bg-zinc-700"
+                                onClick={() =>
+                                    setEditing((p) => ({
+                                        ...p,
+                                        metaTitle: importPreview.title || p?.metaTitle,
+                                    }))
+                                }
+                            >
+                                Meta titlu (SEO)
+                            </button>
+                            <button
+                                type="button"
+                                className="px-3 py-2 bg-zinc-800 rounded-lg text-[10px] font-black uppercase text-zinc-200 hover:bg-zinc-700"
+                                onClick={() =>
+                                    setEditing((p) => ({
+                                        ...p,
+                                        metaDescription:
+                                            (importPreview.description?.slice(0, 160) || '') || p?.metaDescription,
+                                    }))
+                                }
+                            >
+                                Meta descriere (SEO)
+                            </button>
+                        </div>
+                        {importPreview.ai && (importPreview.ai.summary || (importPreview.ai.bullets?.length ?? 0) > 0) && (
+                            <div className="pt-3 border-t border-zinc-800 space-y-2">
+                                <div className="text-[10px] font-black uppercase text-ea-green-400">Sugestie AI</div>
+                                {importPreview.ai.summary && (
+                                    <p className="text-zinc-300 leading-relaxed">{importPreview.ai.summary}</p>
+                                )}
+                                <ul className="list-disc list-inside text-zinc-400 space-y-1">
+                                    {(importPreview.ai.bullets || []).map((b, i) => (
+                                        <li key={i}>{b}</li>
+                                    ))}
+                                </ul>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        className="px-3 py-2 bg-ea-green-900/40 rounded-lg text-[10px] font-black uppercase text-ea-green-300"
+                                        onClick={() =>
+                                            setEditing((p) => ({
+                                                ...p,
+                                                longDescription: [importPreview.ai?.summary, (importPreview.ai?.bullets || []).map((x) => `• ${x}`).join('\n')]
+                                                    .filter(Boolean)
+                                                    .join('\n\n'),
+                                            }))
+                                        }
+                                    >
+                                        Aplică tot în descriere lungă
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {!importPreview.aiAvailable && useAiImport && (
+                            <p className="text-[10px] text-amber-500/90">AI indisponibil: lipsește OPENAI_API_KEY pe server.</p>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800">
@@ -301,7 +605,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                 </td>
                                 <td className="px-6 py-5 text-right">
                                     <div className="flex items-center justify-end gap-2">
-                                        <button onClick={() => { setEditing(p); setImageUrl(p.imageSrc); }} className="p-3 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-zinc-400 hover:text-white transition-all"><Pencil className="w-4 h-4" /></button>
+                                        <button onClick={() => { setEditing({ ...p, gallery: p.gallery ?? [], referenceLinks: p.referenceLinks ?? [] }); setImageUrl(p.imageSrc); }} className="p-3 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-zinc-400 hover:text-white transition-all"><Pencil className="w-4 h-4" /></button>
                                         <button onClick={() => del(p.slug)} className="p-3 bg-zinc-950 hover:bg-red-950/20 border border-zinc-800 rounded-xl text-zinc-600 hover:text-red-400 transition-all"><Trash2 className="w-4 h-4" /></button>
                                     </div>
                                 </td>

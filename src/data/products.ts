@@ -17,6 +17,9 @@ export interface Product {
     description: string;
     longDescription?: string;       // Rich descriere pentru pagina de produs
     imageSrc: string;
+    gallery?: string[];
+    manufacturerUrl?: string;
+    referenceLinks?: { label: string; url: string }[];
     specs: string[];
     specIcons?: { icon: string; label: string; value: string }[]; // 3 specs cu iconițe
     detailedSpecs: any;

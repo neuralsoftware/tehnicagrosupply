@@ -79,6 +79,9 @@ export default async function ProductPage({ params }: PageProps) {
                 detailedSpecs={product.detailedSpecs}
                 expertVerdict={product.expertVerdict}
                 ctaLabel="Solicită Ofertă Tehnică"
+                gallery={product.gallery}
+                manufacturerUrl={product.manufacturerUrl}
+                referenceLinks={product.referenceLinks}
             />
 
             {product.longDescription && (

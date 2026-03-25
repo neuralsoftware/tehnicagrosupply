@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     specDetailBlock: { marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: COLORS.border },
     specDetailGroup: { fontSize: 8, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.textMuted, marginBottom: 4, marginTop: 6 },
     specDetailLine: { fontSize: 7.5, color: COLORS.textMuted, lineHeight: 1.35, marginBottom: 2 },
+    linkRow: { marginTop: 8, fontSize: 7.5, color: COLORS.primary },
     badgeText: { fontSize: 8, color: COLORS.white, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 1, textTransform: 'uppercase' },
     brandLabel: { fontSize: 9, color: COLORS.primary, fontFamily: 'Roboto', fontWeight: 'bold', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 6 },
     modelTitle: { fontSize: 17, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, marginBottom: 8, letterSpacing: -0.3, maxWidth: '100%' },
@@ -139,16 +140,18 @@ const styles = StyleSheet.create({
 });
 
 // Helpers
-const ProductImage = ({ url, fallback, catalog }: { url?: string; fallback?: string; catalog?: boolean }) => {
+const ProductImage = ({ url, fallback, catalog, compact }: { url?: string; fallback?: string; catalog?: boolean; compact?: boolean }) => {
     if (!url) {
-        const h = catalog ? 200 : 220;
+        const h = compact ? 72 : catalog ? 200 : 220;
         return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
     }
     const absolute = resolvePublicUrl(url);
     const safeJpgUrl = `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=jpg&w=800`;
-    const imgStyle = catalog
+    const imgStyle = compact
+        ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
+        : catalog
         ? { width: '100%', height: 200, objectFit: 'contain' as const }
         : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
     return React.createElement(Image, { src: safeJpgUrl, style: imgStyle });
@@ -343,7 +346,15 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                         ),
                         React.createElement(View, { style: styles.catalogRow },
                             React.createElement(View, { style: styles.catalogImageCol },
-                                React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true })
+                                React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, catalog: true }),
+                                ...(Array.isArray(product.gallery) ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 3) : []).map((u, gi) =>
+                                    React.createElement(ProductImage, { key: `gal-${gi}`, url: u, fallback: product?.name, catalog: true, compact: true })
+                                ),
+                                product.manufacturerUrl &&
+                                    React.createElement(Text, { style: styles.linkRow }, `Producător / fișă: ${product.manufacturerUrl}`),
+                                ...(Array.isArray(product.referenceLinks) ? product.referenceLinks.filter((l) => l?.url).slice(0, 3) : []).map((l, ri) =>
+                                    React.createElement(Text, { key: `rl-${ri}`, style: styles.linkRow }, `${l.label || 'Referință'}: ${l.url}`)
+                                )
                             ),
                             React.createElement(View, { style: styles.catalogTextCol },
                                 React.createElement(Text, { style: styles.brandLabel }, product?.brand || 'TEHNICAGRO'),

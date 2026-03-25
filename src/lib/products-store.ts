@@ -13,6 +13,11 @@ const PRODUCTS_BLOB_KEY = 'catalog/products.json';
 const CATEGORIES_BLOB_KEY = 'catalog/categories.json';
 const MATERIALE_BLOB_KEY = 'catalog/materiale.json';
 
+export interface ProductReferenceLink {
+    label: string;
+    url: string;
+}
+
 export interface DynamicProduct {
     id: string;
     slug: string;
@@ -24,6 +29,12 @@ export interface DynamicProduct {
     description: string;
     longDescription?: string;
     imageSrc: string;
+    /** Imagini suplimentare (URL Blob sau absolute), pentru site și PDF */
+    gallery?: string[];
+    /** Site oficial producător / fișă tehnică principală */
+    manufacturerUrl?: string;
+    /** Linkuri suplimentare (manual, catalog PDF, etc.) */
+    referenceLinks?: ProductReferenceLink[];
     specs: string[];
     specIcons?: { icon: string; label: string; value: string }[];
     detailedSpecs: Record<string, Record<string, string>>;
@@ -111,7 +122,7 @@ export async function saveProduct(product: DynamicProduct): Promise<void> {
     const current = await readBlob<DynamicProduct[]>(PRODUCTS_BLOB_KEY, []);
     const idx = current.findIndex(p => p.slug === product.slug);
     if (idx >= 0) {
-        current[idx] = { ...product, updatedAt: new Date().toISOString() };
+        current[idx] = { ...current[idx], ...product, slug: product.slug, updatedAt: new Date().toISOString() };
     } else {
         current.push({ ...product, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
     }
