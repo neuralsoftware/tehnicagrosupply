@@ -22,8 +22,6 @@ import { CATEGORIES as CATEGORY_LABELS } from '@/data/products';
 import {
     PDF_COMPANY,
     PDF_DOCUMENTATION_NOTE,
-    PDF_BRAND_CARDS,
-    getCategoryPdfCopy,
 } from '@/data/pdf-materiale-copy';
 import React from 'react';
 
@@ -797,27 +795,6 @@ function pdfCatalogLogoSrc(config: { logoDataUri?: string }): string {
     return pdfCatalogLogoUrl();
 }
 
-/** Doar cartonașele producătorilor care apar în produsele selectate pentru broșură */
-function getBrandCardsForCatalog(products: DynamicProduct[]) {
-    const brands = products.map((p) => (p.brand || '').trim()).filter(Boolean);
-    if (brands.length === 0) return [];
-    return PDF_BRAND_CARDS.filter((card) =>
-        brands.some((b) => b.toLowerCase().includes(card.matchBrand.toLowerCase()))
-    );
-}
-
-function getRelevantFundingPrograms(products: DynamicProduct[]) {
-    const picked = new Map<string, any>();
-    for (const p of products) {
-        const list = ((FUNDING_PROGRAMS as any)[p.category] || []) as any[];
-        for (const prog of list.filter((x) => x.status === 'active')) {
-            const key = String(prog.code || prog.title || `${p.category}-${picked.size}`);
-            if (!picked.has(key)) picked.set(key, prog);
-        }
-    }
-    return Array.from(picked.values()).slice(0, 3);
-}
-
 function getProfessionalProductLead(product: DynamicProduct): string {
     if (product.slug === 'multisem-ads') {
         return 'Avers-Agro Multisem ADS este o semănătoare proiectată pentru lucrări conservative, cu utilizare posibilă în semănat direct, mini-till sau convențional, în funcție de configurația echipată. Ansamblul de brăzdare cu dublu disc, presiunea ridicată pe brăzdar și suspensia paralelogram urmăresc pătrunderea constantă în rest vegetal și menținerea unei adâncimi de semănat stabile.';
@@ -859,8 +836,6 @@ const renderPageFooter = (pageNumber: number, phone?: string) => (
 function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Category[]): React.ReactElement<DocumentProps> {
     const productsToDisplay = products || [];
     const logoSrc = pdfCatalogLogoSrc(config);
-    const brandCardsSelected = getBrandCardsForCatalog(productsToDisplay);
-    const selectedPrograms = getRelevantFundingPrograms(productsToDisplay);
     let currentPage = 1;
 
     // Categorize products for transitions
@@ -922,70 +897,6 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
             ),
             renderPageFooter(currentPage += 1, config.phone)
         ),
-
-        // PAGINĂ CONTEXT COMPACTĂ: producători selectați + programe relevante
-        ...((brandCardsSelected.length > 0 || selectedPrograms.length > 0)
-            ? [
-                  React.createElement(Page, { size: 'A4', style: styles.page, key: 'context-compact' },
-                      renderPageHeader('PRODUCĂTORI ȘI PROGRAME'),
-                      React.createElement(View, { style: { paddingTop: HEADER_BLOCK + 8, paddingBottom: 40, paddingHorizontal: MARGIN, flex: 1 } },
-                          renderAccentSectionTitle('ctx-title', 'Contextul acestei selecții'),
-                          React.createElement(
-                              Text,
-                              { style: styles.mainText },
-                              productsToDisplay.length === 1
-                                  ? `Selecția curentă este construită în jurul modelului ${productsToDisplay[0].name}, încadrat în categoria ${categoryDisplayName(productsToDisplay[0].category, categoriesFromDb).toLowerCase()}. Prezentarea sintetizează datele relevante de produs, producător și compatibilitate orientativă cu programele de sprijin aplicabile.`
-                                  : 'Selecția curentă reunește produse configurate pentru utilizări complementare în fermă. Pagina de față rezumă producătorii incluși și programele de sprijin care pot avea relevanță orientativă pentru utilajele prezentate.'
-                          ),
-                          React.createElement(View, { style: styles.contextGrid },
-                              React.createElement(View, { style: styles.contextLeftCol },
-                                  ...(() => {
-                                      const first = productsToDisplay[0];
-                                      if (!first) return [];
-                                      const copy = getCategoryPdfCopy(first.category);
-                                      return [
-                                          renderAccentSectionTitle('ctx-cat', `Categorie: ${categoryDisplayName(first.category, categoriesFromDb)}`),
-                                          ...copy.paragraphs.slice(0, 2).map((p, i) =>
-                                              React.createElement(Text, { key: `ctx-cat-p-${i}`, style: styles.mainText }, p)
-                                          ),
-                                      ];
-                                  })(),
-                                  renderAccentSectionTitle('ctx-brands', 'Producători selectați'),
-                                  ...brandCardsSelected.map((card, ci) =>
-                                      React.createElement(View, { key: `ctx-brand-${ci}`, style: styles.compactBrandCard },
-                                          React.createElement(Text, { style: styles.compactBrandTitle }, card.name),
-                                          React.createElement(Text, { style: styles.compactBrandTag }, card.tagline),
-                                          React.createElement(Text, { style: styles.compactBrandText }, card.paragraphs[0] || '')
-                                      )
-                                  )
-                              ),
-                              React.createElement(View, { style: styles.contextRightCol },
-                                  renderAccentSectionTitle('ctx-prog', 'Programe compatibile'),
-                                  ...(selectedPrograms.length > 0
-                                      ? selectedPrograms.map((prog, pi) =>
-                                            React.createElement(View, { key: `ctx-prog-${pi}`, style: styles.programCard },
-                                                React.createElement(Text, { style: styles.programCardTitle }, prog.title || prog.code || 'Program'),
-                                                React.createElement(
-                                                    Text,
-                                                    { style: styles.programCardText },
-                                                    `${prog.maxGrant ? `${prog.maxGrant}. ` : ''}${prog.details || 'Eligibilitatea și cuantumul se verifică exclusiv în ghidurile oficiale și în dosarul fermei.'}`
-                                                )
-                                            )
-                                        )
-                                      : [
-                                            React.createElement(
-                                                Text,
-                                                { key: 'ctx-prog-empty', style: styles.mainText },
-                                                'Nu există în prezent un program activ preluat din administrare pentru această selecție.'
-                                            ),
-                                        ])
-                              )
-                          )
-                      ),
-                      renderPageFooter(currentPage += 1, config.phone)
-                  ),
-              ]
-            : []),
 
         // GENERARE DINAMICĂ: DOAR PRODUSELE (fără pagini separate de categorie/program ca să evităm broșuri prea lungi)
         ...categories.flatMap(catName => {
