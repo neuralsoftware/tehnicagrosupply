@@ -192,10 +192,18 @@ const styles = StyleSheet.create({
     },
     badgeRow: { marginBottom: 8 },
     badge: { alignSelf: 'flex-start', backgroundColor: COLORS.primaryDark, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 4 },
-    productOverviewGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%' },
+    productOverviewGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%', marginBottom: 16 },
     productDetailGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%' },
     productMainCol: { width: '42%', marginRight: 16 },
     productRightCol: { flex: 1, minWidth: 0 },
+    productOverviewImageFrame: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 10,
+        padding: 10,
+        backgroundColor: COLORS.white,
+    },
     catalogRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
     catalogImageCol: {
         width: '36%',
@@ -316,6 +324,7 @@ const styles = StyleSheet.create({
         padding: 6,
         backgroundColor: COLORS.white,
         marginBottom: 12,
+        minHeight: 232,
     },
     productSupplementEmpty: {
         minHeight: 154,
@@ -463,6 +472,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#f8fafc',
         marginTop: 8,
     },
+    productIntroBullets: {
+        fontSize: 9.5,
+        color: COLORS.textMuted,
+        lineHeight: 1.5,
+        marginTop: 8,
+    },
     productImageColumn: { width: '52%', alignSelf: 'flex-start' as const },
     blockTitle: { fontSize: 9, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.text, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingBottom: 4, marginTop: 10 },
     specItem: { flexDirection: 'row', marginBottom: 5, alignItems: 'flex-start' },
@@ -541,6 +556,8 @@ const ProductImage = ({
     url,
     fallback,
     catalog,
+    hero,
+    detail,
     /** Aceeași înălțime ca imaginea principală catalog (coloană stângă) */
     catalogStack,
     compact,
@@ -550,14 +567,16 @@ const ProductImage = ({
     url?: string;
     fallback?: string;
     catalog?: boolean;
+    hero?: boolean;
+    detail?: boolean;
     catalogStack?: boolean;
     compact?: boolean;
     galleryThumb?: boolean;
     stripThumb?: boolean;
 }) => {
     if (!url) {
-        const h = stripThumb ? 56 : galleryThumb ? 80 : compact ? 72 : catalog || catalogStack ? 200 : 220;
-        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
+        const h = stripThumb ? 56 : galleryThumb ? 80 : compact ? 72 : hero ? 372 : detail ? 220 : catalog || catalogStack ? 200 : 220;
+        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
     }
@@ -569,6 +588,10 @@ const ProductImage = ({
           ? { width: '100%', height: 80, objectFit: 'contain' as const }
           : compact
             ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
+            : hero
+              ? { width: '100%', height: 372, objectFit: 'cover' as const }
+              : detail
+                ? { width: '100%', height: 220, objectFit: 'cover' as const }
             : catalog || catalogStack
               ? { width: '100%', height: 200, objectFit: 'contain' as const }
               : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
@@ -952,6 +975,11 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     );
 
                 const kicker = [secTitle.toUpperCase(), product?.brand].filter(Boolean).join(' · ');
+                const introBullets = [
+                    'Alegerea modelului ține cont de lățime de lucru, necesarul de putere și tipul exploatației.',
+                    'Consultați datele producătorului pentru adâncime, consum și cerințe de întreținere.',
+                    'Informațiile despre fonduri au caracter orientativ și se confirmă în dosar.',
+                ];
 
                 const overviewPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-overview-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
@@ -976,6 +1004,9 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                 renderAccentSectionTitle(`princ-${pSlug}`, 'Prezentare tehnică'),
                                 React.createElement(View, { style: styles.productIntroBox },
                                     React.createElement(Text, { style: styles.productSheetBody }, descText),
+                                    ...introBullets.map((line, bi) =>
+                                        renderChevronBullet(`intro-${pSlug}-${bi}`, styles.productIntroBullets as Record<string, unknown>, line)
+                                    ),
                                     React.createElement(
                                         Text,
                                         { style: styles.productSheetDisclaimer },
@@ -984,6 +1015,11 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                 ),
                                 ...renderProductMetaOnly(product)
                             )
+                        ),
+                        React.createElement(
+                            View,
+                            { style: styles.productOverviewImageFrame },
+                            React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, hero: true })
                         )
                     ),
                     renderPageFooter(currentPage += 1, config.phone)
@@ -999,7 +1035,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                     React.createElement(
                                         View,
                                         { key: `detail-${pSlug}-${gi}`, style: styles.productSupplementImageBox },
-                                        React.createElement(ProductImage, { url: u, fallback: product?.name, catalogStack: true })
+                                        React.createElement(ProductImage, { url: u, fallback: product?.name, detail: true })
                                     )
                                 ),
                                 detailGallery.length === 1 &&
