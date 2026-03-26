@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { DynamicProduct } from '@/lib/products-store';
-import { Pencil, Trash2, Plus, X, Save } from 'lucide-react';
+import { DynamicProduct, ProductFeatureBlock } from '@/lib/products-store';
+import { Pencil, Trash2, Plus, X, Save, FileStack } from 'lucide-react';
 import { ImageOptimizer } from './ImageOptimizer';
 
 function slugify(str: string) {
@@ -24,6 +24,9 @@ export function CatalogTab({ adminAuth, categories }: Props) {
     const [editing, setEditing] = useState<Partial<DynamicProduct> | null>(null);
     const [saving, setSaving] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
+    const [deepDiveBusySlug, setDeepDiveBusySlug] = useState<string | null>(null);
+    const DEEP_DIVE_PHONE = '+40 723 380 022';
+    const DEEP_DIVE_EMAIL = 'tehnicagro.supply@gmail.com';
 
     const load = async () => {
         const res = await fetch('/api/products', { cache: 'no-store' });
@@ -52,6 +55,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
         metaDescription: '',
         videoUrl: '',
         badge: '',
+        featureBlocks: [],
     });
 
     const save = async () => {
@@ -78,6 +82,13 @@ export function CatalogTab({ adminAuth, categories }: Props) {
             specIcons: editing.specIcons,
             createdAt: editing.createdAt || '',
             updatedAt: editing.updatedAt || '',
+            featureBlocks: Array.isArray(editing.featureBlocks)
+                ? editing.featureBlocks.map((b) => ({
+                      image: String(b?.image || '').trim(),
+                      title: String(b?.title || '').trim(),
+                      description: String(b?.description || '').trim(),
+                  }))
+                : [],
         } satisfies Partial<DynamicProduct>;
 
         const method = products.find((p) => p.slug === editing.slug) ? 'PUT' : 'POST';
@@ -91,6 +102,44 @@ export function CatalogTab({ adminAuth, categories }: Props) {
         setEditing(null);
         setImageUrl('');
         load();
+    };
+
+    const generateDeepDiveForSlug = async (slug: string, name: string) => {
+        if (
+            !window.confirm(
+                `Generezi broșura PDF dedicată (deep dive) pentru „${name}”? Vezi tab-ul Materiale → istoric pentru link.`
+            )
+        ) {
+            return;
+        }
+        setDeepDiveBusySlug(slug);
+        try {
+            const res = await fetch('/api/materiale/single', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminAuth: (adminAuth || '').trim(),
+                    productSlug: slug,
+                    config: {
+                        title: `Broșură dedicată: ${name}`,
+                        phone: DEEP_DIVE_PHONE,
+                        email: DEEP_DIVE_EMAIL,
+                    },
+                }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                alert((data as { error?: string; details?: string }).error || 'Eroare la generare.');
+                return;
+            }
+            const url = (data as { brochure?: { publicUrl?: string } }).brochure?.publicUrl;
+            if (url) window.open(url, '_blank', 'noopener,noreferrer');
+            else alert('PDF generat; verifică istoricul în Materiale publicitare.');
+        } catch (e) {
+            alert('Eroare rețea: ' + String(e));
+        } finally {
+            setDeepDiveBusySlug(null);
+        }
     };
 
     const del = async (slug: string) => {
@@ -267,6 +316,110 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                     </button>
                 </div>
 
+                <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 border-l-4 border-l-sky-600/60 space-y-4">
+                    <div>
+                        <label className="block text-[10px] text-sky-400 uppercase font-black tracking-widest">
+                            Blocuri broșură dedicată (PDF deep dive)
+                        </label>
+                        <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
+                            Pentru „Generează broșură dedicată”: câte un rând cu poză, titlu și descriere. În PDF apar câte 2 blocuri
+                            pe pagină, aranjament zig-zag.
+                        </p>
+                    </div>
+                    {(editing.featureBlocks || []).map((block, idx) => (
+                        <div
+                            key={idx}
+                            className="p-4 rounded-2xl border border-zinc-800 bg-zinc-950/60 space-y-3"
+                        >
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] text-sky-500/90 font-black uppercase">Bloc {idx + 1}</span>
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setEditing((p) => {
+                                            if (!p) return p;
+                                            return {
+                                                ...p,
+                                                featureBlocks: (p.featureBlocks || []).filter((_, i) => i !== idx),
+                                            };
+                                        })
+                                    }
+                                    className="text-[10px] text-zinc-500 hover:text-red-400 font-bold uppercase"
+                                >
+                                    Elimină
+                                </button>
+                            </div>
+                            <input
+                                value={block.title}
+                                onChange={(e) =>
+                                    setEditing((p) => {
+                                        if (!p) return p;
+                                        const blocks: ProductFeatureBlock[] = [...(p.featureBlocks || [])];
+                                        blocks[idx] = { ...blocks[idx], title: e.target.value };
+                                        return { ...p, featureBlocks: blocks };
+                                    })
+                                }
+                                placeholder="Titlu secțiune (ex: Lățimi de lucru)"
+                                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-sky-500/50"
+                            />
+                            <textarea
+                                value={block.description}
+                                onChange={(e) =>
+                                    setEditing((p) => {
+                                        if (!p) return p;
+                                        const blocks: ProductFeatureBlock[] = [...(p.featureBlocks || [])];
+                                        blocks[idx] = { ...blocks[idx], description: e.target.value };
+                                        return { ...p, featureBlocks: blocks };
+                                    })
+                                }
+                                placeholder="Text descriptiv"
+                                rows={3}
+                                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-sky-500/50 resize-none"
+                            />
+                            <input
+                                value={block.image}
+                                onChange={(e) =>
+                                    setEditing((p) => {
+                                        if (!p) return p;
+                                        const blocks: ProductFeatureBlock[] = [...(p.featureBlocks || [])];
+                                        blocks[idx] = { ...blocks[idx], image: e.target.value };
+                                        return { ...p, featureBlocks: blocks };
+                                    })
+                                }
+                                placeholder="URL imagine bloc"
+                                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-xs font-mono outline-none focus:ring-1 focus:ring-sky-500/50"
+                            />
+                            <ImageOptimizer
+                                onOptimized={(url) =>
+                                    setEditing((p) => {
+                                        if (!p) return p;
+                                        const blocks: ProductFeatureBlock[] = [...(p.featureBlocks || [])];
+                                        blocks[idx] = { ...blocks[idx], image: url };
+                                        return { ...p, featureBlocks: blocks };
+                                    })
+                                }
+                                adminAuth={adminAuth}
+                                filename={`${editing.slug || 'product'}-deep-${idx}`}
+                            />
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setEditing((p) => {
+                                if (!p) return p;
+                                return {
+                                    ...p,
+                                    featureBlocks: [...(p.featureBlocks || []), { image: '', title: '', description: '' }],
+                                };
+                            })
+                        }
+                        className="text-[10px] text-sky-400 font-black uppercase hover:text-white transition-colors flex items-center gap-1"
+                    >
+                        <Plus className="w-3 h-3" /> Adaugă bloc broșură dedicată
+                    </button>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4 bg-zinc-900 p-6 rounded-3xl border border-zinc-800">
                     <div>
                         <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">
@@ -402,8 +555,25 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                 <td className="px-6 py-5 text-right">
                                     <div className="flex items-center justify-end gap-2">
                                         <button
+                                            type="button"
+                                            onClick={() => generateDeepDiveForSlug(p.slug, p.name)}
+                                            disabled={deepDiveBusySlug === p.slug}
+                                            title="Generează broșură dedicată (un produs)"
+                                            className="p-3 bg-zinc-950 hover:bg-sky-950/40 border border-zinc-800 rounded-xl text-zinc-500 hover:text-sky-400 transition-all disabled:opacity-40"
+                                        >
+                                            {deepDiveBusySlug === p.slug ? (
+                                                <div className="w-4 h-4 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <FileStack className="w-4 h-4" />
+                                            )}
+                                        </button>
+                                        <button
+                                            type="button"
                                             onClick={() => {
-                                                setEditing({ ...p });
+                                                setEditing({
+                                                    ...p,
+                                                    featureBlocks: p.featureBlocks?.length ? [...p.featureBlocks] : [],
+                                                });
                                                 setImageUrl(p.imageSrc);
                                             }}
                                             className="p-3 bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-zinc-400 hover:text-white transition-all"
@@ -411,6 +581,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                             <Pencil className="w-4 h-4" />
                                         </button>
                                         <button
+                                            type="button"
                                             onClick={() => del(p.slug)}
                                             className="p-3 bg-zinc-950 hover:bg-red-950/20 border border-zinc-800 rounded-xl text-zinc-600 hover:text-red-400 transition-all"
                                         >

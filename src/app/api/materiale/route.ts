@@ -12,6 +12,7 @@ import {
     DynamicProduct,
     Category,
     ProductBrochureProfile,
+    ProductFeatureBlock,
     getBrochureProfilesMap,
     mergeProductForPdf,
     normalizeLegacyProductSlug,
@@ -651,6 +652,27 @@ const styles = StyleSheet.create({
     verdictBox: { backgroundColor: '#fffbeb', padding: 8, borderRadius: 6, borderLeftWidth: 3, borderLeftStyle: 'solid', borderLeftColor: '#f59e0b', marginTop: 0 },
     verdictTitle: { fontSize: 8, fontFamily: 'Roboto', fontWeight: 'bold', color: COLORS.brochureAccent, textTransform: 'uppercase', marginBottom: 3, letterSpacing: 0.8 },
     verdictText: { fontSize: 8, color: '#92400e', lineHeight: 1.3, fontStyle: 'italic' },
+    deepDiveFeatureTitle: {
+        fontSize: 16,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.primaryDark,
+        marginBottom: 10,
+        letterSpacing: -0.2,
+    },
+    deepDiveFeatureBody: {
+        fontSize: 10,
+        color: COLORS.textMuted,
+        lineHeight: 1.45,
+        textAlign: 'justify' as const,
+    },
+    deepDiveZigzagPageInner: {
+        flex: 1,
+        paddingTop: HEADER_BLOCK + 8,
+        paddingBottom: FOOTER_BLOCK + 14,
+        paddingLeft: MARGIN,
+        paddingRight: MARGIN,
+    },
     placeholderBox: { ...PDF_PLACEHOLDER_BORDER, width: '100%', backgroundColor: '#f1f5f9', borderRadius: 6, justifyContent: 'center', alignItems: 'center', marginVertical: 20, padding: 20 },
     placeholderText: { fontSize: 9, color: '#64748b', textAlign: 'center' },
     /** Copertă spate — fundal uniform, tot textul alb */
@@ -882,6 +904,7 @@ const ProductImage = ({
     detail,
     immersive,
     moodboard,
+    deepDiveFeature,
     /** Aceeași înălțime ca imaginea principală catalog (coloană stângă) */
     catalogStack,
     compact,
@@ -895,6 +918,7 @@ const ProductImage = ({
     detail?: boolean;
     immersive?: boolean;
     moodboard?: boolean;
+    deepDiveFeature?: boolean;
     catalogStack?: boolean;
     compact?: boolean;
     galleryThumb?: boolean;
@@ -909,21 +933,23 @@ const ProductImage = ({
                 ? 72
                 : immersive
                   ? 456
-                  : moodboard
-                    ? 180
-                    : hero
-                      ? 410
-                      : detail
-                        ? 160
-                        : catalog || catalogStack
-                          ? 200
-                          : 220;
-        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || immersive || moodboard || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
+                  : deepDiveFeature
+                    ? 250
+                    : moodboard
+                      ? 180
+                      : hero
+                        ? 410
+                        : detail
+                          ? 160
+                          : catalog || catalogStack
+                            ? 200
+                            : 220;
+        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || immersive || moodboard || deepDiveFeature || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
     }
     const absolute = resolvePublicUrl(url);
-    const wSrv = hero || immersive ? 1400 : moodboard ? 1100 : 800;
+    const wSrv = hero || immersive ? 1400 : deepDiveFeature || moodboard ? 1200 : 800;
     const safeJpgUrl = `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=jpg&w=${wSrv}`;
     const imgStyle = stripThumb
         ? { width: '100%', height: 56, objectFit: 'contain' as const }
@@ -933,15 +959,17 @@ const ProductImage = ({
             ? { width: '100%', height: 72, objectFit: 'contain' as const, marginTop: 4 }
             : immersive
               ? { width: '100%', height: '100%', objectFit: 'cover' as const }
-              : moodboard
-                ? { width: '100%', height: 180, objectFit: 'cover' as const }
-                : hero
-                  ? { width: '100%', height: 410, objectFit: 'contain' as const }
-                  : detail
-                    ? { width: '100%', height: 160, objectFit: 'contain' as const }
-                    : catalog || catalogStack
-                      ? { width: '100%', height: 200, objectFit: 'contain' as const }
-                      : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
+              : deepDiveFeature
+                ? { width: '100%', height: 250, objectFit: 'cover' as const }
+                : moodboard
+                  ? { width: '100%', height: 180, objectFit: 'cover' as const }
+                  : hero
+                    ? { width: '100%', height: 410, objectFit: 'contain' as const }
+                    : detail
+                      ? { width: '100%', height: 160, objectFit: 'contain' as const }
+                      : catalog || catalogStack
+                        ? { width: '100%', height: 200, objectFit: 'contain' as const }
+                        : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
     return React.createElement(Image, { src: safeJpgUrl, style: imgStyle });
 };
 
@@ -1082,7 +1110,7 @@ function pdfCatalogLogoUrl(): string {
 }
 
 /** Logo încorporat ca data-URI — evită eșecul încărcării în react-pdf pe server */
-function loadCatalogLogoDataUri(): string | undefined {
+export function loadCatalogLogoDataUri(): string | undefined {
     try {
         const fp = path.join(process.cwd(), 'public', 'logos', 'tehnicagro-supply-logo-catalog.png');
         if (!fs.existsSync(fp)) return undefined;
@@ -1163,6 +1191,178 @@ const renderPageFooter = (pageNumber: number, phone?: string, opts?: { bandBackg
         React.createElement(Text, { style: styles.footerBandContact, wrap: false }, formatPhoneForPdf(phone || DEFAULT_PHONE))
     )
 );
+
+function renderDeepDiveZigzagBlock(
+    product: DynamicProduct,
+    block: ProductFeatureBlock,
+    globalIdx: number,
+    pSlug: string
+): React.ReactElement {
+    const fallback = block.title || product.name || 'Secțiune';
+    const imageCol = React.createElement(
+        View,
+        { style: { width: '50%', paddingLeft: 0, paddingRight: 0 } },
+        React.createElement(
+            View,
+            { style: { width: '100%', minHeight: 250 } },
+            React.createElement(ProductImage, { url: block.image?.trim(), fallback, deepDiveFeature: true })
+        )
+    );
+    const textCol = React.createElement(
+        View,
+        { style: { width: '50%', padding: 30, justifyContent: 'flex-start' as const } },
+        React.createElement(Text, { style: styles.deepDiveFeatureTitle }, (block.title || '—').trim() || '—'),
+        React.createElement(Text, { style: styles.deepDiveFeatureBody }, (block.description || '').trim())
+    );
+    const rowStyle = { flexDirection: 'row' as const, width: '100%', marginBottom: 28, alignItems: 'stretch' as const };
+    if (globalIdx % 2 === 0) {
+        return React.createElement(View, { key: `zz-${pSlug}-${globalIdx}`, style: rowStyle }, imageCol, textCol);
+    }
+    return React.createElement(View, { key: `zz-${pSlug}-${globalIdx}`, style: rowStyle }, textCol, imageCol);
+}
+
+/** Broșură dedicată unui singur produs: pag. 1 = același hero ca în catalog; apoi zig-zag pe featureBlocks; copertă spate comună. */
+export function buildSingleProductDeepDivePDF(
+    config: { phone?: string; email?: string; title?: string; subtitle?: string; logoDataUri?: string },
+    product: DynamicProduct,
+    categoriesFromDb: Category[]
+): React.ReactElement<DocumentProps> {
+    let currentPage = 0;
+    const pSlug = product.slug || 'product';
+    const catName = product.category || '';
+    const secTitle = categoryDisplayName(catName, categoriesFromDb);
+    const descText = getProfessionalProductLead(product);
+    const giantLines = getProductHeroGiantLines(product);
+    const overviewEyebrowText = (() => {
+        const b = (product?.brand || '').trim();
+        const c = (secTitle || '').trim();
+        if (b && c) return `${b} • ${c}`;
+        return b || c;
+    })();
+
+    const blocks = (product.featureBlocks || []).filter((b) => {
+        if (!b) return false;
+        const img = String(b.image || '').trim();
+        const t = String(b.title || '').trim();
+        const d = String(b.description || '').trim();
+        return Boolean(img || t || d);
+    });
+
+    const overviewPage = React.createElement(
+        Page,
+        { size: 'A4', style: styles.page, key: `sd-overview-${pSlug}` },
+        renderPageHeader(secTitle.toUpperCase()),
+        React.createElement(
+            View,
+            { style: styles.productPageRelativeWrap },
+            React.createElement(
+                View,
+                { style: styles.productOverviewShell },
+                React.createElement(
+                    View,
+                    { style: styles.productOverviewTop },
+                    product?.badge &&
+                        React.createElement(
+                            View,
+                            { style: styles.badgeRow },
+                            React.createElement(
+                                View,
+                                { style: styles.badge },
+                                React.createElement(Text, { style: styles.badgeText }, product.badge)
+                            )
+                        ),
+                    React.createElement(
+                        View,
+                        { style: styles.productOverviewHeroRow },
+                        React.createElement(
+                            View,
+                            { style: styles.productOverviewTitleCol },
+                            ...(overviewEyebrowText
+                                ? [
+                                      React.createElement(
+                                          Text,
+                                          { key: `sd-eyebrow-${pSlug}`, style: styles.productOverviewEyebrow },
+                                          overviewEyebrowText
+                                      ),
+                                  ]
+                                : []),
+                            ...giantLines.map((line, li) =>
+                                React.createElement(Text, { key: `sd-g-${pSlug}-${li}`, style: styles.productOverviewGiant }, line)
+                            )
+                        ),
+                        React.createElement(
+                            View,
+                            { style: styles.productOverviewPrincipleCol },
+                            React.createElement(Text, { style: styles.productOverviewPrincipleTitle }, 'PRINCIPIU'),
+                            React.createElement(
+                                View,
+                                { style: styles.productOverviewPrincipleRow },
+                                React.createElement(Text, { style: styles.productOverviewPrincipleChevron }, '›'),
+                                React.createElement(Text, { style: styles.productOverviewPrincipleBody }, descText)
+                            )
+                        )
+                    )
+                )
+            ),
+            React.createElement(
+                View,
+                { style: styles.productOverviewImageAbsolute },
+                React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, immersive: true })
+            )
+        ),
+        renderPageFooter(++currentPage, config.phone)
+    );
+
+    const zigzagPages: React.ReactElement[] = [];
+    for (let i = 0; i < blocks.length; i += 2) {
+        const pair = [blocks[i], blocks[i + 1]].filter(Boolean) as ProductFeatureBlock[];
+        zigzagPages.push(
+            React.createElement(
+                Page,
+                { size: 'A4', style: styles.page, key: `sd-zz-${pSlug}-${i}` },
+                renderPageHeader(secTitle.toUpperCase()),
+                React.createElement(
+                    View,
+                    { style: styles.deepDiveZigzagPageInner },
+                    ...pair.map((block, localJ) => renderDeepDiveZigzagBlock(product, block, i + localJ, pSlug))
+                ),
+                renderPageFooter(++currentPage, config.phone)
+            )
+        );
+    }
+
+    const contactPage = React.createElement(
+        Page,
+        { size: 'A4', style: { ...styles.page, backgroundColor: BACK_COVER_SOLID }, key: `sd-contact-${pSlug}` },
+        React.createElement(
+            View,
+            { style: styles.contactBackOuter },
+            React.createElement(
+                View,
+                { style: styles.contactBackTop },
+                React.createElement(Text, { style: styles.contactBackLogo }, 'TehnicAgro Supply'),
+                React.createElement(Text, { style: styles.contactBackTagline }, 'Selecție tehnică · mecanizare agricolă · România')
+            ),
+            React.createElement(
+                View,
+                { style: styles.contactBackMiddle },
+                React.createElement(Text, { style: styles.contactBackHeadline }, 'PREGĂTIȚI PENTRU CAMPANIA URMĂTOARE.')
+            ),
+            React.createElement(
+                View,
+                { style: styles.contactBackBottom },
+                React.createElement(Text, { style: styles.contactBackLine }, formatPhoneForPdf(config.phone || DEFAULT_PHONE)),
+                React.createElement(Text, { style: styles.contactBackLine }, (config.email && String(config.email).trim()) || DEFAULT_EMAIL),
+                React.createElement(Text, { style: styles.contactBackLineMuted }, PUBLIC_WEB),
+                React.createElement(Text, { style: styles.contactBackNote }, PDF_DOCUMENTATION_NOTE)
+            )
+        ),
+        renderPageFooter(++currentPage, config.phone, { bandBackgroundColor: BACK_COVER_SOLID })
+    );
+
+    const docTitle = (config.title && String(config.title).trim()) || `${product.name} — broșură dedicată`;
+    return React.createElement(Document, { title: docTitle }, overviewPage, ...zigzagPages, contactPage);
+}
 
 function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Category[]): React.ReactElement<DocumentProps> {
     const productsToDisplay = products || [];

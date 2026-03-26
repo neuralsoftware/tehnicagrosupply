@@ -46,6 +46,13 @@ export interface ProductReferenceLink {
     url: string;
 }
 
+/** Secțiuni detaliate pentru broșura PDF „deep dive” (un singur produs). */
+export interface ProductFeatureBlock {
+    image: string;
+    title: string;
+    description: string;
+}
+
 export interface DynamicProduct {
     id: string;
     slug: string;
@@ -78,6 +85,8 @@ export interface DynamicProduct {
     status: 'active' | 'draft';
     createdAt: string;
     updatedAt: string;
+    /** Opțional: blocuri zig-zag în broșura dedicată unui singur produs (admin). */
+    featureBlocks?: ProductFeatureBlock[];
 }
 
 export interface Category {

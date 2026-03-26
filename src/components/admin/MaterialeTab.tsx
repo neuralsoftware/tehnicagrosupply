@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { DynamicProduct, Brochure, ProductBrochureProfile } from '@/lib/products-store';
-import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers, ImageIcon, Trash2 } from 'lucide-react';
+import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers, ImageIcon, Trash2, FileStack } from 'lucide-react';
 
 interface Props {
     adminAuth: string;
@@ -81,6 +81,8 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
     const [historyLoaded, setHistoryLoaded] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [brochureProfiles, setBrochureProfiles] = useState<Record<string, ProductBrochureProfile>>({});
+    const [deepDiveSlug, setDeepDiveSlug] = useState('');
+    const [generatingDeepDive, setGeneratingDeepDive] = useState(false);
 
     useEffect(() => {
         if (!tabVisible || !adminAuth.trim()) return;
@@ -127,6 +129,47 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
     const applyTemplate = (key: string) => {
         const t = TEMPLATES[key];
         if (t) setConfig(p => ({ ...p, ...t }));
+    };
+
+    const generateDeepDiveSingle = async () => {
+        const slug = deepDiveSlug.trim();
+        if (!slug) {
+            alert('Alege produsul pentru broșura dedicată.');
+            return;
+        }
+        setGeneratingDeepDive(true);
+        try {
+            const cleanToken = (adminAuth || '').trim();
+            const prod = allProducts.find((p) => p.slug === slug);
+            const res = await fetch('/api/materiale/single', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminAuth: cleanToken,
+                    productSlug: slug,
+                    config: {
+                        title: prod ? `Broșură dedicată: ${prod.name}` : undefined,
+                        phone: config.phone,
+                        email: config.email,
+                    },
+                }),
+            });
+            const data = await res.json();
+            if (res.ok && data.success && data.brochure) {
+                const nb = data.brochure as Brochure;
+                setResult(nb);
+                setHistory((prev) => [nb, ...prev.filter((x) => x.id !== nb.id)]);
+                void loadHistory();
+                if (nb.publicUrl) window.open(nb.publicUrl, '_blank', 'noopener,noreferrer');
+            } else {
+                const detail = typeof data.details === 'string' && data.details ? `\n\n${data.details}` : '';
+                alert((data.error || 'Eroare') + detail);
+            }
+        } catch (err) {
+            alert('Eroare conexiune: ' + String(err));
+        } finally {
+            setGeneratingDeepDive(false);
+        }
     };
 
     const generate = async () => {
@@ -277,6 +320,45 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                 <div>
                     <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">Mesaj Introductiv</label>
                     <textarea value={config.introText} onChange={e => setConfig(p => ({ ...p, introText: e.target.value }))} rows={5} placeholder="Descrieți pe scurt oferta sau contextul broșurii..." className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 resize-none transition-all leading-relaxed" />
+                </div>
+            </div>
+
+            <div className="bg-zinc-900 border border-sky-900/40 rounded-2xl p-6 space-y-4 shadow-xl">
+                <h3 className="text-sm font-black text-sky-400 uppercase tracking-widest flex items-center gap-2">
+                    <FileStack className="w-4 h-4" /> Broșură dedicată (un singur produs)
+                </h3>
+                <p className="text-[10px] text-zinc-500 leading-relaxed max-w-2xl">
+                    Folosește aceeași copertă hero ca la catalog. Paginile următoare sunt din{' '}
+                    <strong className="text-zinc-400">blocurile broșură dedicată</strong> definite în Catalog la fiecare produs
+                    (zig-zag, 2 blocuri pe pagină). Nu înlocuiește broșura multi-produs.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
+                    <div className="flex-1 min-w-0">
+                        <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">Produs</label>
+                        <select
+                            value={deepDiveSlug}
+                            onChange={(e) => setDeepDiveSlug(e.target.value)}
+                            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-sky-500/50"
+                        >
+                            <option value="">Alege produsul…</option>
+                            {allProducts
+                                .filter((p) => !p.status || p.status === 'active')
+                                .map((p) => (
+                                    <option key={p.slug} value={p.slug}>
+                                        {p.name} · {p.brand}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={generateDeepDiveSingle}
+                        disabled={generatingDeepDive || !deepDiveSlug}
+                        className="shrink-0 px-6 py-4 bg-sky-700 hover:bg-sky-600 disabled:opacity-40 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 border border-sky-600/50"
+                    >
+                        {generatingDeepDive ? <Loader className="w-4 h-4 animate-spin" /> : <FileStack className="w-4 h-4" />}
+                        Generează broșură dedicată
+                    </button>
                 </div>
             </div>
 
