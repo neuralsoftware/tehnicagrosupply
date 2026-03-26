@@ -36,7 +36,7 @@ export function ExpertAuthority() {
     ];
 
     return (
-        <section className="py-24 bg-zinc-50 relative overflow-hidden border-y border-zinc-200">
+        <section className="py-20 bg-zinc-50 relative overflow-hidden border-y border-zinc-100">
 
             <div className="max-w-7xl mx-auto px-4 relative z-10">
                 {/* Header */}
@@ -47,12 +47,13 @@ export function ExpertAuthority() {
                         viewport={{ once: true }}
                         className="space-y-4"
                     >
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-ea-green-50 border border-ea-green-200 text-ea-green-700 text-xs font-black uppercase tracking-[0.2em]">
-                            De Ce TehnicAgro?
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-white border border-slate-200/60 text-ea-green-700 text-xs font-medium shadow-sm">
+                            De ce TehnicAgro?
                         </span>
-                        <h2 className="text-4xl md:text-5xl font-black uppercase text-zinc-900 leading-tight">
-                            Soluții Validate.<br />
-                            <span className="text-ea-green-600">Rezultate Imediate.</span>
+                        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-zinc-900 leading-tight">
+                            Soluții validate.
+                            <br />
+                            <span className="text-ea-green-600">Rezultate imediate.</span>
                         </h2>
                         <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
                             Combinăm <span className="text-zinc-900 font-semibold">utilaje de ultimă generație</span> cu
@@ -70,12 +71,12 @@ export function ExpertAuthority() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-white p-6 rounded-2xl border border-zinc-200 hover:border-ea-green-300 transition-all group shadow-sm hover:shadow-md"
+                            className="group rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
                         >
                             <div className="w-12 h-12 bg-ea-green-50 rounded-xl flex items-center justify-center text-ea-green-600 mb-4 group-hover:bg-ea-green-100 transition-colors">
                                 {adv.icon}
                             </div>
-                            <h3 className="text-lg font-bold text-zinc-900 mb-2 uppercase tracking-tight">
+                            <h3 className="mb-2 text-lg font-semibold tracking-tight text-zinc-900">
                                 {adv.title}
                             </h3>
                             <p className="text-zinc-500 text-sm leading-relaxed">
@@ -90,13 +91,13 @@ export function ExpertAuthority() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    className="bg-white rounded-3xl border border-zinc-200 p-8 md:p-12 shadow-lg"
+                    className="rounded-2xl border border-slate-200/60 bg-white p-8 shadow-sm md:p-12"
                 >
                     <div className="flex flex-col lg:flex-row items-center gap-12">
                         {/* Left - Promise */}
                         <div className="flex-1 space-y-6">
-                            <h3 className="text-3xl font-black text-zinc-900 uppercase tracking-tight">
-                                Promisiunea Noastră
+                            <h3 className="text-2xl font-semibold tracking-tight text-zinc-900 md:text-3xl">
+                                Promisiunea noastră
                             </h3>
                             <p className="text-zinc-600 text-lg leading-relaxed">
                                 Suntem noi pe piață și știm că trebuie să ne <span className="text-ea-green-600 font-bold">demonstrăm valoarea</span>.
@@ -116,25 +117,25 @@ export function ExpertAuthority() {
 
                         {/* Right - Key Numbers */}
                         <div className="lg:w-80 space-y-4">
-                            <div className="bg-ea-green-50 rounded-2xl p-6 border border-ea-green-200">
-                                <div className="text-center space-y-1">
-                                    <span className="block text-5xl font-black text-ea-green-700">56€</span>
-                                    <span className="block text-sm text-zinc-500 uppercase tracking-wider font-bold">Subvenție APIA / Hectar</span>
+                            <div className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm">
+                                <div className="space-y-1 text-center">
+                                    <span className="block text-4xl font-semibold tabular-nums text-ea-green-700">56€</span>
+                                    <span className="block text-sm font-medium text-zinc-500">Subvenție APIA / hectar</span>
                                 </div>
                             </div>
-                            <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
-                                <div className="text-center space-y-1">
-                                    <span className="block text-5xl font-black text-blue-700">320 RON</span>
-                                    <span className="block text-sm text-zinc-500 uppercase tracking-wider font-bold">Economie Motorină / Hectar</span>
+                            <div className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm">
+                                <div className="space-y-1 text-center">
+                                    <span className="block text-4xl font-semibold tabular-nums text-blue-700">320 RON</span>
+                                    <span className="block text-sm font-medium text-zinc-500">Economie motorină / hectar</span>
                                 </div>
                             </div>
                             <button
                                 onClick={() => {
                                     document.getElementById('audit')?.scrollIntoView({ behavior: 'smooth' });
                                 }}
-                                className="w-full py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center font-black rounded-xl uppercase tracking-wide transition-all shadow-lg shadow-ea-green-600/20 flex items-center justify-center gap-2"
+                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-ea-green-600 py-4 text-center font-semibold text-white shadow-sm transition-all hover:bg-ea-green-500"
                             >
-                                Calculează-ți Beneficiul
+                                Calculează-ți beneficiul
                                 <ArrowRight className="w-5 h-5" />
                             </button>
                         </div>

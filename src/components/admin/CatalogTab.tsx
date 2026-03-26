@@ -76,6 +76,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
         metaTitle: '',
         metaDescription: '',
         videoUrl: '',
+        heroVideoUrl: '',
         badge: '',
         featureBlocks: [],
     });
@@ -106,6 +107,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
             metaTitle: editing.metaTitle,
             metaDescription: editing.metaDescription,
             videoUrl: editing.videoUrl,
+            heroVideoUrl: editing.heroVideoUrl,
             priceRange: editing.priceRange,
             eligibility: editing.eligibility,
             specIcons: editing.specIcons,
@@ -239,6 +241,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                             ['Brand *', 'brand'],
                             ['Badge', 'badge'],
                             ['URL Video (YouTube)', 'videoUrl'],
+                            ['URL Video Hero (MP4, full-bleed)', 'heroVideoUrl'],
                         ] as const
                     ).map(([label, key]) => (
                         <div key={key}>

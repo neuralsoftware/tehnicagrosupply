@@ -25,6 +25,8 @@ export interface Product {
     detailedSpecs: any;
     expertVerdict: string;
     videoUrl?: string;              // URL YouTube/Vimeo embed
+    /** URL către MP4 (absolut sau `/...`) — banner full-bleed deasupra paginii de produs */
+    heroVideoUrl?: string;
     priceRange?: string;
     eligibility?: string;
     metaTitle?: string;             // SEO: titlu custom

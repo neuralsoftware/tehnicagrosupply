@@ -51,7 +51,7 @@ export function VideoShowcase({ title, videoSrc, badge, ctaText, ctaHref }: Vide
             className="relative rounded-3xl overflow-hidden bg-white border border-zinc-200 shadow-sm group"
         >
             {badge && (
-                <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-ea-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">
+                <div className="absolute top-4 left-4 z-20 px-3 py-1 bg-ea-green-600 text-white text-xs font-medium rounded-full shadow-lg">
                     {badge}
                 </div>
             )}
@@ -86,7 +86,7 @@ export function VideoShowcase({ title, videoSrc, badge, ctaText, ctaHref }: Vide
 
                 {/* Bottom Controls */}
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between">
-                    <h3 className="text-white font-bold text-lg">{title}</h3>
+                    <h3 className="text-white font-semibold text-base md:text-lg tracking-tight">{title}</h3>
                     <div className="flex items-center gap-2">
                         <button
                             onClick={handleFullscreen}
@@ -103,7 +103,7 @@ export function VideoShowcase({ title, videoSrc, badge, ctaText, ctaHref }: Vide
                 <div className="p-4 bg-zinc-50">
                     <a
                         href={ctaHref}
-                        className="block w-full py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center font-bold rounded-xl uppercase tracking-wide transition-all"
+                        className="block w-full py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center text-sm font-medium rounded-xl transition-all"
                     >
                         {ctaText}
                     </a>

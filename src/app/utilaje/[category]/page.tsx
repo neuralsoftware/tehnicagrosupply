@@ -1,10 +1,45 @@
-import { getProducts, getCategories, normalizeCategorySlugParam } from '@/lib/products-store';
+import {
+    getProducts,
+    getCategories,
+    normalizeCategorySlugParam,
+    isProductVisibleOnSite,
+    productMatchesCategorySlug,
+    isViticultureCategoryField,
+} from '@/lib/products-store';
+import {
+    collectCategoryHeroMp4Urls,
+    CATEGORY_HERO_PROVITIS_MP4,
+} from '@/lib/category-hero-videos';
+import { CategoryHeroBanner } from '@/components/CategoryHeroBanner';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+/** Titlu afișat fără MAJUSCULE FORȚATE; diacritice corecte pentru slug-uri cunoscute. */
+const CATEGORY_DISPLAY_TITLE: Record<string, string> = {
+    viticol: 'Viticultură',
+    'pregatire-sol': 'Pregătire sol',
+    'semanat-fertilizat': 'Semănat și fertilizat',
+    'recoltare-logistica': 'Recoltare și logistică',
+    'protectia-plantelor': 'Protecția plantelor',
+    legumicol: 'Legumicol',
+};
+
+function formatCategoryTitle(slug: string, rawName: string): string {
+    const mapped = CATEGORY_DISPLAY_TITLE[slug];
+    if (mapped) return mapped;
+    const t = rawName.trim();
+    if (!t) return t;
+    const allShouty = t === t.toUpperCase() && /[A-ZĂÂÎȘȚ]/.test(t);
+    if (allShouty) {
+        const lower = t.toLocaleLowerCase('ro-RO');
+        return lower.charAt(0).toLocaleUpperCase('ro-RO') + lower.slice(1);
+    }
+    return t;
+}
 
 interface PageProps {
     params: Promise<{
@@ -33,7 +68,26 @@ const CATEGORY_SEO: Record<string, { title: string; description: string; keyword
         description: 'Remorci de transbordare cereale K-Factor Powerbank & Booster. Eficientizează recoltarea, reduce pierderile și costurile de transport. Eligibile DR-12.',
         keywords: ['remorca transbordare cereale', 'k-factor powerbank', 'remorca agricola cereale', 'logistica recoltare romania', 'remorca cereale pret'],
     },
+    viticol: {
+        title: 'Utilaje Viticole Premium | Provitis | TehnicAgro Supply',
+        description:
+            'Soluții pentru viticultură: maști și echipamente Provitis, consultanță și finanțare. TehnicAgro Supply — partener pentru plantația ta.',
+        keywords: ['utilaje viticole', 'provitis', 'vie', 'echipamente viticultura', 'tehnicagro viticol'],
+    },
 };
+
+/** Pagini viticole: slug din URL poate fi viticol, viticultura etc. */
+function isViticultureCategoryUrl(categoryParam: string, normalizedKey: string): boolean {
+    const raw = categoryParam.toLowerCase();
+    const key = normalizedKey.toLowerCase();
+    return raw.includes('viti') || key.includes('viti');
+}
+
+function truncateHeroSubtitle(text: string, maxLen: number): string {
+    const t = text.trim();
+    if (t.length <= maxLen) return t;
+    return t.slice(0, maxLen).trimEnd() + '…';
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { category } = await params;
@@ -65,37 +119,55 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-
 export default async function CategoryPage({ params }: PageProps) {
     const { category } = await params;
     const categoryKey = normalizeCategorySlugParam(category);
     const [allProducts, categories] = await Promise.all([getProducts(), getCategories()]);
-    const catMeta = categories.find((c) => normalizeCategorySlugParam(c.slug) === categoryKey);
+    let catMeta = categories.find((c) => normalizeCategorySlugParam(c.slug) === categoryKey);
+    if (
+        !catMeta &&
+        (categoryKey === 'viticol' || isViticultureCategoryUrl(category, categoryKey))
+    ) {
+        catMeta = categories.find((c) => isViticultureCategoryField(c.slug));
+    }
     if (!catMeta) {
         notFound();
     }
     if (category !== catMeta.slug) {
         permanentRedirect(`/utilaje/${catMeta.slug}`);
     }
-    const categoryName = catMeta.name;
+    const categoryTitle = formatCategoryTitle(catMeta.slug, catMeta.name);
     const filteredProducts = allProducts.filter(
-        (p) => normalizeCategorySlugParam(p.category) === categoryKey && p.status !== 'draft'
+        (p) =>
+            isProductVisibleOnSite(p.status) && productMatchesCategorySlug(p.category, categoryKey)
     );
+
+    let categoryHeroMp4s = collectCategoryHeroMp4Urls(filteredProducts);
+    if (
+        categoryHeroMp4s.length === 0 &&
+        isViticultureCategoryUrl(category, categoryKey)
+    ) {
+        categoryHeroMp4s = [CATEGORY_HERO_PROVITIS_MP4];
+    }
+
+    const isViti = isViticultureCategoryUrl(category, categoryKey);
+    const seo = CATEGORY_SEO[catMeta.slug];
+    const subtitleSource = isViti
+        ? 'Soluții premium pentru vie și plantație — utilaje Provitis și consultanță TehnicAgro.'
+        : catMeta.description?.trim() ||
+          seo?.description ||
+          `Descoperă utilajele din categoria ${categoryTitle}, optimizate pentru eficiență și conformitate europeană.`;
+    const heroSubtitle = truncateHeroSubtitle(subtitleSource, 260);
 
     return (
         <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
-            <div className="max-w-7xl mx-auto px-4">
-                {/* Header */}
-                <div className="mb-16 space-y-4">
-                    <h1 className="text-5xl md:text-6xl font-black text-zinc-900 uppercase tracking-tighter">
-                        {categoryName}
-                    </h1>
-                    <p className="text-zinc-500 max-w-2xl text-lg">
-                        Descoperă utilajele din categoria <span className="text-ea-green-600">{categoryName}</span>, optimizate pentru eficiență și în conformitate cu normele europene.
-                    </p>
-                </div>
+            <CategoryHeroBanner
+                categoryTitle={categoryTitle}
+                subtitle={heroSubtitle}
+                videoUrls={categoryHeroMp4s}
+            />
 
-                {/* Product Grid */}
+            <div className="max-w-7xl mx-auto px-4">
                 {filteredProducts.length > 0 ? (
                     <div className="grid lg:grid-cols-2 gap-12">
                         {filteredProducts.map((product) => (
@@ -103,7 +175,6 @@ export default async function CategoryPage({ params }: PageProps) {
                                 key={product.id}
                                 className="bg-white rounded-3xl overflow-hidden border border-zinc-200 flex flex-col md:flex-row group shadow-sm hover:shadow-lg transition-all"
                             >
-                                {/* Image */}
                                 <div className="md:w-2/5 aspect-[4/5] md:aspect-auto relative overflow-hidden">
                                     <img
                                         src={product.imageSrc}
@@ -119,18 +190,18 @@ export default async function CategoryPage({ params }: PageProps) {
                                     )}
                                 </div>
 
-                                {/* Content */}
                                 <div className="md:w-3/5 p-8 flex flex-col justify-between">
                                     <div className="space-y-4">
                                         <h2 className="text-2xl font-black text-zinc-900 uppercase tracking-tight">
                                             {product.name}
                                         </h2>
-                                        <p className="text-zinc-500 text-sm line-clamp-3">
-                                            {product.description}
-                                        </p>
+                                        <p className="text-zinc-500 text-sm line-clamp-3">{product.description}</p>
                                         <ul className="space-y-2">
                                             {product.specs.slice(0, 3).map((spec, i) => (
-                                                <li key={i} className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-wider">
+                                                <li
+                                                    key={i}
+                                                    className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-wider"
+                                                >
                                                     <Check className="w-3 h-3 text-ea-green-600" />
                                                     {spec}
                                                 </li>
@@ -154,7 +225,10 @@ export default async function CategoryPage({ params }: PageProps) {
                         <p className="text-zinc-500 uppercase font-black tracking-widest text-sm">
                             Momentan nu există utilaje adăugate în această categorie.
                         </p>
-                        <Link href="/#contact" className="mt-6 inline-block text-ea-green-500 font-bold uppercase hover:underline">
+                        <Link
+                            href="/#contact"
+                            className="mt-6 inline-block text-ea-green-500 font-bold uppercase hover:underline"
+                        >
                             Contactează-ne pentru cereri speciale
                         </Link>
                     </div>

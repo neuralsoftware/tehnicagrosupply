@@ -113,6 +113,8 @@ export interface DynamicProduct {
     detailedSpecs: Record<string, Record<string, string>>;
     expertVerdict: string;
     videoUrl?: string;
+    /** Opțional: filmare MP4 pentru hero cinematic full-bleed pe pagina de produs */
+    heroVideoUrl?: string;
     priceRange?: string;
     eligibility?: string;
     metaTitle?: string;
@@ -145,6 +147,36 @@ export function normalizeCategorySlugParam(param: string): string {
         .replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
+}
+
+/**
+ * Detectează câmpul `category` al unui produs ca fiind viticol, chiar dacă în JSON
+ * apare ca „viticol”, „Viticol”, „viticultură”, „viticulture”, slug-uri derivate etc.
+ */
+export function isViticultureCategoryField(category: unknown): boolean {
+    const n = normalizeCategorySlugParam(String(category ?? ''));
+    if (!n) return false;
+    if (n === 'viticol' || n.startsWith('viticol-')) return true;
+    if (n.includes('viticult')) return true;
+    return false;
+}
+
+/** Vizibil pe site: doar rândurile cu status clar „draft” sunt ascunse. */
+export function isProductVisibleOnSite(status: unknown): boolean {
+    return coerceActiveDraftStatus(status) !== 'draft';
+}
+
+/**
+ * Compară categoria salvată pe produs cu slug-ul din URL/rută (ex. viticol).
+ * Pentru viticol, acceptă și synonym/normalizări prin isViticultureCategoryField.
+ */
+export function productMatchesCategorySlug(productCategory: unknown, siteCategorySlug: string): boolean {
+    const key = normalizeCategorySlugParam(siteCategorySlug);
+    const pc = normalizeCategorySlugParam(String(productCategory ?? ''));
+    if (pc === key) return true;
+    if (key === 'viticol' && isViticultureCategoryField(productCategory)) return true;
+    if (isViticultureCategoryField(siteCategorySlug) && isViticultureCategoryField(productCategory)) return true;
+    return false;
 }
 
 export interface Brochure {
@@ -467,6 +499,14 @@ const STATIC_CATEGORIES: Category[] = [
     { slug: 'pregatire-sol', name: 'Pregătire Sol', status: 'active', isStatic: true, createdAt: '2025-01-01T00:00:00Z' },
     { slug: 'semanat-fertilizat', name: 'Semănat & Fertilizat', status: 'active', isStatic: true, createdAt: '2025-01-01T00:00:00Z' },
     { slug: 'recoltare-logistica', name: 'Recoltare & Logistică', status: 'active', isStatic: true, createdAt: '2025-01-01T00:00:00Z' },
+    {
+        slug: 'viticol',
+        name: 'Viticol',
+        description: 'Soluții premium pentru vie și plantație — utilaje Provitis și consultanță TehnicAgro.',
+        status: 'active',
+        isStatic: true,
+        createdAt: '2025-01-01T00:00:00Z',
+    },
     { slug: 'protectia-plantelor', name: 'Protecția Plantelor', status: 'draft', isStatic: true, createdAt: '2025-01-01T00:00:00Z' },
 ];
 
@@ -493,10 +533,14 @@ export async function getCategories(): Promise<Category[]> {
     const rawDynamic = await readBlob<unknown>(CATEGORIES_BLOB_KEY, []);
     const dynamic = parseCategoriesFromStorage(rawDynamic).map(normalizeCategoryRow);
     const dynamicSlugs = new Set(dynamic.map((c) => normalizeCategorySlugParam(c.slug)));
+    const hasViticultureInCloud = dynamic.some((c) => isViticultureCategoryField(c.slug));
     const merged = [
-        ...STATIC_CATEGORIES.filter(
-            (c) => !dynamicSlugs.has(normalizeCategorySlugParam(c.slug))
-        ).map(normalizeCategoryRow),
+        ...STATIC_CATEGORIES.filter((c) => {
+            const s = normalizeCategorySlugParam(c.slug);
+            if (dynamicSlugs.has(s)) return false;
+            if (c.slug === 'viticol' && hasViticultureInCloud) return false;
+            return true;
+        }).map(normalizeCategoryRow),
         ...dynamic,
     ];
     return merged.sort((a, b) => a.name.localeCompare(b.name));

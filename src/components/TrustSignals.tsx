@@ -28,9 +28,9 @@ const signals = [
 
 export function TrustSignals() {
     return (
-        <section className="py-12 bg-white border-y border-zinc-100">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <section className="border-y border-zinc-100 bg-white py-20">
+            <div className="mx-auto max-w-7xl px-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {signals.map((signal, index) => (
                         <motion.div
                             key={index}
@@ -38,13 +38,13 @@ export function TrustSignals() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.08 }}
-                            className="flex items-start gap-4 p-5 rounded-xl hover:bg-ea-green-50 transition-colors border border-transparent hover:border-ea-green-200"
+                            className="flex items-start gap-4 rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
                         >
-                            <div className="p-2.5 bg-ea-green-50 rounded-xl border border-ea-green-200 shrink-0">
+                            <div className="shrink-0 rounded-xl border border-slate-200/60 bg-slate-50/80 p-2.5">
                                 {signal.icon}
                             </div>
                             <div>
-                                <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-tight">
+                                <h3 className="text-sm font-semibold tracking-tight text-zinc-900">
                                     {signal.title}
                                 </h3>
                                 <p className="text-zinc-500 text-sm leading-relaxed mt-1">

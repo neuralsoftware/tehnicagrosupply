@@ -33,9 +33,11 @@ export function ProductSection({
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
-        <section id={id} className={`py-24 bg-zinc-50 text-zinc-900 overflow-hidden relative`}>
+        <section id={id} className="pt-12 pb-24 md:pt-14 bg-zinc-50 text-zinc-900 overflow-hidden relative">
             <div className="max-w-7xl mx-auto px-4 relative z-10">
-                <div className={`flex flex-col lg:flex-row gap-16 items-center ${reversed ? 'lg:flex-row-reverse' : ''}`}>
+                <div
+                    className={`flex flex-col lg:flex-row gap-10 lg:gap-16 items-start ${reversed ? 'lg:flex-row-reverse' : ''}`}
+                >
                     <motion.div
                         initial={{ opacity: 0, x: reversed ? 50 : -50 }}
                         whileInView={{ opacity: 1, x: 0 }}

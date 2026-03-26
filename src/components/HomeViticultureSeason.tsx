@@ -1,35 +1,33 @@
 import Link from 'next/link';
-import { ArrowRight, Grape } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
-/** Sub hero — direcționare clară către catalogul de sezon viticol */
+const VITICULTURE_BG = '/images/viticulture-season-bg.jpg';
+
+/** Card categorie premium — viticultură (imagine + overlay), nu alertă de sistem */
 export function HomeViticultureSeason() {
     return (
-        <section className="py-14 md:py-16 bg-white border-y border-zinc-100" aria-labelledby="viticulture-season-heading">
-            <div className="max-w-5xl mx-auto px-4">
-                <div className="relative overflow-hidden rounded-3xl border border-emerald-100/80 bg-gradient-to-br from-emerald-50/90 via-white to-zinc-50/80 shadow-sm px-6 py-8 md:px-10 md:py-10 md:flex md:items-center md:justify-between md:gap-10">
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                    <div className="relative flex items-start gap-4 mb-6 md:mb-0">
-                        <div className="shrink-0 w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-900/10">
-                            <Grape className="w-6 h-6" aria-hidden />
-                        </div>
-                        <div>
-                            <p className="text-xs font-bold text-emerald-700 uppercase tracking-[0.2em] mb-1">
-                                Echipamente de sezon
-                            </p>
-                            <h2 id="viticulture-season-heading" className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight">
-                                Viticultură
-                            </h2>
-                            <p className="text-zinc-600 mt-2 text-sm md:text-base max-w-lg leading-relaxed">
-                                Selecție de utilaje pentru vie, pregătirea terenului și campania din domeniul viticol.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="relative shrink-0">
+        <section className="border-y border-zinc-100 bg-white py-8 md:py-10" aria-labelledby="viticulture-season-heading">
+            <div className="max-w-7xl mx-auto px-4">
+                <div className="relative min-h-[260px] md:min-h-[300px] rounded-2xl overflow-hidden shadow-md border border-zinc-200/80">
+                    <div
+                        className="absolute inset-0 bg-cover bg-center scale-[1.02]"
+                        style={{ backgroundImage: `url(${VITICULTURE_BG})` }}
+                        role="img"
+                        aria-label="Vie și echipamente viticole"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/35" aria-hidden />
+                    <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-12 md:py-14 max-w-2xl mx-auto">
+                        <h2 id="viticulture-season-heading" className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white tracking-tight leading-tight drop-shadow-sm">
+                            Echipamente de sezon: Viticultură
+                        </h2>
+                        <p className="mt-3 text-sm md:text-base text-white/85 max-w-lg leading-relaxed">
+                            Gama pentru vie, pregătirea solului și campania viticolă — aceeași calitate ca în cereale.
+                        </p>
                         <Link
                             href="/utilaje/viticol"
-                            className="inline-flex items-center justify-center gap-2 w-full md:w-auto px-7 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold tracking-wide transition-all shadow-lg shadow-emerald-600/20"
+                            className="mt-8 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white text-zinc-900 text-sm font-medium hover:bg-zinc-100 transition-colors shadow-lg"
                         >
-                            Vezi utilajele pentru viticultură
+                            Explorează gama
                             <ArrowRight className="w-4 h-4" aria-hidden />
                         </Link>
                     </div>

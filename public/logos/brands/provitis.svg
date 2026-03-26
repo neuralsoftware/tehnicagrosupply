@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none" role="img" aria-label="Provitis">
+  <!-- Ciorchine stilizat (portocaliu) + text negru — aproximare marca Provitis -->
+  <g transform="translate(2, 6)">
+    <ellipse cx="14" cy="22" rx="5.5" ry="6.5" fill="#EA580C"/>
+    <ellipse cx="22" cy="18" rx="5.5" ry="6.5" fill="#F97316"/>
+    <ellipse cx="18" cy="11" rx="5.5" ry="6.5" fill="#FB923C"/>
+    <ellipse cx="10" cy="14" rx="4.8" ry="5.8" fill="#C2410C"/>
+    <ellipse cx="26" cy="24" rx="4.8" ry="5.8" fill="#EA580C"/>
+    <path d="M18 2 Q20 6 18 9 Q16 6 18 2" fill="#171717"/>
+  </g>
+  <text x="44" y="31" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="22" font-weight="700" letter-spacing="0.04em" fill="#171717">PROVITIS</text>
+</svg>

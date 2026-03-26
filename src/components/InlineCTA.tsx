@@ -15,7 +15,7 @@ export function InlineCTA({ variant = 'calculator' }: InlineCTAProps) {
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="py-8 px-4"
+                className="py-6 px-4"
             >
                 <div className="max-w-3xl mx-auto bg-ea-green-50 rounded-2xl border border-ea-green-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
@@ -44,7 +44,7 @@ export function InlineCTA({ variant = 'calculator' }: InlineCTAProps) {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="py-8 px-4"
+            className="py-6 px-4"
         >
             <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
                 <div className="flex items-center gap-3">

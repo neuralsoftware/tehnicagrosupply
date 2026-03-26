@@ -29,7 +29,13 @@ function formatLeadApiError(data: { error?: string; details?: Array<{ message?: 
     return data.error || 'Cererea nu a putut fi procesată.';
 }
 
-export function RoiCalculator() {
+export function RoiCalculator({
+    embedded = false,
+    compact = false,
+}: {
+    embedded?: boolean;
+    compact?: boolean;
+} = {}) {
     const [hectares, setHectares] = useState<number>(100);
     const [showForm, setShowForm] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -210,29 +216,58 @@ export function RoiCalculator() {
         return "Optimizare Generală: Structura propusă vizează reducerea costurilor fixe și conformitatea cu noile standarde de subvenționare 2026.";
     };
 
-    return (
-        <section id="audit" className="py-24 bg-white relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-ea-green-200 to-transparent" />
+    const isSymmetricPanel = embedded && compact;
+    const shellClass = compact
+        ? isSymmetricPanel
+            ? 'flex h-full min-h-0 flex-col rounded-2xl border border-slate-200/60 bg-slate-50 p-6 shadow-sm md:p-8'
+            : 'rounded-2xl border border-slate-200/60 bg-slate-50 p-5 shadow-sm md:p-6'
+        : 'rounded-3xl border border-slate-200/60 bg-slate-50 p-8 shadow-sm md:p-12';
+    const headCls = compact ? 'mb-5 space-y-2 text-center' : 'mb-10 space-y-3 text-center';
+    const badgeCls = compact
+        ? 'inline-block rounded-full border border-slate-200/60 bg-white px-3 py-1 text-xs font-medium text-ea-green-700 shadow-sm'
+        : 'inline-block rounded-full border border-slate-200/60 bg-white px-4 py-1.5 text-sm font-medium text-ea-green-700 shadow-sm';
+    const h2Cls = compact
+        ? 'text-2xl font-semibold leading-tight tracking-tight text-zinc-900 md:text-3xl'
+        : 'text-3xl font-semibold leading-tight tracking-tight text-zinc-900 md:text-4xl';
+    const descCls = compact ? 'mx-auto max-w-2xl text-sm text-zinc-500' : 'mx-auto max-w-2xl text-lg text-zinc-500';
+    const sliderBlockCls = compact ? 'mb-6 mx-auto max-w-full' : 'mb-12 mx-auto max-w-3xl';
+    const sliderLabelRowCls = compact ? 'mb-4 flex items-center justify-between' : 'mb-6 flex items-center justify-between';
+    const haLabelCls = compact ? 'text-sm font-medium text-zinc-700' : 'text-lg font-medium text-zinc-700';
+    const haBadgeCls = compact
+        ? 'rounded-lg border border-slate-200/60 bg-white px-3 py-1.5 text-2xl font-semibold tabular-nums text-zinc-900 md:text-3xl'
+        : 'rounded-xl border border-slate-200/60 bg-white px-5 py-2.5 text-4xl font-semibold tabular-nums text-zinc-900';
+    const teaserBlockCls = compact ? 'mb-6 space-y-4' : 'mb-12 space-y-8';
+    const resultGridCls = compact ? 'grid grid-cols-3 gap-2 md:gap-3' : 'grid gap-6 md:grid-cols-3';
+    const resultCardPad = compact ? 'p-3 md:p-4' : 'p-6';
+    const resultIconCls = compact ? 'mb-2 h-7 w-7' : 'mb-4 h-10 w-10';
+    const actionPt =
+        compact && isSymmetricPanel
+            ? 'mt-auto border-t border-zinc-200 pt-6'
+            : compact
+              ? 'border-t border-zinc-200 pt-6'
+              : 'border-t border-zinc-200 pt-10';
+    const mainColumnCls = isSymmetricPanel ? 'flex min-h-0 flex-1 flex-col' : '';
 
-            <div className="max-w-5xl mx-auto px-4 relative z-10">
-                <div className="text-center mb-12 space-y-4">
-                    <span className="inline-block px-4 py-1 rounded-full bg-ea-green-50 border border-ea-green-200 text-ea-green-600 text-sm font-semibold uppercase tracking-wider">
-                        Instrument Profesional de Diagnoză
-                    </span>
-                    <h2 className="text-4xl md:text-5xl font-bold uppercase text-zinc-900 leading-tight">
-                        Audit de Eficiență Tehnologică
-                    </h2>
-                    <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
-                        Analizăm impactul tehnologiilor No-Till și Conservatoare asupra rentabilității fermei tale în contextul noilor subvenții 2026.
-                    </p>
-                </div>
+    const shell = (
+        <div className={shellClass}>
+                    <div className={headCls}>
+                        <span className={badgeCls}>
+                            Instrument profesional de diagnoză
+                        </span>
+                        <h2 className={h2Cls}>
+                            Audit de eficiență tehnologică
+                        </h2>
+                        <p className={descCls}>
+                            Analizăm impactul tehnologiilor No-Till și conservatoare asupra rentabilității fermei tale în contextul noilor subvenții 2026.
+                        </p>
+                    </div>
 
-                <div className="bg-zinc-50 rounded-3xl border border-zinc-200 shadow-xl p-6 md:p-12">
+                    <div className={mainColumnCls}>
                     {/* Input Slider */}
-                    <div className="mb-12 max-w-3xl mx-auto">
-                        <label className="flex justify-between items-center mb-6">
-                            <span className="text-zinc-700 font-medium text-lg">Suprafață de Lucru (Hectare):</span>
-                            <span className="text-4xl font-black text-zinc-900 bg-white px-6 py-3 rounded-2xl border border-zinc-200 shadow-sm">
+                    <div className={sliderBlockCls}>
+                        <label className={sliderLabelRowCls}>
+                            <span className={haLabelCls}>Suprafață (ha)</span>
+                            <span className={haBadgeCls}>
                                 {hectares} ha
                             </span>
                         </label>
@@ -245,7 +280,7 @@ export function RoiCalculator() {
                             onChange={(e) => setHectares(Number(e.target.value))}
                             className="w-full h-4 bg-zinc-200 rounded-xl appearance-none cursor-pointer accent-ea-green-600"
                         />
-                        <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-600 mt-3 px-1 tracking-widest">
+                        <div className="flex justify-between text-xs font-medium text-zinc-600 mt-3 px-1">
                             <span>10 ha</span>
                             <span>Model Standard</span>
                             <span>Exploatație Comercială</span>
@@ -256,32 +291,34 @@ export function RoiCalculator() {
 
                     {/* Results Block - Hidden/Teaser until submitted */}
                     {!submitted ? (
-                        <div className="mb-12 relative">
-                            {/* Blurry teaser overlay */}
-                            <div className="grid md:grid-cols-3 gap-8 filter blur-sm opacity-50 select-none pointer-events-none">
-                                <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center shadow-sm">
-                                    <Banknote className="w-10 h-10 text-ea-green-600 mb-4" />
-                                    <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Venit Securizat APIA</span>
-                                    <span className="text-3xl font-bold text-zinc-900">??? RON</span>
+                        <div className={teaserBlockCls}>
+                            <div className={resultGridCls}>
+                                <div className={`flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm`}>
+                                    <Banknote className={`${resultIconCls} text-ea-green-600`} />
+                                    <span className="mb-2 text-xs font-medium text-zinc-600">Venit securizat APIA</span>
+                                    <span className={`font-semibold tabular-nums text-zinc-400 ${compact ? 'text-xl' : 'text-3xl'}`}>— <span className={`font-normal text-zinc-400 ${compact ? 'text-sm' : 'text-lg'}`}>RON</span></span>
                                 </div>
-                                <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center shadow-sm">
-                                    <Droplets className="w-10 h-10 text-blue-600 mb-4" />
-                                    <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Optimizare Costuri</span>
-                                    <span className="text-3xl font-bold text-zinc-900">??? RON</span>
+                                <div className={`flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm`}>
+                                    <Droplets className={`${resultIconCls} text-blue-600`} />
+                                    <span className="mb-2 text-xs font-medium text-zinc-600">Optimizare costuri</span>
+                                    <span className={`font-semibold tabular-nums text-zinc-400 ${compact ? 'text-xl' : 'text-3xl'}`}>— <span className={`font-normal text-zinc-400 ${compact ? 'text-sm' : 'text-lg'}`}>RON</span></span>
                                 </div>
-                                <div className="bg-ea-green-50 p-6 rounded-2xl border border-ea-green-300 flex flex-col items-center text-center shadow-sm">
-                                    <TrendingUp className="w-10 h-10 text-ea-green-600 mb-4" />
-                                    <span className="text-ea-green-600 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Impact Profit Net</span>
-                                    <span className="text-4xl font-black text-ea-green-600">??? RON</span>
+                                <div className={`flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm`}>
+                                    <TrendingUp className={`${resultIconCls} text-ea-green-600`} />
+                                    <span className="mb-2 text-xs font-medium text-zinc-600">Impact profit net estimat</span>
+                                    <span className={`font-semibold tabular-nums text-zinc-400 ${compact ? 'text-xl' : 'text-3xl'}`}>— <span className={`font-normal text-zinc-400 ${compact ? 'text-sm' : 'text-lg'}`}>RON</span></span>
                                 </div>
                             </div>
 
-                            {/* CTA to unlock */}
                             {!showForm && (
-                                <div className="absolute inset-0 flex items-center justify-center z-10 bg-white/40 rounded-2xl">
+                                <div className="flex flex-col items-center gap-3">
+                                    <p className={`text-center text-zinc-500 ${compact ? 'max-w-sm text-xs' : 'max-w-md text-sm'}`}>
+                                        Pornește auditul pentru estimări personalizate — îți cerem câteva date, în deplină siguranță.
+                                    </p>
                                     <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                        type="button"
                                         onClick={() => {
                                             setFormError(null);
                                             setShowForm(true);
@@ -289,38 +326,38 @@ export function RoiCalculator() {
                                                 (window as typeof window & { fbq: (ev: string) => void }).fbq('trackCustom', 'AuditStart');
                                             }
                                         }}
-                                        className="group relative inline-flex items-center gap-3 px-8 mx-4 py-5 bg-ea-green-600 text-white font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-ea-green-500 transition-all overflow-hidden"
+                                        className={`inline-flex items-center gap-2 rounded-lg bg-ea-green-600 font-medium text-white shadow-sm transition-colors hover:bg-ea-green-500 ${compact ? 'px-4 py-2 text-sm' : 'px-6 py-3'}`}
                                     >
-                                        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                                        <span className="relative z-10 flex items-center gap-2">
-                                            <Calculator className="w-5 h-5" />
-                                            Află Rezultatul pentru {hectares} ha
-                                        </span>
+                                        <Calculator className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
+                                        Află rezultatul pentru {hectares} ha
                                     </motion.button>
                                 </div>
                             )}
                         </div>
                     ) : (
-                        <div className="grid md:grid-cols-3 gap-8 mb-12">
-                            <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center group hover:border-ea-green-300 transition-colors shadow-sm">
-                                <Banknote className="w-10 h-10 text-ea-green-600 mb-4 group-hover:scale-110 transition-transform" />
-                                <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Venit Securizat APIA</span>
-                                <span className="text-3xl font-bold text-zinc-900">
-                                    {subsidyIncome.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-zinc-500">RON</span>
+                        <div className={compact ? 'mb-6 grid grid-cols-3 gap-2 md:gap-3' : 'mb-12 grid gap-6 md:grid-cols-3 md:gap-8'}>
+                            <div className={`group flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm transition-shadow hover:shadow-md`}>
+                                <Banknote className={`${resultIconCls} text-ea-green-600 transition-transform group-hover:scale-105`} />
+                                <span className="mb-2 text-xs font-medium text-zinc-500">Venit securizat APIA</span>
+                                <span className={`font-semibold tabular-nums text-zinc-900 ${compact ? 'text-lg md:text-xl' : 'text-3xl'}`}>
+                                    {subsidyIncome.toLocaleString('ro-RO', { maximumFractionDigits: 0 })}{' '}
+                                    <span className={`font-normal text-zinc-500 ${compact ? 'text-xs' : 'text-sm'}`}>RON</span>
                                 </span>
                             </div>
-                            <div className="bg-white p-6 rounded-2xl border border-zinc-200 flex flex-col items-center text-center group hover:border-blue-300 transition-colors shadow-sm">
-                                <Droplets className="w-10 h-10 text-blue-600 mb-4 group-hover:scale-110 transition-transform" />
-                                <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Optimizare Costuri Input</span>
-                                <span className="text-3xl font-bold text-zinc-900">
-                                    {(fuelSavings + inputSavings).toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-zinc-500">RON</span>
+                            <div className={`group flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm transition-shadow hover:shadow-md`}>
+                                <Droplets className={`${resultIconCls} text-blue-600 transition-transform group-hover:scale-105`} />
+                                <span className="mb-2 text-xs font-medium text-zinc-500">Optimizare costuri input</span>
+                                <span className={`font-semibold tabular-nums text-zinc-900 ${compact ? 'text-lg md:text-xl' : 'text-3xl'}`}>
+                                    {(fuelSavings + inputSavings).toLocaleString('ro-RO', { maximumFractionDigits: 0 })}{' '}
+                                    <span className={`font-normal text-zinc-500 ${compact ? 'text-xs' : 'text-sm'}`}>RON</span>
                                 </span>
                             </div>
-                            <div className="bg-ea-green-50 p-6 rounded-2xl border border-ea-green-300 flex flex-col items-center text-center group border-dashed shadow-sm">
-                                <TrendingUp className="w-10 h-10 text-ea-green-600 mb-4 group-hover:scale-110 transition-transform" />
-                                <span className="text-ea-green-600 text-[10px] uppercase tracking-[0.2em] font-bold mb-2">Impact Profit Net / An</span>
-                                <span className="text-4xl font-black text-ea-green-600">
-                                    {totalBenefit.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} <span className="text-sm font-normal text-ea-green-700">RON</span>
+                            <div className={`group flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm transition-shadow hover:shadow-md`}>
+                                <TrendingUp className={`${resultIconCls} text-ea-green-600 transition-transform group-hover:scale-105`} />
+                                <span className="mb-2 text-xs font-medium text-zinc-500">Impact profit net / an</span>
+                                <span className={`font-semibold tabular-nums text-ea-green-600 ${compact ? 'text-xl md:text-2xl' : 'text-3xl md:text-4xl'}`}>
+                                    {totalBenefit.toLocaleString('ro-RO', { maximumFractionDigits: 0 })}{' '}
+                                    <span className={`font-normal text-ea-green-700 ${compact ? 'text-xs' : 'text-sm'}`}>RON</span>
                                 </span>
                             </div>
                         </div>
@@ -329,7 +366,7 @@ export function RoiCalculator() {
 
 
                     {/* Action Area */}
-                    <div className="border-t border-zinc-200 pt-10">
+                    <div className={actionPt}>
                         {!showForm ? (
                             <div className="text-center text-zinc-500 text-sm">
                             </div>
@@ -343,7 +380,7 @@ export function RoiCalculator() {
                                         onSubmit={handleDownloadReport}
                                         className="max-w-4xl mx-auto"
                                     >
-                                        <div className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
+                                        <div className="rounded-2xl border border-slate-200/60 bg-white p-8 shadow-sm">
                                             <div className="text-center mb-6">
                                                 <h3 className="text-xl font-bold text-zinc-900 mb-2">Completare date pentru generare</h3>
                                                 <p className="text-zinc-500 text-sm">
@@ -492,7 +529,7 @@ export function RoiCalculator() {
                                     <motion.div
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className="max-w-4xl mx-auto bg-zinc-50 text-zinc-900 rounded-[2.5rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-white"
+                                        className="max-w-4xl mx-auto bg-zinc-50 text-zinc-900 rounded-3xl overflow-hidden shadow-lg border border-zinc-200"
                                     >
                                         {/* Header Raport - Professional Look */}
                                         <div className="bg-zinc-900 p-10 flex justify-between items-start text-white border-b-8 border-ea-green-600">
@@ -531,8 +568,7 @@ export function RoiCalculator() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="bg-zinc-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
-                                                        <div className="absolute top-0 right-0 w-32 h-32 bg-ea-green-500 opacity-5 blur-3xl -mr-10 -mt-10"></div>
+                                                    <div className="bg-zinc-900 text-white p-8 rounded-3xl relative overflow-hidden border border-zinc-700">
                                                         <span className="block text-zinc-500 text-[10px] uppercase font-black tracking-widest mb-2">Total Beneficiu Suplimentar Anual</span>
                                                         <span className="block text-5xl font-black text-ea-green-400 mb-2">{totalBenefit.toLocaleString('ro-RO')} <span className="text-lg text-ea-green-800">RON</span></span>
                                                         <p className="text-xs text-zinc-500 font-medium">Acest profit acoperă plata ratelor pentru utilajele achiziționate în proporție de peste 80%.</p>
@@ -661,8 +697,20 @@ export function RoiCalculator() {
                             </AnimatePresence>
                         )}
                     </div>
+                    </div>
                 </div>
+    );
+
+    if (embedded) {
+        return (
+            <div className={`flex w-full min-w-0 flex-col ${compact ? 'h-full min-h-0' : ''}`}>
+                {shell}
             </div>
+        );
+    }
+    return (
+        <section id="audit" className="relative overflow-hidden bg-white py-12 md:py-16">
+            <div className="relative z-10 mx-auto max-w-5xl px-4">{shell}</div>
         </section>
     );
 }

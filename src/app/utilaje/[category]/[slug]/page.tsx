@@ -1,4 +1,4 @@
-import { getProducts, normalizeCategorySlugParam } from '@/lib/products-store';
+import { getProducts, productMatchesCategorySlug } from '@/lib/products-store';
 import { getPublishedPosts } from '@/data/blog';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { ProductSection } from '@/components/ProductSection';
@@ -18,11 +18,8 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { category, slug } = await params;
-    const categoryKey = normalizeCategorySlugParam(category);
     const products = await getProducts();
-    const product = products.find(
-        (p) => p.slug === slug && normalizeCategorySlugParam(p.category) === categoryKey
-    );
+    const product = products.find((p) => p.slug === slug && productMatchesCategorySlug(p.category, category));
     if (!product) return {};
 
     const seoTitle = product.metaTitle || `${product.brand} ${product.name} — Preț & Detalii Tehnice | TehnicAgro Supply`;
@@ -46,11 +43,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
     const { category, slug } = await params;
-    const categoryKey = normalizeCategorySlugParam(category);
     const products = await getProducts();
-    const product = products.find(
-        (p) => p.slug === slug && normalizeCategorySlugParam(p.category) === categoryKey
-    );
+    const product = products.find((p) => p.slug === slug && productMatchesCategorySlug(p.category, category));
 
     if (!product || product.status === 'draft') notFound();
 

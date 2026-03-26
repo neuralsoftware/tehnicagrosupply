@@ -1,4 +1,4 @@
-import { getPublishedPosts } from '@/data/blog';
+import { getPublishedPosts, resolveBlogPostImage } from '@/data/blog';
 import Link from 'next/link';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { Metadata } from 'next';
@@ -38,7 +38,7 @@ export default function BlogPage() {
                             {/* Image */}
                             <div className="aspect-[16/9] overflow-hidden relative">
                                 <img
-                                    src={post.imageSrc}
+                                    src={resolveBlogPostImage(post)}
                                     alt={post.title}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
                                 />

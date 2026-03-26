@@ -6,8 +6,17 @@ export interface BlogPost {
   content: string;
   author: string;
   date: string;
-  imageSrc: string;
+  /** Dacă lipsește sau URL-ul e invalid, homepage folosește imagine fallback din `public/images`. */
+  imageSrc?: string | null;
   category: 'fonduri-europene' | 'tehnologie' | 'noutati';
+}
+
+/** Imagine generică câmp agricol — articole fără `imageSrc` sau cu URL lipsă. */
+export const BLOG_POST_IMAGE_FALLBACK = '/images/agricultural-field-fallback.jpg';
+
+export function resolveBlogPostImage(post: Pick<BlogPost, 'imageSrc'>): string {
+  const trimmed = post.imageSrc?.trim();
+  return trimmed || BLOG_POST_IMAGE_FALLBACK;
 }
 
 export const BLOG_POSTS: BlogPost[] = [

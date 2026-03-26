@@ -1,4 +1,4 @@
-import { BLOG_POSTS, getPublishedPosts } from '@/data/blog';
+import { getPublishedPosts, resolveBlogPostImage } from '@/data/blog';
 import { notFound } from 'next/navigation';
 import { Contact } from '@/components/Contact';
 import { ChevronLeft, Calendar, User, Tag } from 'lucide-react';
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         openGraph: {
             title: post.title,
             description: post.excerpt,
-            images: [post.imageSrc],
+            images: [resolveBlogPostImage(post)],
             type: 'article',
             publishedTime: post.date,
         },
@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             card: 'summary_large_image',
             title: post.title,
             description: post.excerpt,
-            images: [post.imageSrc],
+            images: [resolveBlogPostImage(post)],
         }
     };
 }
@@ -62,7 +62,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         "@type": "Article",
         "headline": post.title,
         "description": post.excerpt,
-        "image": `https://tehnicagrosupply.ro${post.imageSrc}`,
+        "image": `https://tehnicagrosupply.ro${resolveBlogPostImage(post)}`,
         "datePublished": post.date,
         "author": {
             "@type": "Organization",
@@ -111,7 +111,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 {/* Featured Image */}
                 <div className="aspect-video bg-zinc-100 rounded-3xl overflow-hidden mb-12 border border-zinc-200">
                     <img
-                        src={post.imageSrc}
+                        src={resolveBlogPostImage(post)}
                         alt={post.title}
                         className="w-full h-full object-cover opacity-80"
                     />

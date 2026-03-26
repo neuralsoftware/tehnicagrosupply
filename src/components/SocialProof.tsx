@@ -32,7 +32,7 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
     }, [target]);
 
     return (
-        <span className="text-4xl font-black text-ea-green-600 tabular-nums">
+        <span className="text-4xl font-semibold tabular-nums text-ea-green-600">
             {displayValue}{suffix}
         </span>
     );
@@ -74,7 +74,7 @@ function LiveActivityFeed() {
                     initial={{ opacity: 0, x: -50, scale: 0.9 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                     exit={{ opacity: 0, x: -50 }}
-                    className="bg-white border border-zinc-200 rounded-2xl p-4 shadow-xl"
+                    className="rounded-2xl border border-slate-200/60 bg-white p-4 shadow-md"
                 >
                     <div className="flex items-start gap-3">
                         <div className="w-8 h-8 bg-ea-green-50 rounded-full flex items-center justify-center shrink-0">
@@ -96,7 +96,7 @@ function LiveActivityFeed() {
 
 export function SocialProof() {
     return (
-        <section className="py-16 bg-zinc-50 border-y border-zinc-200">
+        <section className="border-y border-zinc-100 bg-zinc-50 py-20">
             <div className="max-w-5xl mx-auto px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -104,9 +104,9 @@ export function SocialProof() {
                     viewport={{ once: true }}
                     className="text-center mb-10"
                 >
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ea-green-50 border border-ea-green-200 text-ea-green-600 text-xs font-black uppercase tracking-[0.2em]">
-                        <Zap className="w-3 h-3" />
-                        De Ce Ne Aleg Fermierii
+                    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200/60 bg-white px-4 py-1.5 text-xs font-medium text-ea-green-700 shadow-sm">
+                        <Zap className="h-3 w-3" />
+                        De ce ne aleg fermierii
                     </span>
                 </motion.div>
 
@@ -115,12 +115,12 @@ export function SocialProof() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-center p-6 bg-white rounded-2xl border border-zinc-200 shadow-sm"
+                        className="rounded-2xl border border-slate-200/60 bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
                     >
-                        <Users className="w-8 h-8 text-ea-green-600 mx-auto mb-3" />
-                        <span className="text-4xl font-black text-ea-green-600">56</span>
-                        <span className="text-xl font-black text-ea-green-700"> EUR/ha</span>
-                        <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Subvenție APIA PD-04</p>
+                        <Users className="mx-auto mb-3 h-8 w-8 text-ea-green-600" />
+                        <span className="text-4xl font-semibold tabular-nums text-ea-green-600">56</span>
+                        <span className="text-xl font-semibold text-ea-green-700"> EUR/ha</span>
+                        <p className="mt-2 text-sm font-medium text-zinc-500">Subvenție APIA PD-04</p>
                     </motion.div>
 
                     <motion.div
@@ -128,12 +128,12 @@ export function SocialProof() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="text-center p-6 bg-white rounded-2xl border border-zinc-200 shadow-sm"
+                        className="rounded-2xl border border-slate-200/60 bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
                     >
-                        <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                        <span className="text-4xl font-black text-blue-600">-40L</span>
-                        <span className="text-xl font-black text-blue-700"> /ha</span>
-                        <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Economie Motorină</p>
+                        <TrendingUp className="mx-auto mb-3 h-8 w-8 text-blue-600" />
+                        <span className="text-4xl font-semibold tabular-nums text-blue-600">-40L</span>
+                        <span className="text-xl font-semibold text-blue-700"> /ha</span>
+                        <p className="mt-2 text-sm font-medium text-zinc-500">Economie motorină</p>
                     </motion.div>
 
                     <motion.div
@@ -141,11 +141,11 @@ export function SocialProof() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 }}
-                        className="text-center p-6 bg-white rounded-2xl border border-ea-green-200 shadow-sm"
+                        className="rounded-2xl border border-slate-200/60 bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
                     >
-                        <MapPin className="w-8 h-8 text-ea-green-600 mx-auto mb-3" />
-                        <span className="text-4xl font-black text-ea-green-600">100%</span>
-                        <p className="text-sm text-zinc-500 font-bold uppercase tracking-wider mt-2">Eligibil GAEC 6</p>
+                        <MapPin className="mx-auto mb-3 h-8 w-8 text-ea-green-600" />
+                        <span className="text-4xl font-semibold tabular-nums text-ea-green-600">100%</span>
+                        <p className="mt-2 text-sm font-medium text-zinc-500">Eligibil GAEC 6</p>
                     </motion.div>
                 </div>
             </div>

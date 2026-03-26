@@ -10,9 +10,8 @@ const DEFAULT_MESSAGE = 'Bună ziua! Doresc informații despre utilajele agricol
 export function WhatsAppButton() {
     const [isOpen, setIsOpen] = useState(false);
     const [showPulse, setShowPulse] = useState(true);
-    const [hasInteracted, setHasInteracted] = useState(false);
+    const [showTooltipLabel, setShowTooltipLabel] = useState(true);
 
-    // Auto-hide the tooltip hint after 3 seconds 
     useEffect(() => {
         const timer = setTimeout(() => {
             setShowPulse(false);
@@ -20,9 +19,14 @@ export function WhatsAppButton() {
         return () => clearTimeout(timer);
     }, []);
 
+    useEffect(() => {
+        const t = setTimeout(() => setShowTooltipLabel(false), 5000);
+        return () => clearTimeout(t);
+    }, []);
+
     const handleClick = () => {
-        setHasInteracted(true);
         setShowPulse(false);
+        setShowTooltipLabel(false);
         setIsOpen(!isOpen);
     };
 
@@ -144,14 +148,15 @@ export function WhatsAppButton() {
                 </motion.button>
 
                 {/* Tooltip */}
-                {!isOpen && (
+                {!isOpen && showTooltipLabel && (
                     <motion.div
-                        initial={{ opacity: 0, x: 10 }}
+                        initial={{ opacity: 0, x: 8 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="absolute right-20 top-1/2 -translate-y-1/2 bg-zinc-900 text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap shadow-lg"
+                        exit={{ opacity: 0 }}
+                        className="absolute right-[4.25rem] top-1/2 -translate-y-1/2 bg-zinc-800/95 text-white px-2.5 py-1.5 rounded-md text-[11px] font-medium tracking-tight whitespace-nowrap shadow-md border border-zinc-700/50"
                     >
                         Scrie-ne pe WhatsApp!
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full border-8 border-transparent border-l-zinc-900"></div>
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full border-[6px] border-transparent border-l-zinc-800/95" />
                     </motion.div>
                 )}
             </div>
