@@ -5,7 +5,8 @@ import { Pencil, Trash2, Plus, X, Save, FileStack } from 'lucide-react';
 import { ImageOptimizer } from './ImageOptimizer';
 
 function slugify(str: string) {
-    return str
+    return String(str || '')
+        .trim()
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
@@ -60,14 +61,21 @@ export function CatalogTab({ adminAuth, categories }: Props) {
 
     const save = async () => {
         if (!editing) return;
+        const slugFinal = (editing.slug || slugify(editing.name || '')).trim();
+        const categoryFinal = (editing.category || '').trim();
+        const nameFinal = (editing.name || '').trim();
+        if (!slugFinal || !nameFinal || !categoryFinal) {
+            alert('Completează numele, categoria și slug-ul (sau lasă numele să genereze slug-ul).');
+            return;
+        }
         setSaving(true);
         const sitePayload = {
-            id: editing.id || editing.slug || '',
-            slug: editing.slug || '',
-            name: editing.name || '',
-            brand: editing.brand || '',
+            id: editing.id || slugFinal || `product-${slugFinal}-${Date.now()}`,
+            slug: slugFinal,
+            name: nameFinal,
+            brand: (editing.brand || '').trim(),
             badge: editing.badge,
-            category: editing.category || '',
+            category: categoryFinal,
             description: editing.description || '',
             imageSrc: imageUrl || editing.imageSrc || '',
             specs: editing.specs || [],
@@ -91,17 +99,27 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                 : [],
         } satisfies Partial<DynamicProduct>;
 
-        const method = products.find((p) => p.slug === editing.slug) ? 'PUT' : 'POST';
-        const url = method === 'PUT' ? `/api/products/${editing.slug}` : '/api/products';
-        await fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json', 'x-admin-auth': adminAuth },
-            body: JSON.stringify({ ...sitePayload, adminAuth, siteCatalogOnly: true }),
-        });
-        setSaving(false);
-        setEditing(null);
-        setImageUrl('');
-        load();
+        try {
+            const res = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-admin-auth': (adminAuth || '').trim() },
+                body: JSON.stringify({
+                    ...sitePayload,
+                    adminAuth: (adminAuth || '').trim(),
+                    siteCatalogOnly: true,
+                }),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                alert((data as { error?: string }).error || `Eroare server (${res.status}). Produsul nu a fost salvat.`);
+                return;
+            }
+            setEditing(null);
+            setImageUrl('');
+            await load();
+        } finally {
+            setSaving(false);
+        }
     };
 
     const generateDeepDiveForSlug = async (slug: string, name: string) => {
@@ -177,7 +195,11 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                         </p>
                     </div>
                     <button
-                        onClick={() => setEditing(null)}
+                        type="button"
+                        onClick={() => {
+                            setImageUrl('');
+                            setEditing(null);
+                        }}
                         className="p-3 bg-zinc-900 border border-zinc-800 rounded-2xl text-zinc-400 hover:text-white transition-all"
                     >
                         <X className="w-5 h-5" />
@@ -466,12 +488,17 @@ export function CatalogTab({ adminAuth, categories }: Props) {
 
                 <div className="flex justify-end gap-3 py-10 border-t border-zinc-800">
                     <button
-                        onClick={() => setEditing(null)}
+                        type="button"
+                        onClick={() => {
+                            setImageUrl('');
+                            setEditing(null);
+                        }}
                         className="px-8 py-4 text-zinc-500 font-black uppercase text-xs hover:text-white transition-colors leading-none"
                     >
                         Renunță
                     </button>
                     <button
+                        type="button"
                         onClick={save}
                         disabled={saving}
                         className="px-10 py-5 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 shadow-2xl shadow-ea-green-900/40 transition-all hover:-translate-y-1 active:translate-y-0 leading-none disabled:opacity-50"
@@ -501,7 +528,11 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                     </p>
                 </div>
                 <button
-                    onClick={() => setEditing(blank())}
+                    type="button"
+                    onClick={() => {
+                        setImageUrl('');
+                        setEditing(blank());
+                    }}
                     className="flex items-center gap-2 px-6 py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase text-xs shadow-xl shadow-ea-green-900/20 transition-all hover:scale-105 active:scale-95 leading-none"
                 >
                     <Plus className="w-4 h-4" /> Adaugă produs
@@ -542,10 +573,12 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                                 alt=""
                                                 className="w-12 h-12 rounded-xl object-cover border border-zinc-800 transition-transform group-hover/img:scale-110"
                                             />
-                                            {p.imageSrc.includes('public.blob.vercel-storage.com') && (
+                                            {/public\.blob\.vercel-storage\.com|supabase\.co\/storage\//i.test(
+                                                p.imageSrc
+                                            ) && (
                                                 <div
                                                     className="absolute -top-1 -right-1 w-3 h-3 bg-ea-green-500 rounded-full border-2 border-zinc-900"
-                                                    title="Stocat pe Blob"
+                                                    title="Stocat în cloud"
                                                 />
                                             )}
                                         </div>

@@ -66,6 +66,14 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
         loadProfiles();
     }, [adminAuth]);
 
+    const productsSorted = useMemo(
+        () =>
+            [...allProducts].sort((a, b) =>
+                a.name.localeCompare(b.name, 'ro', { sensitivity: 'base' })
+            ),
+        [allProducts]
+    );
+
     const product = useMemo(
         () => (selectedSlug ? allProducts.find((p) => p.slug === selectedSlug) : undefined),
         [allProducts, selectedSlug]
@@ -188,18 +196,23 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
                     </ol>
                 </div>
                 <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden max-h-[70vh] overflow-y-auto">
-                    {allProducts.map((p) => (
+                    {productsSorted.map((p) => (
                         <button
                             key={p.slug}
                             type="button"
                             onClick={() => selectProduct(p.slug)}
-                            className={`w-full text-left px-4 py-3 border-b border-zinc-800 flex justify-between items-center hover:bg-zinc-800/50 transition-colors ${selectedSlug === p.slug ? 'bg-ea-green-900/20 border-l-2 border-l-ea-green-500' : ''}`}
+                            className={`w-full text-left px-4 py-3 border-b border-zinc-800 flex justify-between items-center gap-2 hover:bg-zinc-800/50 transition-colors ${selectedSlug === p.slug ? 'bg-ea-green-900/20 border-l-2 border-l-ea-green-500' : ''}`}
                         >
-                            <span className="font-bold text-sm text-white uppercase">{p.name}</span>
-                            <span className="text-[9px] text-zinc-500 font-mono">{profiles[p.slug] ? '●' : '○'}</span>
+                            <span className="font-bold text-sm text-white uppercase min-w-0 flex-1 text-left">
+                                {p.name}
+                                {p.status === 'draft' ? (
+                                    <span className="text-amber-400/90 text-[9px] font-black ml-2 normal-case">(ciornă)</span>
+                                ) : null}
+                            </span>
+                            <span className="text-[9px] text-zinc-500 font-mono shrink-0">{profiles[p.slug] ? '●' : '○'}</span>
                         </button>
                     ))}
-                    {allProducts.length === 0 && (
+                    {productsSorted.length === 0 && (
                         <p className="p-6 text-zinc-500 text-xs">Nu există produse în catalog. Adaugă mai întâi din tab-ul Catalog.</p>
                     )}
                 </div>

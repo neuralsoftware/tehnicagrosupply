@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DynamicProduct, Brochure, ProductBrochureProfile } from '@/lib/products-store';
 import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers, ImageIcon, Trash2, FileStack } from 'lucide-react';
 
@@ -134,7 +134,7 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
     const generateDeepDiveSingle = async () => {
         const slug = deepDiveSlug.trim();
         if (!slug) {
-            alert('Alege produsul pentru broșura dedicată.');
+            alert('Alege produsul pentru PDF-ul de prezentare.');
             return;
         }
         setGeneratingDeepDive(true);
@@ -148,7 +148,6 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                     adminAuth: cleanToken,
                     productSlug: slug,
                     config: {
-                        title: prod ? `Broșură dedicată: ${prod.name}` : undefined,
                         phone: config.phone,
                         email: config.email,
                     },
@@ -244,10 +243,17 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
         else window.open(`mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`Bună ziua,\n\nVă trimitere materialul de prezentare:\n${url}\n\nTehnicAgro Supply`)}`, '_blank');
     };
 
-    // Group products by category
+    /** Toate produsele (inclusiv ciornă) — la fel ca în tab-ul „Date broșură”; sortat alfabetic */
+    const productsSorted = useMemo(
+        () =>
+            [...allProducts].sort((a, b) =>
+                a.name.localeCompare(b.name, 'ro', { sensitivity: 'base' })
+            ),
+        [allProducts]
+    );
+
     const byCategory: Record<string, DynamicProduct[]> = {};
-    // Lenient filter: allow 'active' or products without an explicit status (migrated items)
-    allProducts.filter(p => !p.status || p.status === 'active').forEach(p => {
+    productsSorted.forEach((p) => {
         if (!byCategory[p.category || 'diverse']) byCategory[p.category || 'diverse'] = [];
         byCategory[p.category || 'diverse'].push(p);
     });
@@ -341,13 +347,12 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                             className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-sky-500/50"
                         >
                             <option value="">Alege produsul…</option>
-                            {allProducts
-                                .filter((p) => !p.status || p.status === 'active')
-                                .map((p) => (
-                                    <option key={p.slug} value={p.slug}>
-                                        {p.name} · {p.brand}
-                                    </option>
-                                ))}
+                            {productsSorted.map((p) => (
+                                <option key={p.slug} value={p.slug}>
+                                    {p.name} · {p.brand}
+                                    {p.status === 'draft' ? ' (ciornă)' : ''}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <button
@@ -369,7 +374,7 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                     <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{selectedSlugs.length}/8 selectate</span>
                 </div>
                 {Object.keys(byCategory).length === 0 ? (
-                    <p className="text-zinc-600 text-sm italic">Nu există produse active. Activează produse din tab-ul Catalog.</p>
+                    <p className="text-zinc-600 text-sm italic">Nu există produse în catalog. Adaugă produse din tab-ul Catalog.</p>
                 ) : (
                     <div className="space-y-6">
                         {Object.entries(byCategory).map(([cat, prods]) => (
@@ -382,7 +387,14 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                                         <label key={p.slug} className={`flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${selectedSlugs.includes(p.slug) ? 'border-ea-green-600 bg-ea-green-900/10 text-white shadow-lg shadow-ea-green-900/10' : 'border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800/50'}`}>
                                             <input type="checkbox" checked={selectedSlugs.includes(p.slug)} onChange={() => toggleProduct(p.slug)} disabled={!selectedSlugs.includes(p.slug) && selectedSlugs.length >= 8} className="w-4 h-4 rounded accent-ea-green-500 bg-zinc-950 border-zinc-700" />
                                             <div className="min-w-0 flex-1">
-                                                <div className="text-xs font-black truncate">{p.name}</div>
+                                                <div className="text-xs font-black truncate flex flex-wrap items-center gap-2">
+                                                    <span>{p.name}</span>
+                                                    {p.status === 'draft' && (
+                                                        <span className="text-[9px] uppercase font-bold text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded">
+                                                            Ciornă
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <div className="text-[10px] text-zinc-600 font-bold uppercase">{p.brand}</div>
                                                 {(() => {
                                                     const { textOk, extraPhotos } = pdfContentHints(brochureProfiles[p.slug]);

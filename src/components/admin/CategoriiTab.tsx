@@ -31,9 +31,29 @@ export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
     const save = async () => {
         if (!editing?.slug || !editing?.name) return;
         setSaving(true);
-        const method = categories.find(c => c.slug === editing.slug) ? 'PUT' : 'POST';
-        const url = method === 'PUT' ? `/api/categories/${editing.slug}` : '/api/categories';
-        await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'x-admin-auth': adminAuth }, body: JSON.stringify(editing) });
+        const slugFinal = String(editing.slug || '').trim();
+        const statusFinal: 'active' | 'draft' = editing.status === 'active' ? 'active' : 'draft';
+        const payload = {
+            slug: slugFinal,
+            name: String(editing.name || '').trim(),
+            description: (editing.description ?? '').trim(),
+            status: statusFinal,
+            createdAt: editing.createdAt || new Date().toISOString(),
+            ...(editing.isStatic ? { isStatic: true as const } : {}),
+        };
+        const method = categories.some((c) => c.slug === slugFinal) ? 'PUT' : 'POST';
+        const url = method === 'PUT' ? `/api/categories/${encodeURIComponent(slugFinal)}` : '/api/categories';
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'x-admin-auth': (adminAuth || '').trim() },
+            body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            alert((data as { error?: string }).error || `Eroare la salvare (${res.status}).`);
+            setSaving(false);
+            return;
+        }
         setSaving(false);
         setEditing(null);
         load();
@@ -41,7 +61,16 @@ export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
 
     const toggleStatus = async (cat: Category) => {
         const updated = { ...cat, status: cat.status === 'active' ? 'draft' : 'active' } as Category;
-        await fetch(`/api/categories/${cat.slug}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'x-admin-auth': adminAuth }, body: JSON.stringify(updated) });
+        const res = await fetch(`/api/categories/${encodeURIComponent(cat.slug)}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'x-admin-auth': (adminAuth || '').trim() },
+            body: JSON.stringify(updated),
+        });
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            alert((data as { error?: string }).error || 'Nu s-a putut schimba statusul.');
+            return;
+        }
         load();
     };
 

@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { saveCategory, deleteCategory, getProducts, getCategories, Category } from '@/lib/products-store';
 
 function isAuthenticated(request: Request): boolean {
-    const auth = request.headers.get('x-admin-auth');
-    return auth === process.env.ADMIN_PASSWORD;
+    const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
+    const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+    return headerAuth !== '' && headerAuth === serverPass;
 }
 
 export async function PUT(request: Request, { params }: { params: Promise<{ slug: string }> }) {

@@ -33,10 +33,12 @@ export default function AdminPage() {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('/api/products');
+            const res = await fetch('/api/products', { cache: 'no-store' });
             const data = await res.json();
             setAllProducts(data.products || []);
-        } catch { /* fallback to empty */ }
+        } catch {
+            /* fallback to empty */
+        }
     };
 
     const handleLogin = async (e: React.FormEvent) => {

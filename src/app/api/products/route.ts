@@ -9,7 +9,14 @@ function isAuthenticated(request: Request): boolean {
 export async function GET() {
     try {
         const products = await getProducts();
-        return NextResponse.json({ products });
+        return NextResponse.json(
+            { products },
+            {
+                headers: {
+                    'Cache-Control': 'no-store, max-age=0, must-revalidate',
+                },
+            }
+        );
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
@@ -38,6 +45,8 @@ export async function POST(request: Request) {
         await saveProduct(product as DynamicProduct, { siteCatalogOnly: Boolean(siteCatalogOnly) });
         return NextResponse.json({ success: true, product });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to save product' }, { status: 500 });
+        const message = error instanceof Error ? error.message : 'Eroare la salvare';
+        console.error('[api/products POST]', error);
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

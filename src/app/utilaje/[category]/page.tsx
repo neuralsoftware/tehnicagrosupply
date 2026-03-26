@@ -1,7 +1,7 @@
-import { getProducts } from '@/lib/products-store';
+import { getProducts, getCategories, normalizeCategorySlugParam } from '@/lib/products-store';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -11,15 +11,6 @@ interface PageProps {
         category: string;
     }>;
 }
-
-const CATEGORY_NAMES: Record<string, string> = {
-    'pregatire-sol': 'Pregătire Sol',
-    'semanat-fertilizat': 'Semănat & Fertilizat',
-    'protectia-plantelor': 'Protecția Plantelor',
-    'recoltare-logistica': 'Recoltare & Logistică',
-    'viticol': 'Viticol',
-    'legumicol': 'Legumicol',
-};
 
 const CATEGORY_SEO: Record<string, { title: string; description: string; keywords: string[] }> = {
     'pregatire-sol': {
@@ -46,18 +37,28 @@ const CATEGORY_SEO: Record<string, { title: string; description: string; keyword
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { category } = await params;
-    const seo = CATEGORY_SEO[category];
-    if (!seo) return {};
+    const categoryKey = normalizeCategorySlugParam(category);
+    const categories = await getCategories();
+    const cat = categories.find((c) => normalizeCategorySlugParam(c.slug) === categoryKey);
+    if (!cat) return {};
+    const seo = CATEGORY_SEO[cat.slug];
+    const title =
+        seo?.title ?? `Utilaje ${cat.name} Agricole | TehnicAgro Supply`;
+    const description =
+        seo?.description ??
+        (cat.description?.trim() ||
+            `Utilaje și echipamente pentru ${cat.name}. Oferte și finanțare DR-12 — TehnicAgro Supply.`);
+    const keywords = seo?.keywords ?? ['utilaje agricole', cat.name.toLowerCase(), 'tehnicagro'];
     return {
-        title: seo.title,
-        description: seo.description,
-        keywords: seo.keywords,
+        title,
+        description,
+        keywords,
         alternates: {
-            canonical: `https://tehnicagrosupply.ro/utilaje/${category}`,
+            canonical: `https://tehnicagrosupply.ro/utilaje/${cat.slug}`,
         },
         openGraph: {
-            title: seo.title,
-            description: seo.description,
+            title,
+            description,
             locale: 'ro_RO',
             type: 'website',
         },
@@ -67,13 +68,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CategoryPage({ params }: PageProps) {
     const { category } = await params;
-    const allProducts = await getProducts();
-    const filteredProducts = allProducts.filter(p => p.category === category && p.status !== 'draft');
-    const categoryName = CATEGORY_NAMES[category];
-
-    if (!categoryName) {
+    const categoryKey = normalizeCategorySlugParam(category);
+    const [allProducts, categories] = await Promise.all([getProducts(), getCategories()]);
+    const catMeta = categories.find((c) => normalizeCategorySlugParam(c.slug) === categoryKey);
+    if (!catMeta) {
         notFound();
     }
+    if (category !== catMeta.slug) {
+        permanentRedirect(`/utilaje/${catMeta.slug}`);
+    }
+    const categoryName = catMeta.name;
+    const filteredProducts = allProducts.filter(
+        (p) => normalizeCategorySlugParam(p.category) === categoryKey && p.status !== 'draft'
+    );
 
     return (
         <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">

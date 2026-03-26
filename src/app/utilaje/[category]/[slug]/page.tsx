@@ -1,6 +1,6 @@
-import { getProducts } from '@/lib/products-store';
+import { getProducts, normalizeCategorySlugParam } from '@/lib/products-store';
 import { getPublishedPosts } from '@/data/blog';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { ProductSection } from '@/components/ProductSection';
 import { Contact } from '@/components/Contact';
 import { TrustSignals } from '@/components/TrustSignals';
@@ -18,8 +18,11 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { category, slug } = await params;
+    const categoryKey = normalizeCategorySlugParam(category);
     const products = await getProducts();
-    const product = products.find(p => p.slug === slug && p.category === category);
+    const product = products.find(
+        (p) => p.slug === slug && normalizeCategorySlugParam(p.category) === categoryKey
+    );
     if (!product) return {};
 
     const seoTitle = product.metaTitle || `${product.brand} ${product.name} — Preț & Detalii Tehnice | TehnicAgro Supply`;
@@ -29,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
         title: seoTitle,
         description: seoDesc,
-        alternates: { canonical: `https://tehnicagrosupply.ro/utilaje/${category}/${slug}` },
+        alternates: { canonical: `https://tehnicagrosupply.ro/utilaje/${product.category}/${slug}` },
         openGraph: {
             title: `${product.brand} ${product.name} | TehnicAgro`,
             description: seoDesc,
@@ -43,10 +46,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
     const { category, slug } = await params;
+    const categoryKey = normalizeCategorySlugParam(category);
     const products = await getProducts();
-    const product = products.find(p => p.slug === slug && p.category === category);
+    const product = products.find(
+        (p) => p.slug === slug && normalizeCategorySlugParam(p.category) === categoryKey
+    );
 
     if (!product || product.status === 'draft') notFound();
+
+    if (category !== product.category) {
+        permanentRedirect(`/utilaje/${product.category}/${slug}`);
+    }
 
     const allPosts = getPublishedPosts();
     const exactMatches = allPosts.filter(post =>
@@ -56,7 +66,7 @@ export default async function ProductPage({ params }: PageProps) {
     );
     const postsToShow = exactMatches.length > 0 ? exactMatches.slice(0, 3) : allPosts.slice(0, 3);
 
-    const fundingPrograms = (FUNDING_PROGRAMS[category] || []).filter(p => p.status === 'active');
+    const fundingPrograms = (FUNDING_PROGRAMS[product.category] || []).filter(p => p.status === 'active');
 
     const productSchema = {
         '@context': 'https://schema.org', '@type': 'Product',

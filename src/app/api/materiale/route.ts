@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { uploadToSupabase } from '@/lib/supabase';
 import {
     getProducts,
     getCategories,
@@ -1192,6 +1192,72 @@ const renderPageFooter = (pageNumber: number, phone?: string, opts?: { bandBackg
     )
 );
 
+/** Copertă broșură: panou verde stânga + zonă albă dreapta (aceeași schemă ca la catalogul multi-produs). */
+function renderStandardBrochureCoverPage(opts: {
+    coverTitle: string;
+    subtitle?: string;
+    slogan?: string;
+    /** Linie sub marcă pe panoul stânga (implicit: catalog multi-produs). Pentru prezentare un singur produs, text pentru client. */
+    leftEditionLine?: string;
+    /** Subtitlu dreapta dacă lipsesc subtitle + slogan explicite */
+    defaultSubtitle?: string;
+    defaultSlogan?: string;
+}): React.ReactElement {
+    const leftLine = opts.leftEditionLine?.trim() || 'Document comercial · selecție';
+    const sub =
+        (opts.subtitle && String(opts.subtitle).trim()) ||
+        (opts.defaultSubtitle?.trim() || 'Mecanizare agricolă · România');
+    const slo =
+        opts.slogan?.trim() ||
+        opts.defaultSlogan?.trim() ||
+        'Selecție tehnică pe baza documentației producătorilor incluși. Parametrii se validează la ofertare.';
+    return React.createElement(
+        Page,
+        { size: 'A4', style: styles.page, key: 'brochure-standard-cover' },
+        React.createElement(
+            View,
+            { style: { flex: 1, flexDirection: 'column' } },
+            React.createElement(
+                View,
+                { style: { flex: 1, flexDirection: 'row', minHeight: 0 } },
+                React.createElement(
+                    View,
+                    { style: { ...styles.coverLeftPanel, justifyContent: 'space-between' } },
+                    React.createElement(
+                        View,
+                        { style: styles.coverBrandBlock },
+                        React.createElement(Text, { style: styles.coverBrandName }, 'TehnicAgro Supply'),
+                        React.createElement(
+                            Text,
+                            { style: styles.coverBrandTag },
+                            'Utilaje agricole · selecție tehnică · România'
+                        ),
+                        React.createElement(View, { style: styles.coverRule }),
+                        React.createElement(Text, { style: styles.coverEdition }, leftLine)
+                    ),
+                    React.createElement(Text, { style: styles.coverWebHint }, PUBLIC_WEB)
+                ),
+                React.createElement(
+                    View,
+                    { style: styles.coverRightPanel },
+                    React.createElement(Text, { style: styles.coverTitle }, opts.coverTitle),
+                    React.createElement(Text, { style: styles.coverSubtitle }, sub),
+                    React.createElement(Text, { style: styles.coverSlogan }, slo)
+                )
+            ),
+            React.createElement(
+                View,
+                { style: styles.coverFooterBar },
+                React.createElement(
+                    Text,
+                    { style: styles.coverFooterBarText },
+                    'Mecanizare responsabilă · selecție tehnică pentru ferme din România'
+                )
+            )
+        )
+    );
+}
+
 function renderDeepDiveZigzagBlock(
     product: DynamicProduct,
     block: ProductFeatureBlock,
@@ -1221,16 +1287,28 @@ function renderDeepDiveZigzagBlock(
     return React.createElement(View, { key: `zz-${pSlug}-${globalIdx}`, style: rowStyle }, textCol, imageCol);
 }
 
-/** Broșură dedicată unui singur produs: pag. 1 = același hero ca în catalog; apoi zig-zag pe featureBlocks; copertă spate comună. */
+/** Prezentare PDF un singur produs: copertă verde/albă (fără jargon intern); hero; zig-zag; copertă spate. */
 export function buildSingleProductDeepDivePDF(
     config: { phone?: string; email?: string; title?: string; subtitle?: string; logoDataUri?: string },
     product: DynamicProduct,
     categoriesFromDb: Category[]
 ): React.ReactElement<DocumentProps> {
-    let currentPage = 0;
+    let currentPage = 1;
     const pSlug = product.slug || 'product';
     const catName = product.category || '';
     const secTitle = categoryDisplayName(catName, categoriesFromDb);
+    const brandLine = (product?.brand || '').trim();
+    const coverTitle = (product.name || 'Utilaj').trim();
+    const clientSubtitle =
+        (config.subtitle && String(config.subtitle).trim()) ||
+        [brandLine, secTitle].filter(Boolean).join(' · ');
+    const coverPage = renderStandardBrochureCoverPage({
+        coverTitle,
+        subtitle: clientSubtitle,
+        leftEditionLine: 'Performanță de excepție · recomandare tehnică',
+        slogan:
+            'Un utilaj ales pentru rezultate concrete în câmp — fiabilitate, precizie și eficiență pentru ferma dumneavoastră.',
+    });
     const descText = getProfessionalProductLead(product);
     const giantLines = getProductHeroGiantLines(product);
     const overviewEyebrowText = (() => {
@@ -1310,7 +1388,7 @@ export function buildSingleProductDeepDivePDF(
                 React.createElement(ProductImage, { url: product?.imageSrc, fallback: product?.name, immersive: true })
             )
         ),
-        renderPageFooter(++currentPage, config.phone)
+        renderPageFooter((currentPage += 1), config.phone)
     );
 
     const zigzagPages: React.ReactElement[] = [];
@@ -1326,7 +1404,7 @@ export function buildSingleProductDeepDivePDF(
                     { style: styles.deepDiveZigzagPageInner },
                     ...pair.map((block, localJ) => renderDeepDiveZigzagBlock(product, block, i + localJ, pSlug))
                 ),
-                renderPageFooter(++currentPage, config.phone)
+                renderPageFooter((currentPage += 1), config.phone)
             )
         );
     }
@@ -1357,11 +1435,11 @@ export function buildSingleProductDeepDivePDF(
                 React.createElement(Text, { style: styles.contactBackNote }, PDF_DOCUMENTATION_NOTE)
             )
         ),
-        renderPageFooter(++currentPage, config.phone, { bandBackgroundColor: BACK_COVER_SOLID })
+        renderPageFooter((currentPage += 1), config.phone, { bandBackgroundColor: BACK_COVER_SOLID })
     );
 
-    const docTitle = (config.title && String(config.title).trim()) || `${product.name} — broșură dedicată`;
-    return React.createElement(Document, { title: docTitle }, overviewPage, ...zigzagPages, contactPage);
+    const docTitle = `${coverTitle} · TehnicAgro Supply`;
+    return React.createElement(Document, { title: docTitle }, coverPage, overviewPage, ...zigzagPages, contactPage);
 }
 
 function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Category[]): React.ReactElement<DocumentProps> {
@@ -1658,29 +1736,22 @@ export async function POST(request: Request) {
         const buffer = await renderToBuffer(doc);
         console.log(`[Materiale] PDF generated successfully. Buffer size: ${buffer.length}`);
 
-        // Blob Upload
         const uniqueSuffix = Math.random().toString(36).substring(2, 8) + Date.now().toString(36);
         const id = `brochure-${uniqueSuffix}`;
-        const blob = await put(`materiale/${id}.pdf`, buffer, { 
-            access: 'public', 
-            contentType: 'application/pdf',
-            addRandomSuffix: true,
-            allowOverwrite: true
-        });
-        
-        // Save Metadata
-        const data: Brochure = { 
-            id, 
-            title: config?.title || 'Broșură TehnicAgro', 
-            subtitle: config?.subtitle, 
-            publicUrl: blob.url, 
-            createdAt: new Date().toISOString(), 
-            productSlugs: selected.map((p: DynamicProduct) => p.slug), 
-            config: config || {} 
+        const publicUrl = await uploadToSupabase(buffer, `materiale/${id}.pdf`, 'application/pdf');
+
+        const data: Brochure = {
+            id,
+            title: config?.title || 'Broșură TehnicAgro',
+            subtitle: config?.subtitle,
+            publicUrl,
+            createdAt: new Date().toISOString(),
+            productSlugs: selected.map((p: DynamicProduct) => p.slug),
+            config: config || {},
         };
         await saveBrochure(data);
 
-        return NextResponse.json({ success: true, brochure: { ...data, downloadUrl: blob.url } });
+        return NextResponse.json({ success: true, brochure: { ...data, downloadUrl: publicUrl } });
     } catch (err: any) {
         console.error('CRITICAL API ERROR in /api/materiale:', err.stack || err);
         return NextResponse.json({ 

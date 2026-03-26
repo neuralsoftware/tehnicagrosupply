@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { FUNDING_PROGRAMS, FundingProgram } from '@/data/funding-programs';
-import { put, list } from '@vercel/blob';
+import { readJsonFromSupabase, uploadToSupabase } from '@/lib/supabase';
 
 const PROGRAMS_BLOB_KEY = 'catalog/funding-programs.json';
 
@@ -10,16 +10,7 @@ function isAuthenticated(request: Request): boolean {
 }
 
 async function getOverrides(): Promise<Record<string, Partial<FundingProgram>>> {
-    try {
-        const { blobs } = await list({ prefix: PROGRAMS_BLOB_KEY });
-        const blob = blobs.find(b => b.pathname === PROGRAMS_BLOB_KEY);
-        if (!blob) return {};
-        const res = await fetch(blob.url);
-        if (!res.ok) return {};
-        return await res.json();
-    } catch {
-        return {};
-    }
+    return readJsonFromSupabase<Record<string, Partial<FundingProgram>>>(PROGRAMS_BLOB_KEY, {});
 }
 
 export async function GET() {
@@ -47,11 +38,11 @@ export async function PUT(request: Request) {
         const { code, updates } = await request.json();
         const current = await getOverrides();
         current[code] = { ...current[code], ...updates };
-        await put(PROGRAMS_BLOB_KEY, JSON.stringify(current), {
-            access: 'public',
-            contentType: 'application/json',
-            addRandomSuffix: false,
-        });
+        await uploadToSupabase(
+            Buffer.from(JSON.stringify(current), 'utf-8'),
+            PROGRAMS_BLOB_KEY,
+            'application/json'
+        );
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to update program' }, { status: 500 });

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { uploadToSupabase } from '@/lib/supabase';
 
 export async function POST(request: Request) {
     try {
@@ -16,14 +16,16 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
         }
 
-        // Upload to Vercel Blob
-        const blob = await put(`products/${filename}`, file, {
-            access: 'public',
-            contentType: file.type || 'image/webp',
-            addRandomSuffix: true,
-        });
+        const safeBase = String(filename).replace(/[^a-zA-Z0-9._-]/g, '_');
+        const storagePath = `products/${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${safeBase}`;
+        const arrayBuffer = await file.arrayBuffer();
+        const url = await uploadToSupabase(
+            Buffer.from(arrayBuffer),
+            storagePath,
+            file.type || 'image/webp'
+        );
 
-        return NextResponse.json({ url: blob.url });
+        return NextResponse.json({ url });
     } catch (error) {
         console.error('Upload error:', error);
         return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
