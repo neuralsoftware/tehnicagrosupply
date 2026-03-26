@@ -14,6 +14,7 @@ Utilizatorul este **non-tehnic**. Nu îl implica în modificat fișiere, comenzi
 
 **Asistentul trebuie să:**
 - implementeze singur schimbările în cod/deploy;
+- **după fiecare intervenție în cod** care e gata de livrare: `git commit` + `git push` pe `main` (Vercel face deploy automat), **fără** să aștepte confirmare separată „da la push”, decât dacă utilizatorul cere explicit altceva sau sunt modificări doar locale/draft;
 - explica pe scurt *ce* s-a schimbat pentru el, în română clară, fără jargon inutil;
 - când apar opțiuni (ex. texte pentru repere, etichete UI), să propună variante concrete și să le aplice după feedback;
 - nu trimite „editează tu `fișier.ts`” ca pas principal — doar dacă explicit cere el acces la ceva, explică și oferă alternativa să faci tu modificarea.

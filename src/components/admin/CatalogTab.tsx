@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { DynamicProduct, ProductFeatureBlock } from '@/lib/products-store';
-import { Pencil, Trash2, Plus, X, Save, FileStack } from 'lucide-react';
+import { Pencil, Trash2, Plus, X, Save, FileStack, RefreshCw } from 'lucide-react';
 import { ImageOptimizer } from './ImageOptimizer';
 
 function slugify(str: string) {
@@ -20,20 +21,40 @@ interface Props {
 }
 
 export function CatalogTab({ adminAuth, categories }: Props) {
+    const router = useRouter();
     const [products, setProducts] = useState<DynamicProduct[]>([]);
     const [loaded, setLoaded] = useState(false);
     const [editing, setEditing] = useState<Partial<DynamicProduct> | null>(null);
     const [saving, setSaving] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const [imageUrl, setImageUrl] = useState('');
     const [deepDiveBusySlug, setDeepDiveBusySlug] = useState<string | null>(null);
     const DEEP_DIVE_PHONE = '+40 723 380 022';
     const DEEP_DIVE_EMAIL = 'tehnicagro.supply@gmail.com';
 
     const load = async () => {
-        const res = await fetch('/api/products', { cache: 'no-store' });
-        const data = await res.json();
-        setProducts(data.products || []);
+        const res = await fetch(`/api/products?_=${Date.now()}`, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache',
+                Pragma: 'no-cache',
+            },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && Array.isArray((data as { products?: DynamicProduct[] }).products)) {
+            setProducts((data as { products: DynamicProduct[] }).products);
+        }
         setLoaded(true);
+    };
+
+    const refreshList = async () => {
+        setRefreshing(true);
+        try {
+            router.refresh();
+            await load();
+        } finally {
+            setRefreshing(false);
+        }
     };
 
     useEffect(() => {
@@ -116,6 +137,10 @@ export function CatalogTab({ adminAuth, categories }: Props) {
             }
             setEditing(null);
             setImageUrl('');
+            router.refresh();
+            await load();
+            /* ultimă încercare după scriere în Storage (evită lista învechită la CDN) */
+            await new Promise((r) => setTimeout(r, 400));
             await load();
         } finally {
             setSaving(false);
@@ -165,9 +190,10 @@ export function CatalogTab({ adminAuth, categories }: Props) {
         await fetch(`/api/products/${slug}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminAuth }),
+            body: JSON.stringify({ adminAuth: (adminAuth || '').trim() }),
         });
-        load();
+        router.refresh();
+        await load();
     };
 
     if (!loaded)
@@ -534,7 +560,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800">
+            <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800">
                 <div>
                     <h2 className="text-sm font-black text-white uppercase tracking-widest">Catalog Utilaje (site)</h2>
                     <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
@@ -545,16 +571,32 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                         creionul la un produs — secțiunea albastră e imediat sub imaginea principală.
                     </p>
                 </div>
-                <button
-                    type="button"
-                    onClick={() => {
-                        setImageUrl('');
-                        setEditing(blank());
-                    }}
-                    className="flex items-center gap-2 px-6 py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase text-xs shadow-xl shadow-ea-green-900/20 transition-all hover:scale-105 active:scale-95 leading-none"
-                >
-                    <Plus className="w-4 h-4" /> Adaugă produs
-                </button>
+                <div className="flex flex-wrap items-center gap-3">
+                    <button
+                        type="button"
+                        onClick={() => refreshList()}
+                        disabled={refreshing}
+                        title="Reîncarcă lista din cloud (dacă nu apare un produs tocmai salvat)"
+                        className="flex items-center gap-2 px-5 py-4 bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 rounded-2xl font-black uppercase text-xs transition-all leading-none disabled:opacity-50"
+                    >
+                        {refreshing ? (
+                            <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <RefreshCw className="w-4 h-4" />
+                        )}
+                        Reîncarcă lista
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setImageUrl('');
+                            setEditing(blank());
+                        }}
+                        className="flex items-center gap-2 px-6 py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white rounded-2xl font-black uppercase text-xs shadow-xl shadow-ea-green-900/20 transition-all hover:scale-105 active:scale-95 leading-none"
+                    >
+                        <Plus className="w-4 h-4" /> Adaugă produs
+                    </button>
+                </div>
             </div>
 
             <div className="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
