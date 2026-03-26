@@ -86,7 +86,7 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
         if (!tabVisible || !adminAuth.trim()) return;
         let cancelled = false;
         (async () => {
-            const res = await fetch('/api/brochure-profiles', {
+            const res = await fetch(`/api/brochure-profiles?_=${Date.now()}`, {
                 headers: { 'x-admin-auth': adminAuth.trim() },
                 cache: 'no-store',
             });
@@ -103,7 +103,7 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
         setSelectedSlugs(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]);
 
     const loadHistory = async () => {
-        const res = await fetch('/api/materiale', { cache: 'no-store' });
+        const res = await fetch(`/api/materiale?_=${Date.now()}`, { cache: 'no-store' });
         const data = await res.json();
         setHistory(data.brochures || []);
         setHistoryLoaded(true);
@@ -113,7 +113,7 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
         if (!tabVisible || !adminAuth.trim()) return;
         let cancelled = false;
         (async () => {
-            const res = await fetch('/api/materiale', { cache: 'no-store' });
+            const res = await fetch(`/api/materiale?_=${Date.now()}`, { cache: 'no-store' });
             const data = await res.json().catch(() => ({}));
             if (cancelled || !res.ok) return;
             setHistory((data as { brochures?: Brochure[] }).brochures || []);
@@ -146,9 +146,11 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                 }),
             });
             const data = await res.json();
-            if (res.ok && data.success) {
-                setResult(data.brochure);
-                loadHistory();
+            if (res.ok && data.success && data.brochure) {
+                const nb = data.brochure as Brochure;
+                setResult(nb);
+                setHistory((prev) => [nb, ...prev.filter((x) => x.id !== nb.id)]);
+                void loadHistory();
             } else {
                 const detail = typeof data.details === 'string' && data.details ? `\n\nDetalii: ${data.details}` : '';
                 if (res.status === 401) alert('Eroare: Sesiune expirată sau parolă incorectă (401 Unauthorized)');
@@ -181,8 +183,11 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                 else alert((data as { error?: string }).error || 'Eroare la ștergere.');
                 return;
             }
-            setResult((prev) => (prev?.id === b.id ? null : prev));
-            await loadHistory();
+            if ((data as { success?: boolean }).success === true) {
+                setHistory((prev) => prev.filter((x) => x.id !== b.id));
+                setResult((prev) => (prev?.id === b.id ? null : prev));
+                void loadHistory();
+            }
         } catch (err) {
             alert('Eroare rețea: ' + String(err));
         } finally {

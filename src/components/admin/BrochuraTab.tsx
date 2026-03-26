@@ -52,7 +52,10 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
     const [useAiImport, setUseAiImport] = useState(false);
 
     const loadProfiles = async () => {
-        const res = await fetch('/api/brochure-profiles', { headers: { 'x-admin-auth': adminAuth }, cache: 'no-store' });
+        const res = await fetch(`/api/brochure-profiles?_=${Date.now()}`, {
+            headers: { 'x-admin-auth': adminAuth },
+            cache: 'no-store',
+        });
         if (!res.ok) return;
         const data = await res.json();
         setProfiles(data.profiles || {});
@@ -94,8 +97,11 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
             });
             const data = await res.json();
             if (res.ok) {
-                await loadProfiles();
-                if (data.profile) setDraft(emptyDraft(selectedSlug, data.profile));
+                if (data.profile && selectedSlug) {
+                    setProfiles((prev) => ({ ...prev, [selectedSlug]: data.profile }));
+                    setDraft(emptyDraft(selectedSlug, data.profile));
+                }
+                void loadProfiles();
             } else alert(data.error || 'Salvare eșuată');
         } finally {
             setSaving(false);

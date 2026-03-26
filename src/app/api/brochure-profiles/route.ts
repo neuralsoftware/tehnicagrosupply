@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getBrochureProfilesMap, saveBrochureProfile } from '@/lib/products-store';
 
+export const dynamic = 'force-dynamic';
+
 function adminOk(request: Request, adminAuthBody?: string): boolean {
     const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
     const bodyAuth = (adminAuthBody || '').trim();
@@ -16,7 +18,14 @@ export async function GET(request: Request) {
     }
     try {
         const profiles = await getBrochureProfilesMap();
-        return NextResponse.json({ profiles });
+        return NextResponse.json(
+            { profiles },
+            {
+                headers: {
+                    'Cache-Control': 'no-store, max-age=0, must-revalidate',
+                },
+            }
+        );
     } catch {
         return NextResponse.json({ error: 'Failed to load brochure profiles' }, { status: 500 });
     }

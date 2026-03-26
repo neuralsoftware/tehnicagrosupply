@@ -322,15 +322,15 @@ const styles = StyleSheet.create({
     },
     /** Stânga 60% titlu / dreapta 40% principiu — mai mult spațiu pentru cuvinte lungi */
     productOverviewTitleCol: { width: '60%', minWidth: 0, paddingRight: 8 },
-    productOverviewCategory: {
-        fontSize: 11,
-        fontFamily: 'Roboto',
-        fontWeight: 'bold',
-        color: COLORS.text,
+    /** Producător · categorie — deasupra titlului gigantic */
+    productOverviewEyebrow: {
+        fontSize: 14,
+        letterSpacing: 2,
+        color: '#52525b',
         textTransform: 'uppercase' as const,
-        letterSpacing: 1.3,
-        marginBottom: 8,
-        lineHeight: 1.25,
+        marginBottom: 4,
+        fontFamily: 'Roboto',
+        fontWeight: 500,
     },
     productOverviewGiant: {
         fontSize: 55,
@@ -1097,20 +1097,6 @@ function pdfCatalogLogoSrc(config: { logoDataUri?: string }): string {
     return pdfCatalogLogoUrl();
 }
 
-/** Etichetă scurtă de categorie (stil „TYING MACHINE” din broșurile producător) */
-const PDF_CATEGORY_HERO_LABEL: Record<string, string> = {
-    'pregatire-sol': 'PREGĂTIRE SOL',
-    'semanat-fertilizat': 'SEMĂNĂTOARE',
-    'recoltare-logistica': 'RECOLTARE & LOGISTICĂ',
-    'protectia-plantelor': 'PROTECȚIA PLANTELOR',
-    viticol: 'VITICOL',
-    legumicol: 'LEGUMICOL',
-};
-
-function getProductOverviewCategoryLabel(catSlug: string, secTitle: string): string {
-    return PDF_CATEGORY_HERO_LABEL[catSlug] || secTitle.toUpperCase();
-}
-
 /** Una sau două linii de titlu foarte mare (ex. MULTISEM / ADS), fără duplicarea mărcii în stânga */
 function getProductHeroGiantLines(product: DynamicProduct): string[] {
     if (product.slug === 'multisem-ads') {
@@ -1281,8 +1267,13 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     );
 
                 const introBullets = getProfessionalIntroBullets(product);
-                const categoryHero = getProductOverviewCategoryLabel(catName, secTitle);
                 const giantLines = getProductHeroGiantLines(product);
+                const overviewEyebrowText = (() => {
+                    const b = (product?.brand || '').trim();
+                    const c = (secTitle || '').trim();
+                    if (b && c) return `${b} • ${c}`;
+                    return b || c;
+                })();
 
                 // ═══ PAGINA 1 PRODUS: stil PA 5000 — text sus (stânga titlu masiv + dreapta Principiu), imagine full-bleed jos ═══
                 const overviewPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-overview-${pSlug}` },
@@ -1308,7 +1299,15 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                     React.createElement(
                                         View,
                                         { style: styles.productOverviewTitleCol },
-                                        React.createElement(Text, { style: styles.productOverviewCategory }, categoryHero),
+                                        ...(overviewEyebrowText
+                                            ? [
+                                                  React.createElement(
+                                                      Text,
+                                                      { key: `eyebrow-${pSlug}`, style: styles.productOverviewEyebrow },
+                                                      overviewEyebrowText
+                                                  ),
+                                              ]
+                                            : []),
                                         ...giantLines.map((line, li) =>
                                             React.createElement(Text, { key: `g-${pSlug}-${li}`, style: styles.productOverviewGiant }, line)
                                         )
