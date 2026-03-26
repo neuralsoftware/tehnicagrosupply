@@ -91,7 +91,7 @@ export default async function CategoryPage({ params }: PageProps) {
                         {categoryName}
                     </h1>
                     <p className="text-zinc-500 max-w-2xl text-lg">
-                        Descoperiă utilajele din categoria <span className="text-ea-green-600">{categoryName}</span>, optimizate pentru eficiență și conformitate cu normele europene.
+                        Descoperă utilajele din categoria <span className="text-ea-green-600">{categoryName}</span>, optimizate pentru eficiență și în conformitate cu normele europene.
                     </p>
                 </div>
 
