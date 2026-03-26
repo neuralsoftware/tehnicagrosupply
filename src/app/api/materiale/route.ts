@@ -189,6 +189,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         lineHeight: 1.4,
     },
+    /** Domenii/categorii pe copertă — text lizibil, fără uppercase forțat pe propoziții lungi */
+    coverCategoryScope: {
+        fontSize: 10,
+        color: COLORS.brochureAccent,
+        letterSpacing: 0.35,
+        marginBottom: 12,
+        textAlign: 'left' as const,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        lineHeight: 1.45,
+    },
     coverSlogan: {
         fontSize: 9.5,
         color: COLORS.textMuted,
@@ -392,6 +403,37 @@ const styles = StyleSheet.create({
     badge: { alignSelf: 'flex-start', backgroundColor: COLORS.primaryDark, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 4 },
     productOverviewGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%', marginBottom: 16 },
     productDetailGrid: { flexDirection: 'row', alignItems: 'flex-start', width: '100%' },
+    /** Pagina 2 produs: zonă principală centrată pe verticală */
+    productDetailMainSymmetric: {
+        flex: 1,
+        justifyContent: 'center' as const,
+        minHeight: 0,
+    },
+    productDetailGridCentered: {
+        flexDirection: 'row' as const,
+        alignItems: 'center' as const,
+        width: '100%',
+    },
+    productMoodboardStackSymmetric: {
+        width: '42%',
+        marginRight: 14,
+        alignSelf: 'stretch' as const,
+        justifyContent: 'space-between' as const,
+        paddingVertical: 10,
+    },
+    productMoodboardCellSymmetric: {
+        width: '100%',
+        height: 172,
+        marginBottom: 0,
+        padding: 0,
+        overflow: 'hidden' as const,
+    },
+    productRightColSymmetric: {
+        flex: 1,
+        minWidth: 0,
+        justifyContent: 'center' as const,
+        paddingVertical: 6,
+    },
     productMainCol: { width: '42%', marginRight: 16 },
     productRightCol: { flex: 1, minWidth: 0 },
     productHeroTopRow: { flexDirection: 'row', alignItems: 'flex-start', width: '100%', marginBottom: 18 },
@@ -1195,22 +1237,18 @@ const renderPageFooter = (pageNumber: number, phone?: string, opts?: { bandBackg
 /** Copertă broșură: panou verde stânga + zonă albă dreapta (aceeași schemă ca la catalogul multi-produs). */
 function renderStandardBrochureCoverPage(opts: {
     coverTitle: string;
-    subtitle?: string;
+    /** Domenii / categorii incluse — derivat din selecție; vizibil pentru client */
+    categoryScopeLine: string;
+    /** Invitație comercială (opțional); implicit mesaj pentru client, fără jargon intern */
     slogan?: string;
-    /** Linie sub marcă pe panoul stânga (implicit: catalog multi-produs). Pentru prezentare un singur produs, text pentru client. */
+    /** Linie sub marcă pe panoul stânga */
     leftEditionLine?: string;
-    /** Subtitlu dreapta dacă lipsesc subtitle + slogan explicite */
-    defaultSubtitle?: string;
-    defaultSlogan?: string;
 }): React.ReactElement {
-    const leftLine = opts.leftEditionLine?.trim() || 'Document comercial · selecție';
-    const sub =
-        (opts.subtitle && String(opts.subtitle).trim()) ||
-        (opts.defaultSubtitle?.trim() || 'Mecanizare agricolă · România');
+    const leftLine = opts.leftEditionLine?.trim() || 'Catalog comercial';
+    const scope = (opts.categoryScopeLine && String(opts.categoryScopeLine).trim()) || 'Utilaje agricole · România';
     const slo =
         opts.slogan?.trim() ||
-        opts.defaultSlogan?.trim() ||
-        'Selecție tehnică pe baza documentației producătorilor incluși. Parametrii se validează la ofertare.';
+        'Soluții tehnice alese pentru fiabilitate și randament — consultanță și ofertă personalizată pentru ferma dumneavoastră.';
     return React.createElement(
         Page,
         { size: 'A4', style: styles.page, key: 'brochure-standard-cover' },
@@ -1241,7 +1279,7 @@ function renderStandardBrochureCoverPage(opts: {
                     View,
                     { style: styles.coverRightPanel },
                     React.createElement(Text, { style: styles.coverTitle }, opts.coverTitle),
-                    React.createElement(Text, { style: styles.coverSubtitle }, sub),
+                    React.createElement(Text, { style: styles.coverCategoryScope }, scope),
                     React.createElement(Text, { style: styles.coverSlogan }, slo)
                 )
             ),
@@ -1304,10 +1342,14 @@ export function buildSingleProductDeepDivePDF(
         [brandLine, secTitle].filter(Boolean).join(' · ');
     const coverPage = renderStandardBrochureCoverPage({
         coverTitle,
-        subtitle: clientSubtitle,
-        leftEditionLine: 'Performanță de excepție · recomandare tehnică',
+        categoryScopeLine: secTitle
+            ? `Utilaje și echipamente pentru ${secTitle}`
+            : 'Mecanizare agricolă · România',
         slogan:
+            (config.subtitle && String(config.subtitle).trim()) ||
+            clientSubtitle ||
             'Un utilaj ales pentru rezultate concrete în câmp — fiabilitate, precizie și eficiență pentru ferma dumneavoastră.',
+        leftEditionLine: 'Performanță de excepție · recomandare tehnică',
     });
     const descText = getProfessionalProductLead(product);
     const giantLines = getProductHeroGiantLines(product);
@@ -1442,9 +1484,46 @@ export function buildSingleProductDeepDivePDF(
     return React.createElement(Document, { title: docTitle }, coverPage, overviewPage, ...zigzagPages, contactPage);
 }
 
+/** Copertă catalog multi-produs: titlu + domenii din selecție + mesaj comercial (nu text „intern”). */
+function buildMultiProductCatalogCover(
+    config: { title?: string; subtitle?: string },
+    products: DynamicProduct[],
+    categoriesFromDb: Category[]
+): React.ReactElement {
+    const slugs = [...new Set(products.map((p) => (p.category || '').trim()).filter(Boolean))];
+    const labels = slugs.map((s) => categoryDisplayName(s, categoriesFromDb)).filter((n) => n.length > 0);
+    const scopeLine =
+        labels.length === 0
+            ? 'Utilaje agricole pentru ferme din România'
+            : labels.length === 1
+              ? `Utilaje și echipamente pentru ${labels[0]}`
+              : `Domenii acoperite în acest catalog: ${labels.join(' · ')}`;
+
+    const coverTitle =
+        (config.title && String(config.title).trim()) ||
+        (labels.length === 1 ? `Catalog · ${labels[0]}` : 'Catalog utilaje agricole');
+
+    const slogan =
+        (config.subtitle && String(config.subtitle).trim()) ||
+        'Soluții tehnice alese pentru fiabilitate și randament — consultanță și ofertă personalizată pentru exploatația dumneavoastră.';
+
+    const leftEditionLine =
+        labels.length === 1
+            ? `${labels[0]} · ediție comercială`
+            : labels.length > 1
+              ? `${labels.length} domenii · catalog comercial`
+              : 'TehnicAgro Supply · catalog';
+
+    return renderStandardBrochureCoverPage({
+        coverTitle,
+        categoryScopeLine: scopeLine,
+        slogan,
+        leftEditionLine,
+    });
+}
+
 function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Category[]): React.ReactElement<DocumentProps> {
     const productsToDisplay = products || [];
-    const logoSrc = pdfCatalogLogoSrc(config);
     let currentPage = 1;
 
     // Categorize products for transitions
@@ -1458,36 +1537,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
     const categories = Object.keys(byCategory);
 
     return React.createElement(Document, { title: config.title || 'TehnicAgro Supply — catalog selecție' },
-        // PAGINA 1: COPERTĂ (structură tip broșură producător: bandă brand + zonă titlu)
-        React.createElement(Page, { size: 'A4', style: styles.page },
-            React.createElement(View, { style: { flex: 1, flexDirection: 'column' } },
-                React.createElement(View, { style: { flex: 1, flexDirection: 'row', minHeight: 0 } },
-                    React.createElement(
-                        View,
-                        { style: { ...styles.coverLeftPanel, justifyContent: 'space-between' } },
-                        React.createElement(View, { style: styles.coverBrandBlock },
-                            React.createElement(Text, { style: styles.coverBrandName }, 'TehnicAgro Supply'),
-                            React.createElement(Text, { style: styles.coverBrandTag }, 'Utilaje agricole · selecție tehnică · România'),
-                            React.createElement(View, { style: styles.coverRule }),
-                            React.createElement(Text, { style: styles.coverEdition }, 'Document comercial · selecție')
-                        ),
-                        React.createElement(Text, { style: styles.coverWebHint }, PUBLIC_WEB)
-                    ),
-                    React.createElement(View, { style: styles.coverRightPanel },
-                        React.createElement(Text, { style: styles.coverTitle }, 'Catalog selecție'),
-                        React.createElement(Text, { style: styles.coverSubtitle }, config.subtitle || 'Mecanizare agricolă'),
-                        React.createElement(Text, { style: styles.coverSlogan },
-                            'Selecție tehnică pe baza documentației producătorilor incluși. Parametrii se validează la ofertare.'
-                        )
-                    )
-                ),
-                React.createElement(View, { style: styles.coverFooterBar },
-                    React.createElement(Text, { style: styles.coverFooterBarText },
-                        'Mecanizare responsabilă · selecție tehnică pentru ferme din România'
-                    )
-                )
-            )
-        ),
+        buildMultiProductCatalogCover(config, productsToDisplay, categoriesFromDb),
 
         // PAGINA 2: PROFIL COMPANIE (tipografie uniformă, aliniere stânga, spațieri fixe)
         React.createElement(Page, { size: 'A4', style: styles.page },
@@ -1625,26 +1675,38 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                 const detailPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-detail-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productDetailPage },
-                        React.createElement(View, { style: { ...styles.productDetailGrid, flex: 1 } },
+                        React.createElement(
+                            View,
+                            { style: styles.productDetailMainSymmetric },
                             React.createElement(
                                 View,
-                                { style: styles.productMoodboardStack },
-                                ...detailGallery.map((u, gi) =>
-                                    React.createElement(
-                                        View,
-                                        { key: `detail-${pSlug}-${gi}`, style: styles.productMoodboardCell },
-                                        React.createElement(ProductImage, { url: u, fallback: product?.name, moodboard: true })
-                                    )
+                                { style: { ...styles.productDetailGrid, ...styles.productDetailGridCentered, flex: 1 } },
+                                React.createElement(
+                                    View,
+                                    { style: styles.productMoodboardStackSymmetric },
+                                    ...detailGallery.map((u, gi) =>
+                                        React.createElement(
+                                            View,
+                                            { key: `detail-${pSlug}-${gi}`, style: styles.productMoodboardCellSymmetric },
+                                            React.createElement(ProductImage, { url: u, fallback: product?.name, moodboard: true })
+                                        )
+                                    ),
                                 ),
-                            ),
-                            React.createElement(View, { style: styles.productRightCol },
-                                renderAccentSectionTitle(`desc-${pSlug}`, 'Prezentare tehnică', undefined, 'leftRule'),
-                                React.createElement(Text, { style: styles.productSheetBody }, descText),
-                                ...introBullets.slice(0, 2).map((line, bi) =>
-                                    renderChevronBullet(`intro-${pSlug}-${bi}`, styles.productIntroBullets as Record<string, unknown>, line)
-                                ),
-                                renderUnifiedTechnicalSpecs(product),
-                                ...renderProductMetaOnly(product)
+                                React.createElement(
+                                    View,
+                                    { style: styles.productRightColSymmetric },
+                                    renderAccentSectionTitle(`desc-${pSlug}`, 'Prezentare tehnică', undefined, 'leftRule'),
+                                    React.createElement(Text, { style: styles.productSheetBody }, descText),
+                                    ...introBullets.slice(0, 2).map((line, bi) =>
+                                        renderChevronBullet(
+                                            `intro-${pSlug}-${bi}`,
+                                            styles.productIntroBullets as Record<string, unknown>,
+                                            line
+                                        )
+                                    ),
+                                    renderUnifiedTechnicalSpecs(product),
+                                    ...renderProductMetaOnly(product)
+                                )
                             )
                         ),
                         (verdictEl || fundingEl) &&

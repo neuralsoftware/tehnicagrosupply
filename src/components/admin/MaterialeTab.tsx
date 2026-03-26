@@ -23,7 +23,8 @@ const EMAIL = 'tehnicagro.supply@gmail.com';
 const TEMPLATES: Record<string, { title: string; subtitle: string; introTitle: string; introText: string }> = {
     viticol: {
         title: 'Soluții Premium pentru Viticultură',
-        subtitle: 'Tehnologii integrate: de la pregătirea solului la recoltare',
+        subtitle:
+            'De la lucrări în vie până la utilaje pentru recoltă și logistică — precizie și fiabilitate pentru plantația dumneavoastră.',
         introTitle: 'Partenerul tău în Excelența Viticolă',
         introText: 'Vă propunem o selecție de utilaje de înaltă performanță, special concepute pentru exigențele viticulturii moderne. Toate soluțiile prezentate sunt eligibile pentru finațare prin programele APIA și AFIR, oferindu-vă un avantaj competitiv durabil.'
     },
