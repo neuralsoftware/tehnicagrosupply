@@ -162,14 +162,18 @@ export function CatalogTab({ adminAuth, categories }: Props) {
 
     if (editing !== null)
         return (
-            <div className="space-y-4 max-w-3xl animate-in fade-in slide-in-from-bottom-2">
+            <div className="space-y-4 max-w-4xl animate-in fade-in slide-in-from-bottom-2">
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <h3 className="text-xl font-black uppercase text-white tracking-tight">
                             {editing.slug ? 'Editează Produs' : 'Produs Nou'}
                         </h3>
                         <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                            Catalog site — aerisit. Detaliile pentru broșuri: tab „Date broșură”.
+                            Catalog site. Text lung + galerie extra: tab „Date broșură”.
+                        </p>
+                        <p className="text-[10px] text-sky-400/95 font-bold uppercase tracking-widest mt-2 max-w-xl leading-relaxed">
+                            Broșură PDF dedicată (deep dive): secțiunea albastră „Blocuri broșură dedicată” este mai jos, imediat după
+                            imaginea principală.
                         </p>
                     </div>
                     <button
@@ -289,50 +293,23 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                     </div>
                 </div>
 
-                <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800">
-                    <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-3">
-                        Specificații tehnice principale
-                    </label>
-                    {(editing.specs || ['', '', '']).map((spec, i) => (
-                        <input
-                            key={i}
-                            value={spec}
-                            onChange={(e) =>
-                                setEditing((p) => {
-                                    const s = [...(p?.specs || ['', '', ''])];
-                                    s[i] = e.target.value;
-                                    return { ...p, specs: s };
-                                })
-                            }
-                            placeholder={`Spec. ${i + 1} (ex: Lățime: 6.8m)`}
-                            className="w-full mb-2 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 transition-all font-bold"
-                        />
-                    ))}
-                    <button
-                        onClick={() => setEditing((p) => ({ ...p, specs: [...(p?.specs || []), ''] }))}
-                        className="text-[10px] text-ea-green-500 font-black uppercase hover:text-white transition-colors flex items-center gap-1 mt-2"
-                    >
-                        <Plus className="w-3 h-3" /> Adaugă specificație
-                    </button>
-                </div>
-
-                <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 border-l-4 border-l-sky-600/60 space-y-4">
+                <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 border-l-4 border-l-sky-500 space-y-4 ring-1 ring-sky-900/30">
                     <div>
-                        <label className="block text-[10px] text-sky-400 uppercase font-black tracking-widest">
+                        <label className="block text-[11px] text-sky-300 uppercase font-black tracking-widest">
                             Blocuri broșură dedicată (PDF deep dive)
                         </label>
-                        <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
-                            Pentru „Generează broșură dedicată”: câte un rând cu poză, titlu și descriere. În PDF apar câte 2 blocuri
-                            pe pagină, aranjament zig-zag.
+                        <p className="text-[11px] text-zinc-400 mt-2 leading-relaxed font-medium normal-case">
+                            Aici adaugi secțiunile pentru broșura pe un singur produs (titlu, text, poză). Se văd în PDF zig-zag, câte 2
+                            pe pagină. Nu apare pe site public — doar în PDF generat din Catalog sau din Materiale.
                         </p>
                     </div>
                     {(editing.featureBlocks || []).map((block, idx) => (
                         <div
                             key={idx}
-                            className="p-4 rounded-2xl border border-zinc-800 bg-zinc-950/60 space-y-3"
+                            className="p-4 rounded-2xl border border-zinc-700 bg-zinc-950/60 space-y-3"
                         >
                             <div className="flex justify-between items-center">
-                                <span className="text-[10px] text-sky-500/90 font-black uppercase">Bloc {idx + 1}</span>
+                                <span className="text-[10px] text-sky-400 font-black uppercase">Bloc {idx + 1}</span>
                                 <button
                                     type="button"
                                     onClick={() =>
@@ -414,9 +391,36 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                 };
                             })
                         }
-                        className="text-[10px] text-sky-400 font-black uppercase hover:text-white transition-colors flex items-center gap-1"
+                        className="text-[11px] text-sky-300 font-black uppercase hover:text-white transition-colors flex items-center gap-1.5"
                     >
-                        <Plus className="w-3 h-3" /> Adaugă bloc broșură dedicată
+                        <Plus className="w-3.5 h-3.5" /> Adaugă bloc broșură dedicată
+                    </button>
+                </div>
+
+                <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800">
+                    <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-3">
+                        Specificații tehnice principale
+                    </label>
+                    {(editing.specs || ['', '', '']).map((spec, i) => (
+                        <input
+                            key={i}
+                            value={spec}
+                            onChange={(e) =>
+                                setEditing((p) => {
+                                    const s = [...(p?.specs || ['', '', ''])];
+                                    s[i] = e.target.value;
+                                    return { ...p, specs: s };
+                                })
+                            }
+                            placeholder={`Spec. ${i + 1} (ex: Lățime: 6.8m)`}
+                            className="w-full mb-2 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 transition-all font-bold"
+                        />
+                    ))}
+                    <button
+                        onClick={() => setEditing((p) => ({ ...p, specs: [...(p?.specs || []), ''] }))}
+                        className="text-[10px] text-ea-green-500 font-black uppercase hover:text-white transition-colors flex items-center gap-1 mt-2"
+                    >
+                        <Plus className="w-3 h-3" /> Adaugă specificație
                     </button>
                 </div>
 
@@ -491,6 +495,10 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                     <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
                         {products.length} produse · pentru PDF detaliat vezi tab „Date broșură”
                     </p>
+                    <p className="text-[11px] text-sky-400/90 font-semibold mt-3 max-w-2xl leading-snug normal-case">
+                        Pentru <strong className="text-sky-300">blocurile broșură dedicată</strong> (PDF pe un singur produs): apasă
+                        creionul la un produs — secțiunea albastră e imediat sub imaginea principală.
+                    </p>
                 </div>
                 <button
                     onClick={() => setEditing(blank())}
@@ -507,6 +515,9 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                             <th className="px-6 py-5 text-left">Utilaj / Brand</th>
                             <th className="px-6 py-5 text-left">Categorie</th>
                             <th className="px-6 py-5 text-left">Imagine</th>
+                            <th className="px-4 py-5 text-center whitespace-nowrap" title="Blocuri pentru PDF dedicat">
+                                Blocuri PDF
+                            </th>
                             <th className="px-6 py-5 text-center">Status</th>
                             <th className="px-6 py-5 text-right">Gestiune</th>
                         </tr>
@@ -541,6 +552,18 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                     ) : (
                                         <div className="w-12 h-12 rounded-xl bg-zinc-950 border border-dotted border-zinc-700" />
                                     )}
+                                </td>
+                                <td className="px-4 py-5 text-center">
+                                    <span
+                                        className={`inline-flex min-w-[2rem] justify-center text-[10px] font-black tabular-nums rounded-lg px-2 py-1 border ${
+                                            (p.featureBlocks?.length || 0) > 0
+                                                ? 'text-sky-400 border-sky-700/50 bg-sky-950/40'
+                                                : 'text-zinc-600 border-zinc-800 bg-zinc-950/50'
+                                        }`}
+                                        title="Număr blocuri broșură dedicată (vezi formularul produsului)"
+                                    >
+                                        {p.featureBlocks?.length ?? 0}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-5 text-center">
                                     <div
