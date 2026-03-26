@@ -423,23 +423,41 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                     <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-3">
                         Specificații tehnice principale
                     </label>
-                    {(editing.specs || ['', '', '']).map((spec, i) => (
-                        <input
-                            key={i}
-                            value={spec}
-                            onChange={(e) =>
-                                setEditing((p) => {
-                                    const s = [...(p?.specs || ['', '', ''])];
-                                    s[i] = e.target.value;
-                                    return { ...p, specs: s };
-                                })
-                            }
-                            placeholder={`Spec. ${i + 1} (ex: Lățime: 6.8m)`}
-                            className="w-full mb-2 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 transition-all font-bold"
-                        />
+                    {(Array.isArray(editing.specs) ? editing.specs : ['', '', '']).map((spec, i) => (
+                        <div key={i} className="flex gap-2 items-center mb-2">
+                            <input
+                                value={spec}
+                                onChange={(e) =>
+                                    setEditing((p) => {
+                                        if (!p) return p;
+                                        const s = Array.isArray(p.specs) ? [...p.specs] : ['', '', ''];
+                                        s[i] = e.target.value;
+                                        return { ...p, specs: s };
+                                    })
+                                }
+                                placeholder={`Spec. ${i + 1} (ex: Lățime: 6.8m)`}
+                                className="flex-1 min-w-0 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-sm outline-none focus:ring-1 focus:ring-ea-green-500 transition-all font-bold"
+                            />
+                            <button
+                                type="button"
+                                title="Șterge această specificație"
+                                onClick={() =>
+                                    setEditing((p) => {
+                                        if (!p) return p;
+                                        const s = Array.isArray(p.specs) ? [...p.specs] : ['', '', ''];
+                                        s.splice(i, 1);
+                                        return { ...p, specs: s };
+                                    })
+                                }
+                                className="shrink-0 p-3 rounded-xl border border-zinc-700 bg-zinc-950 text-zinc-400 hover:text-red-400 hover:border-red-900/60 hover:bg-red-950/30 transition-colors"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </div>
                     ))}
                     <button
-                        onClick={() => setEditing((p) => ({ ...p, specs: [...(p?.specs || []), ''] }))}
+                        type="button"
+                        onClick={() => setEditing((p) => ({ ...p, specs: [...(Array.isArray(p?.specs) ? p.specs : []), ''] }))}
                         className="text-[10px] text-ea-green-500 font-black uppercase hover:text-white transition-colors flex items-center gap-1 mt-2"
                     >
                         <Plus className="w-3 h-3" /> Adaugă specificație
