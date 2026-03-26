@@ -25,7 +25,10 @@ export default async function Home() {
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 3);
 
-    const catalogProducts = await getProducts();
+    const [catalogProducts, viticultureCatalogHref] = await Promise.all([
+        getProducts(),
+        getViticultureCategoryCatalogPath(),
+    ]);
     const viticolHomePreview = catalogProducts
         .filter(
             (p) =>
