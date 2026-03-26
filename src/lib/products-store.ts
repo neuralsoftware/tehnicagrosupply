@@ -551,6 +551,24 @@ export async function getActiveCategories(): Promise<Category[]> {
     return cats.filter(c => c.status === 'active');
 }
 
+/**
+ * Calea către pagina de catalog viticol/viticultură: folosește slug-ul din admin (ex. viticultura),
+ * nu hardcodarea „viticol”, ca linkurile de pe home să coincidă cu categoria activă.
+ */
+export async function getViticultureCategoryCatalogPath(): Promise<string> {
+    const active = await getActiveCategories();
+    let row = active.find((c) => isViticultureCategoryField(c.slug));
+    if (!row) {
+        const all = await getCategories();
+        row = all.find((c) => isViticultureCategoryField(c.slug));
+    }
+    const slug = String(row?.slug || '').trim();
+    if (slug) {
+        return `/utilaje/${slug}`;
+    }
+    return '/utilaje/viticol';
+}
+
 export async function saveCategory(category: Category): Promise<void> {
     const raw = await readBlob<unknown>(CATEGORIES_BLOB_KEY, []);
     const current = parseCategoriesFromStorage(raw);

@@ -17,7 +17,13 @@ function toCardModel(p: DynamicProduct): FeaturedProductCardModel {
 }
 
 /** Produse vizibile din categoria viticolă (catalog Supabase + static) — sub bannerul de sezon. */
-export function HomeViticultureProducts({ products }: { products: DynamicProduct[] }) {
+export function HomeViticultureProducts({
+    products,
+    catalogHref,
+}: {
+    products: DynamicProduct[];
+    catalogHref: string;
+}) {
     if (!products.length) return null;
 
     return (
@@ -36,7 +42,7 @@ export function HomeViticultureProducts({ products }: { products: DynamicProduct
                 </div>
                 <div className="mt-10 flex justify-center md:justify-start">
                     <Link
-                        href="/utilaje/viticol"
+                        href={catalogHref}
                         className="inline-flex items-center gap-2 text-ea-green-700 text-sm font-medium hover:text-ea-green-600 transition-colors"
                     >
                         Toată gama pentru viticultură

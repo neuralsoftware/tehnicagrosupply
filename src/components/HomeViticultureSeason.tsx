@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 const VITICULTURE_BG = '/images/viticulture-season-bg.jpg';
 
 /** Card categorie premium — viticultură (imagine + overlay), nu alertă de sistem */
-export function HomeViticultureSeason() {
+export function HomeViticultureSeason({ catalogHref }: { catalogHref: string }) {
     return (
         <section className="border-y border-zinc-100 bg-white py-8 md:py-10" aria-labelledby="viticulture-season-heading">
             <div className="max-w-7xl mx-auto px-4">
@@ -24,7 +24,7 @@ export function HomeViticultureSeason() {
                             Gama pentru vie, pregătirea solului și campania viticolă — aceeași calitate ca în cereale.
                         </p>
                         <Link
-                            href="/utilaje/viticol"
+                            href={catalogHref}
                             className="mt-8 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white text-zinc-900 text-sm font-medium hover:bg-zinc-100 transition-colors shadow-lg"
                         >
                             Explorează gama

@@ -10,7 +10,12 @@ import { HomeBlogTeaser } from '@/components/HomeBlogTeaser';
 import { HomeAuditContextBand } from '@/components/HomeAuditContextBand';
 import { HomePromiseBand } from '@/components/HomePromiseBand';
 import { getPublishedPosts } from '@/data/blog';
-import { getProducts, productMatchesCategorySlug, isProductVisibleOnSite } from '@/lib/products-store';
+import {
+    getProducts,
+    getViticultureCategoryCatalogPath,
+    productMatchesCategorySlug,
+    isProductVisibleOnSite,
+} from '@/lib/products-store';
 
 /** Catalog viticol de pe home trebuie citit la fiecare request (altfel rămâne gol sau vechi de la build static). */
 export const dynamic = 'force-dynamic';
@@ -64,9 +69,9 @@ export default async function Home() {
 
             <Hero />
 
-            <HomeViticultureSeason />
+            <HomeViticultureSeason catalogHref={viticultureCatalogHref} />
 
-            <HomeViticultureProducts products={viticolHomePreview} />
+            <HomeViticultureProducts products={viticolHomePreview} catalogHref={viticultureCatalogHref} />
 
             <HomeAuditContextBand />
 
