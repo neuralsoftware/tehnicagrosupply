@@ -10,8 +10,14 @@ import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 import { SocialProof } from '@/components/SocialProof';
 import { InlineCTA } from '@/components/InlineCTA';
+import { HomeViticultureSeason } from '@/components/HomeViticultureSeason';
+import { HomeBlogTeaser } from '@/components/HomeBlogTeaser';
+import { getPublishedPosts } from '@/data/blog';
 
-export default function Home() {
+export default async function Home() {
+    const recentBlogPosts = [...getPublishedPosts()].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    ).slice(0, 3);
     // Schema.org JSON-LD for SEO Rich Results
     const faqSchema = {
         "@context": "https://schema.org",
@@ -53,6 +59,8 @@ export default function Home() {
 
             <Hero />
 
+            <HomeViticultureSeason />
+
             {/* Social Proof - Immediate trust & activity */}
             <SocialProof />
 
@@ -90,6 +98,8 @@ export default function Home() {
             </section>
 
             <Contact />
+
+            <HomeBlogTeaser posts={recentBlogPosts} />
 
             <WhatsAppButton />
             <ExitIntentPopup />

@@ -13,7 +13,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
         // Use supabaseAdmin to bypass RLS
         const { data, error } = await supabaseAdmin
-            .from('leads')
+            .from('clients' as any)
             .update(dbUpdates)
             .eq('id', id)
             .select()
@@ -36,10 +36,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         const { id } = await params;
 
         // Use supabaseAdmin to bypass RLS
-        const { error } = await supabaseAdmin
-            .from('leads')
-            .delete()
-            .eq('id', id);
+        const { error } = await supabaseAdmin.from('clients' as any).delete().eq('id', id);
 
         if (error) {
             console.error('Supabase delete error:', error);

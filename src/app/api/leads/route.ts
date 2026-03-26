@@ -5,14 +5,16 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 const leadSchema = z.object({
     name: z.string().min(2, 'Nume prea scurt').max(100, 'Nume prea lung'),
-    phone: z.string()
-        .transform((val) => {
-            let digits = val.replace(/[^\d+]/g, '');
-            return digits;
-        })
-        .refine((val) => val.length >= 8, {
-            message: 'Telefon invalid'
-        }),
+    /** Opțional în formularul ROI; dacă e completat, minim 8 caractere numerice */
+    phone: z.preprocess(
+        (v) => (v === undefined || v === null ? '' : String(v)),
+        z
+            .string()
+            .transform((val) => val.replace(/[^\d+]/g, ''))
+            .refine((val) => val.length === 0 || val.replace(/^\+/, '').length >= 8, {
+                message: 'Telefon invalid (minim 8 cifre dacă îl completezi)',
+            })
+    ),
     email: z.string().email('Email invalid').optional().or(z.literal('')),
     county: z.string().max(100).optional().default(''),
     hectares: z.number().min(0, 'Suprafață invalidă').max(10000, 'Max 10000 ha').optional().default(0),

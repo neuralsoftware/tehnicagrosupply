@@ -86,37 +86,37 @@ function HeroContent() {
 
     let headline = (
         <>
-            Eficiență Garantată. <span className="text-ea-green-600">Securizează Subvenția</span><br />
-            <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">și Maximizează Profitul.</span>
+            Eficiență garantată: <strong className="font-bold text-ea-green-600">Securizează subvenția</strong>, apoi maximizează
+            profitul fermei tale.
         </>
     );
 
     if (ref === 'subventie') {
         headline = (
             <>
-                Maximizați <span className="text-ea-green-600">Subvenția APIA</span><br />
-                <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">cu Tehnologia TehnicAgro.</span>
+                Maximizează <strong className="font-bold text-ea-green-600">subvenția APIA</strong> cu tehnologia adaptată
+                nevoilor fermei tale.
             </>
         );
     } else if (ref === 'roi') {
         headline = (
             <>
-                Calculați <span className="text-ea-green-600">ROI-ul Fermei</span><br />
-                <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">și Reduceți Costurile.</span>
+                Află <strong className="font-bold text-ea-green-600">ROI-ul real</strong> al fermei tale și unde poți reduce
+                costurile an de an.
             </>
         );
     } else if (ref === 'avers') {
         headline = (
             <>
-                Puterea <span className="text-ea-green-600">Avers-Agro</span><br />
-                <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">Performanță No-Till Reală.</span>
+                Performanță no-till cu <strong className="font-bold text-ea-green-600">Avers-Agro</strong>, aleasă pentru
+                lucru în rest vegetal și precizie la semănat.
             </>
         );
     } else if (ref === 'dr12') {
         headline = (
             <>
-                Proiecte <span className="text-ea-green-600">DR-12: 200.000€</span><br />
-                <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-zinc-500">Finanțare 80% pt. Utilaje.</span>
+                <strong className="font-bold text-ea-green-600">DR-12: până la 200.000 €</strong> — finanțare nerambursabilă
+                de până la 80% pentru utilajele tale.
             </>
         );
     }
@@ -162,7 +162,7 @@ function HeroContent() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="text-3xl sm:text-4xl md:text-6xl font-bold uppercase tracking-tight text-zinc-900 px-2"
+                    className="text-3xl sm:text-4xl md:text-[2.75rem] lg:text-5xl font-semibold tracking-tight text-zinc-900 px-2 max-w-4xl mx-auto leading-[1.15] normal-case"
                 >
                     {headline}
                 </motion.h1>

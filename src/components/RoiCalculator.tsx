@@ -19,11 +19,22 @@ const URGENCY_OPTIONS = [
     { id: 'info', label: 'Doar Informativ (Planificare)' }
 ];
 
+function formatLeadApiError(data: { error?: string; details?: Array<{ message?: string } | { path?: unknown; message?: string }> }): string {
+    if (Array.isArray(data.details) && data.details.length > 0) {
+        const parts = data.details
+            .map((d) => (d && typeof d === 'object' && 'message' in d ? String((d as { message?: string }).message || '') : ''))
+            .filter(Boolean);
+        if (parts.length) return parts.join(' ');
+    }
+    return data.error || 'Cererea nu a putut fi procesată.';
+}
+
 export function RoiCalculator() {
     const [hectares, setHectares] = useState<number>(100);
     const [showForm, setShowForm] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formError, setFormError] = useState<string | null>(null);
     const isFetchingRef = useRef(false);
 
     const [leadId, setLeadId] = useState<string | null>(null);
@@ -61,94 +72,109 @@ export function RoiCalculator() {
 
     const handleDownloadReport = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (isFetchingRef.current) return;
         isFetchingRef.current = true;
         setIsSubmitting(true);
-        
+        setFormError(null);
 
-        // Dual Tracking: GA4 + Facebook Pixel
-        if (typeof window !== 'undefined') {
-            // GA4 Enhanced Lead Conversion
-            if ((window as any).gtag) {
-                (window as any).gtag('event', 'generate_lead', {
-                    value: totalBenefit,
-                    currency: 'RON',
-                    event_category: 'Lead Generation',
-                    event_label: `${county} - ${hectares}ha - ${selectedCrops.join(', ')}`,
-                    hectares: hectares,
-                    county: county,
-                    crops_count: selectedCrops.length,
-                    urgency: urgency
-                });
-            }
+        const leadData = {
+            name: contact.trim(),
+            phone: phone.trim(),
+            email: email.trim(),
+            county,
+            hectares,
+            crops: selectedCrops,
+            urgency,
+            subsidyIncome,
+            fuelSavings,
+            totalBenefit,
+            message: `Hectare: ${hectares}, Culturi: ${selectedCrops.join(', ')}, Urgență: ${urgency}, Beneficiu Total: ${totalBenefit} RON`,
+            source: 'ROI Calculator',
+        };
 
-            // Facebook Pixel Lead Event
-            if ((window as any).fbq) {
-                (window as any).fbq('track', 'Lead', {
-                    content_name: 'ROI Calculator TehnicAgro',
-                    value: totalBenefit,
-                    currency: 'RON',
-                    content_category: 'Lead Generation'
-                });
-            }
-        }
-
-        // Save to API (backend)
         try {
-            const leadData = {
-                name: contact,
-                phone,
-                email,
-                county,
-                hectares,
-                crops: selectedCrops,
-                urgency,
-                subsidyIncome,
-                fuelSavings,
-                totalBenefit,
-                message: `Hectare: ${hectares}, Culturi: ${selectedCrops.join(', ')}, Urgență: ${urgency}, Beneficiu Total: ${totalBenefit} RON`,
-                source: 'ROI Calculator'
-            };
-
             const res = await fetch('/api/leads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(leadData)
+                body: JSON.stringify(leadData),
             });
 
-            const data = await res.json();
-            if (data.success && data.lead?.id) {
-                setLeadId(data.lead.id);
+            const data = (await res.json().catch(() => ({}))) as {
+                success?: boolean;
+                lead?: { id?: string | number };
+                error?: string;
+                details?: Array<{ message?: string }>;
+            };
+
+            if (!res.ok || !data.success) {
+                setFormError(formatLeadApiError(data));
+                return;
             }
 
-            // Send automatic report email if email exists
-            if (email) {
-                await fetch('/api/send-report', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(leadData)
-                });
+            const id = data.lead?.id;
+            if (id != null && String(id)) {
+                setLeadId(String(id));
             }
 
-            // Mark as converted to prevent Exit Intent
             if (typeof window !== 'undefined') {
+                if ((window as typeof window & { gtag?: (...args: unknown[]) => void }).gtag) {
+                    (window as typeof window & { gtag: (...args: unknown[]) => void }).gtag('event', 'generate_lead', {
+                        value: totalBenefit,
+                        currency: 'RON',
+                        event_category: 'Lead Generation',
+                        event_label: `${county} - ${hectares}ha - ${selectedCrops.join(', ')}`,
+                        hectares: hectares,
+                        county: county,
+                        crops_count: selectedCrops.length,
+                        urgency: urgency,
+                    });
+                }
+                if ((window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq) {
+                    (window as typeof window & { fbq: (...args: unknown[]) => void }).fbq('track', 'Lead', {
+                        content_name: 'ROI Calculator TehnicAgro',
+                        value: totalBenefit,
+                        currency: 'RON',
+                        content_category: 'Lead Generation',
+                    });
+                }
                 localStorage.setItem('tehnicagro_lead_submitted', 'true');
             }
 
+            if (leadData.email) {
+                const reportRes = await fetch('/api/send-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(leadData),
+                });
+                if (!reportRes.ok) {
+                    console.warn('[ROI] send-report', reportRes.status);
+                }
+            }
+
+            setSubmitted(true);
         } catch (error) {
             console.error('Error in lead submission flow:', error);
+            setFormError('Eroare de rețea. Verifică conexiunea și încearcă din nou.');
         } finally {
             isFetchingRef.current = false;
             setIsSubmitting(false);
         }
-
-        setSubmitted(true);
     };
 
     const resetCalculator = () => {
         setShowForm(false);
         setSubmitted(false);
+        setFormError(null);
+        setLeadId(null);
+        setCallRequested(false);
+        setContact('');
+        setPhone('');
+        setEmail('');
+        setCounty('');
+        setSelectedCrops([]);
+        setUrgency('');
+        setGdprConsent(false);
     };
 
     const [callRequested, setCallRequested] = useState(false);
@@ -257,9 +283,10 @@ export function RoiCalculator() {
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
                                         onClick={() => {
+                                            setFormError(null);
                                             setShowForm(true);
-                                            if (typeof window !== 'undefined' && (window as any).fbq) {
-                                                (window as any).fbq('trackCustom', 'AuditStart');
+                                            if (typeof window !== 'undefined' && (window as typeof window & { fbq?: (ev: string) => void }).fbq) {
+                                                (window as typeof window & { fbq: (ev: string) => void }).fbq('trackCustom', 'AuditStart');
                                             }
                                         }}
                                         className="group relative inline-flex items-center gap-3 px-8 mx-4 py-5 bg-ea-green-600 text-white font-black rounded-2xl uppercase tracking-tighter shadow-2xl hover:bg-ea-green-500 transition-all overflow-hidden"
@@ -318,9 +345,21 @@ export function RoiCalculator() {
                                     >
                                         <div className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm">
                                             <div className="text-center mb-6">
-                                                <h3 className="text-xl font-bold text-zinc-900 mb-2">Completare Date pentru Generare</h3>
-                                                <p className="text-zinc-500 text-sm">Pentru a genera analiza financiară precisă pe {hectares} hectare, te rugăm să introduci datele de mai jos.</p>
+                                                <h3 className="text-xl font-bold text-zinc-900 mb-2">Completare date pentru generare</h3>
+                                                <p className="text-zinc-500 text-sm">
+                                                    Pentru analiza financiară pe {hectares} hectare, completează câmpurile de mai jos.
+                                                </p>
                                             </div>
+
+                                            {formError && (
+                                                <div
+                                                    role="alert"
+                                                    className="mb-6 flex gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900"
+                                                >
+                                                    <AlertCircle className="w-5 h-5 shrink-0 text-red-600" aria-hidden />
+                                                    <span>{formError}</span>
+                                                </div>
+                                            )}
 
                                             {/* ESSENTIAL FIELDS */}
                                             <div className="space-y-6 mb-8">
@@ -566,7 +605,9 @@ export function RoiCalculator() {
                                                                 <span className="text-[10px] uppercase font-black tracking-widest text-ea-green-800">Următorii Pași</span>
                                                             </div>
                                                             <p className="text-[11px] text-zinc-600 leading-normal">
-                                                                Acest raport digital este o diagnoză preliminară. Pentru a primi **oferta tehnică oficială** și validarea 100% a conformității APIA, aprobă raportul mai jos. Un specialist TehnicAgro te va contacta în cel mai scurt timp.
+                                                                Acest raport digital este o diagnoză preliminară. Pentru a primi{' '}
+                                                <strong>oferta tehnică oficială</strong> și validarea conformității APIA, un specialist
+                                                TehnicAgro te va contacta în cel mai scurt timp.
                                                             </p>
                                                         </div>
                                                     </div>
