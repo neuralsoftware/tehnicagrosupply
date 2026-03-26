@@ -344,6 +344,18 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto',
         fontWeight: 500,
     },
+    /** Denumirea utilajului pe pag. 1 — ~50% din mărimea liniei de cod model */
+    productOverviewGiantName: {
+        fontSize: 27.5,
+        fontFamily: 'Roboto',
+        fontWeight: 'bold',
+        color: COLORS.brochureAccent,
+        lineHeight: 0.95,
+        letterSpacing: -0.55,
+        textTransform: 'uppercase' as const,
+        marginBottom: 4,
+    },
+    /** Cod model / variantă — rămâne la impact mare */
     productOverviewGiant: {
         fontSize: 55,
         fontFamily: 'Roboto',
@@ -1167,16 +1179,77 @@ function pdfCatalogLogoSrc(config: { logoDataUri?: string }): string {
     return pdfCatalogLogoUrl();
 }
 
-/** Una sau două linii de titlu foarte mare (ex. MULTISEM / ADS), fără duplicarea mărcii în stânga */
-function getProductHeroGiantLines(product: DynamicProduct): string[] {
-    if (product.slug === 'multisem-ads') {
-        return ['MULTISEM', 'ADS'];
-    }
+/** Textul titlului fără prefix de marcă (pentru parsare denumire / cod). */
+function getProductNameRestWithoutBrand(product: DynamicProduct): string {
     const brand = (product.brand || '').trim();
     let rest = (product.name || 'UTILAJ').trim();
     if (brand && rest.toLowerCase().startsWith(`${brand.toLowerCase()} `)) {
         rest = rest.slice(brand.length).trim();
     }
+    return rest;
+}
+
+/**
+ * Detectează cod model la sfârșitul denumirii (ex. „… SRBH 22”, „… KSE680”, „… ADS” când e descriptiv lung).
+ * Returnează null dacă nu e clar unde se separă.
+ */
+function tryExtractTrailingModelCode(rest: string): { descriptive: string; code: string } | null {
+    const t = rest.trim();
+    if (t.length < 5) return null;
+
+    const wordCount = (s: string) => s.split(/\s+/).filter(Boolean).length;
+
+    // „... LITERE CIFRE” (ex. SRBH 22, KSE 680)
+    const mLettersDigits = t.match(/^(.+?)\s+([A-Za-zĂÂÎȘȚăâîșț]{2,12})\s+(\d{1,4}[A-Za-z0-9./\-]*)\s*$/);
+    if (mLettersDigits) {
+        const descriptive = mLettersDigits[1].trim();
+        if (wordCount(descriptive) >= 2 && descriptive.length >= 4) {
+            return { descriptive, code: `${mLettersDigits[2]} ${mLettersDigits[3]}`.trim() };
+        }
+    }
+
+    // „... COD” o singură bucată alfanumerică (ex. KSE680)
+    const mFused = t.match(/^(.+?)\s+([A-Za-z]{1,5}\d{2,4}[A-Za-z0-9]*)\s*$/);
+    if (mFused && mFused[1].includes(' ') && wordCount(mFused[1].trim()) >= 2) {
+        return { descriptive: mFused[1].trim(), code: mFused[2] };
+    }
+
+    // „... ADS” — doar dacă partea descriptivă are suficiente cuvinte (reduce fals pozitive)
+    const mShortAlpha = t.match(/^(.+?)\s+([A-Z]{2,5})\s*$/);
+    if (mShortAlpha) {
+        const descriptive = mShortAlpha[1].trim();
+        if (wordCount(descriptive) >= 4 && /^[A-Z]{2,5}$/.test(mShortAlpha[2])) {
+            return { descriptive, code: mShortAlpha[2] };
+        }
+    }
+
+    return null;
+}
+
+/** Împarte denumirea pe 1–2 linii (aceeași logică ca înainte, dar doar pe partea descriptivă). */
+function chunkDescriptiveTitleLines(descriptive: string): string[] {
+    const parts = descriptive.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return [descriptive.toUpperCase()];
+    const upper = parts.map((p) => p.toUpperCase());
+    if (upper.length >= 4) {
+        const mid = Math.ceil(upper.length / 2);
+        return [upper.slice(0, mid).join(' '), upper.slice(mid).join(' ')];
+    }
+    if (upper.length === 3) {
+        return [upper.slice(0, 2).join(' '), upper[2]];
+    }
+    if (upper.length === 2) {
+        return [upper.join(' ')];
+    }
+    return [upper[0]];
+}
+
+/** Una sau două linii full-gigant (fără cod separat detectat). */
+function getProductHeroGiantLines(product: DynamicProduct): string[] {
+    if (product.slug === 'multisem-ads') {
+        return ['MULTISEM', 'ADS'];
+    }
+    const rest = getProductNameRestWithoutBrand(product);
     const parts = rest.split(/\s+/).filter(Boolean);
     if (parts.length >= 3) {
         const mid = Math.ceil(parts.length / 2);
@@ -1186,6 +1259,53 @@ function getProductHeroGiantLines(product: DynamicProduct): string[] {
         return [parts[0].toUpperCase(), parts[1].toUpperCase()];
     }
     return [rest.toUpperCase()];
+}
+
+type ProductHeroTitleParts =
+    | { mode: 'split'; nameLines: string[]; codeLine: string }
+    | { mode: 'stack'; lines: string[] };
+
+/** Denumire la ~50% + cod model gigantic când se poate identifica sigur codul. */
+function getProductHeroTitleParts(product: DynamicProduct): ProductHeroTitleParts {
+    if (product.slug === 'multisem-ads') {
+        return { mode: 'split', nameLines: ['MULTISEM'], codeLine: 'ADS' };
+    }
+    const rest = getProductNameRestWithoutBrand(product);
+    const extracted = tryExtractTrailingModelCode(rest);
+    if (extracted && extracted.descriptive.trim().length > 0) {
+        return {
+            mode: 'split',
+            nameLines: chunkDescriptiveTitleLines(extracted.descriptive),
+            codeLine: extracted.code.toUpperCase(),
+        };
+    }
+    return { mode: 'stack', lines: getProductHeroGiantLines(product) };
+}
+
+function renderProductOverviewGiantTitleNodes(
+    pSlug: string,
+    keyPrefix: string,
+    parts: ProductHeroTitleParts
+): React.ReactElement[] {
+    if (parts.mode === 'split') {
+        const nodes: React.ReactElement[] = [];
+        parts.nameLines.forEach((line, li) => {
+            nodes.push(
+                React.createElement(
+                    Text,
+                    { key: `${keyPrefix}-name-${pSlug}-${li}`, style: styles.productOverviewGiantName },
+                    line
+                )
+            );
+        });
+        nodes.push(
+            React.createElement(Text, { key: `${keyPrefix}-code-${pSlug}`, style: styles.productOverviewGiant }, parts.codeLine)
+        );
+        return nodes;
+    }
+    return parts.lines.map((line, li) =>
+        React.createElement(Text, { key: `${keyPrefix}-stack-${pSlug}-${li}`, style: styles.productOverviewGiant }, line)
+    );
 }
 
 function getProfessionalProductLead(product: DynamicProduct): string {
@@ -1352,7 +1472,7 @@ export function buildSingleProductDeepDivePDF(
         leftEditionLine: 'Performanță de excepție · recomandare tehnică',
     });
     const descText = getProfessionalProductLead(product);
-    const giantLines = getProductHeroGiantLines(product);
+    const heroTitleParts = getProductHeroTitleParts(product);
     const overviewEyebrowText = (() => {
         const b = (product?.brand || '').trim();
         const c = (secTitle || '').trim();
@@ -1406,9 +1526,7 @@ export function buildSingleProductDeepDivePDF(
                                       ),
                                   ]
                                 : []),
-                            ...giantLines.map((line, li) =>
-                                React.createElement(Text, { key: `sd-g-${pSlug}-${li}`, style: styles.productOverviewGiant }, line)
-                            )
+                            ...renderProductOverviewGiantTitleNodes(pSlug, 'sd', heroTitleParts)
                         ),
                         React.createElement(
                             View,
@@ -1595,7 +1713,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                     );
 
                 const introBullets = getProfessionalIntroBullets(product);
-                const giantLines = getProductHeroGiantLines(product);
+                const heroTitleParts = getProductHeroTitleParts(product);
                 const overviewEyebrowText = (() => {
                     const b = (product?.brand || '').trim();
                     const c = (secTitle || '').trim();
@@ -1636,9 +1754,7 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
                                                   ),
                                               ]
                                             : []),
-                                        ...giantLines.map((line, li) =>
-                                            React.createElement(Text, { key: `g-${pSlug}-${li}`, style: styles.productOverviewGiant }, line)
-                                        )
+                                        ...renderProductOverviewGiantTitleNodes(pSlug, 'ov', heroTitleParts)
                                     ),
                                     React.createElement(
                                         View,
