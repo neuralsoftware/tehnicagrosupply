@@ -51,7 +51,7 @@ function isPostgrestError(x: unknown): x is PostgrestError {
 }
 
 /** Tabel sarcini/mesaje în proiectul CRM (mesajul site → task). Supabase: public.<nume>. */
-const CRM_TASKS_TABLE = process.env.CRM_TASKS_TABLE?.trim() || 'tasks';
+const CRM_TASKS_TABLE = process.env.CRM_TASKS_TABLE?.trim() || 'client_tasks';
 
 export async function POST(request: Request) {
     try {
