@@ -160,7 +160,7 @@ export default async function CategoryPage({ params }: PageProps) {
     const heroSubtitle = truncateHeroSubtitle(subtitleSource, 260);
 
     return (
-        <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
+        <main className="min-h-screen bg-white text-zinc-900 pt-16 pb-24">
             <CategoryHeroBanner
                 categoryTitle={categoryTitle}
                 subtitle={heroSubtitle}
