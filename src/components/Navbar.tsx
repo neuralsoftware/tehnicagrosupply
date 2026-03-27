@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronDown, Phone, MessageSquare } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -10,7 +11,25 @@ function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+const NAV_LINK_CLASS =
+    'text-zinc-600 hover:text-ea-green-600 text-sm font-bold uppercase tracking-widest transition-colors flex items-center gap-1';
+
 export function Navbar() {
+    const pathname = usePathname();
+    const isHome = pathname === '/';
+
+    const scrollTopInstant = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (!isHome) return;
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'auto' });
+    };
+
+    const scrollToSectionInstant = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+        if (!isHome) return;
+        e.preventDefault();
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'auto', block: 'start' });
+    };
+
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [utilajeLinks, setUtilajeLinksList] = useState([
@@ -39,15 +58,21 @@ export function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const navLinks = [
+    const navLinks: {
+        name: string;
+        href: string;
+        hashId?: string;
+        children?: { name: string; href: string }[];
+    }[] = [
         { name: 'Acasă', href: '/' },
         {
             name: 'Utilaje',
             href: '/#oferta',
+            hashId: 'oferta',
             children: utilajeLinks,
         },
         { name: 'Blog Subvenții', href: '/blog' },
-        { name: 'Contact', href: '/#contact' },
+        { name: 'Contact', href: '/#contact', hashId: 'contact' },
     ];
 
     return (
@@ -60,7 +85,7 @@ export function Navbar() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2">
+                    <Link href="/" onClick={scrollTopInstant} className="flex items-center gap-2">
                         <span className="text-xl md:text-2xl font-black text-zinc-900 uppercase tracking-tighter">
                             Tehnic<span className="text-ea-green-600">Agro</span>
                         </span>
@@ -72,7 +97,14 @@ export function Navbar() {
                             <div key={link.name} className="relative group">
                                 <Link
                                     href={link.href}
-                                    className="text-zinc-600 hover:text-ea-green-600 text-sm font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
+                                    onClick={
+                                        link.name === 'Acasă'
+                                            ? scrollTopInstant
+                                            : link.hashId
+                                              ? (e) => scrollToSectionInstant(e, link.hashId!)
+                                              : undefined
+                                    }
+                                    className={NAV_LINK_CLASS}
                                 >
                                     {link.name}
                                     {link.children && <ChevronDown className="w-4 h-4" />}
@@ -125,7 +157,11 @@ export function Navbar() {
                         <div key={link.name}>
                             <Link
                                 href={link.href}
-                                onClick={() => setIsOpen(false)}
+                                onClick={(e) => {
+                                    if (link.name === 'Acasă') scrollTopInstant(e);
+                                    else if (link.hashId) scrollToSectionInstant(e, link.hashId);
+                                    setIsOpen(false);
+                                }}
                                 className="text-zinc-900 text-lg font-bold uppercase tracking-widest block py-2"
                             >
                                 {link.name}

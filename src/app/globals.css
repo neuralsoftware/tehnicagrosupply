@@ -16,8 +16,8 @@ body {
   color: #18181b;
 }
 
-/* Smooth scrolling + offset pentru navbar fix (ancore #audit, #contact etc.) */
+/* Fără scroll animat (evită amețeală la #contact / #oferta). Offset pentru navbar fix. */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   scroll-padding-top: 5rem;
 }
