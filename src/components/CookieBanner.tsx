@@ -12,6 +12,7 @@ export default function CookieBanner() {
       setIsVisible(true);
     } else if (consent === 'granted') {
       updateConsent(true);
+      window.dispatchEvent(new Event('tehnicagro-cookie-consent'));
     }
 
     // Ascultăm comanda de redeschidere din Footer
@@ -36,12 +37,14 @@ export default function CookieBanner() {
     localStorage.setItem('cookie_consent', 'granted');
     updateConsent(true);
     setIsVisible(false);
+    window.dispatchEvent(new Event('tehnicagro-cookie-consent'));
   };
 
   const handleDecline = () => {
     localStorage.setItem('cookie_consent', 'denied');
     updateConsent(false);
     setIsVisible(false);
+    window.dispatchEvent(new Event('tehnicagro-cookie-consent'));
   };
 
   if (!isVisible) return null;
@@ -63,7 +66,7 @@ export default function CookieBanner() {
           onClick={handleAccept}
           className="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-slate-900 bg-emerald-500 rounded-lg hover:bg-emerald-400 transition-colors"
         >
-          Accept Toate
+          Acceptă
         </button>
       </div>
     </div>

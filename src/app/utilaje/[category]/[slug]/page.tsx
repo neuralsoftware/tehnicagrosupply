@@ -1,8 +1,12 @@
 import {
     getProducts,
+    getCategories,
     productMatchesCategorySlug,
     normalizeLegacyProductSlug,
+    normalizeCategorySlugParam,
 } from '@/lib/products-store';
+import { formatCategoryTitle } from '@/lib/category-display-titles';
+import { Breadcrumb } from '@/components/Breadcrumb';
 import { formatProductSeoDisplayName } from '@/lib/product-seo-display-name';
 import { getPublishedPosts } from '@/data/blog';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -77,6 +81,21 @@ export default async function ProductPage({ params }: PageProps) {
 
     const fundingPrograms = getActiveProgramsForCategory(product.category);
 
+    const categories = await getCategories();
+    const catRow = categories.find(
+        (c) => normalizeCategorySlugParam(c.slug) === normalizeCategorySlugParam(product.category)
+    );
+    const categoryLabel = formatCategoryTitle(
+        catRow?.slug ?? String(product.category),
+        catRow?.name ?? ''
+    );
+    const breadcrumbItems = [
+        { label: 'Acasă', href: '/' },
+        { label: 'Utilaje', href: '/utilaje' },
+        { label: categoryLabel, href: `/utilaje/${product.category}` },
+        { label: product.name },
+    ];
+
     const productSchema = {
         '@context': 'https://schema.org', '@type': 'Product',
         name: product.name, description: product.description,
@@ -87,6 +106,7 @@ export default async function ProductPage({ params }: PageProps) {
 
     return (
         <main className="min-h-screen bg-white text-zinc-900 pt-20">
+            <Breadcrumb items={breadcrumbItems} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
 
             <ProductSection

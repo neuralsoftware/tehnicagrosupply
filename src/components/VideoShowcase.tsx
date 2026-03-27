@@ -67,11 +67,13 @@ export function VideoShowcase({
                 </div>
             )}
 
-            <div className="relative aspect-video">
+            <div className="relative aspect-video" role="region" aria-label={`Demonstrație video: ${title}`}>
                 <video
                     id={`video-${title.replace(/\s/g, '')}`}
                     src={videoSrc}
                     poster={posterSrc}
+                    title={`Demonstrație video: ${title}`}
+                    aria-label={`Film demonstrativ ${title}. Folosește controalele pentru redare sau pauză.`}
                     muted
                     loop
                     playsInline
@@ -83,7 +85,9 @@ export function VideoShowcase({
                 {/* Overlay Controls */}
                 <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
                     <button
+                        type="button"
                         onClick={handlePlay}
+                        aria-label={isPlaying ? `Pauză: ${title}` : `Redă demonstrația video ${title}`}
                         className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110"
                     >
                         {isPlaying ? (
@@ -102,9 +106,11 @@ export function VideoShowcase({
                     <h3 className="text-white font-semibold text-base md:text-lg tracking-tight">{title}</h3>
                     <div className="flex items-center gap-2">
                         <button
+                            type="button"
                             onClick={handleFullscreen}
                             className="p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all"
-                            title="Fullscreen"
+                            title={`Ecran complet: ${title}`}
+                            aria-label={`Ecran complet — ${title}`}
                         >
                             <Maximize2 className="w-4 h-4 text-white" />
                         </button>

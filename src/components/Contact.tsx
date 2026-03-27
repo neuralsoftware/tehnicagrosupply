@@ -16,9 +16,18 @@ interface ContactProps {
     productName?: string; // CRM: transmite ce utilaj a cerut clientul
     /** Home: logo-uri + formular pe același ecran (split ~40/60). */
     variant?: 'default' | 'homeSplit';
+    /** Pagina dedicată /contact: fără `id="contact"` (evită duplicat cu anchor homepage). */
+    hideSectionAnchor?: boolean;
+    /** Pagina /contact: ascunde titlul marketing deasupra formularului (există deja H1 pe pagină). */
+    hideMarketingCopy?: boolean;
 }
 
-export function Contact({ productName, variant = 'default' }: ContactProps = {}) {
+export function Contact({
+    productName,
+    variant = 'default',
+    hideSectionAnchor = false,
+    hideMarketingCopy = false,
+}: ContactProps = {}) {
     const [farmName, setFarmName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
@@ -126,6 +135,8 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
         variant === 'homeSplit'
             ? 'relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm md:p-8'
             : 'relative mx-auto max-w-xl overflow-hidden rounded-3xl border border-zinc-200 bg-white p-8 shadow-xl';
+
+    const defaultSectionProps = hideSectionAnchor ? {} : { id: 'contact' as const };
 
     if (variant === 'homeSplit') {
         return (
@@ -357,21 +368,26 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
     }
 
     return (
-        <section id="contact" className="relative overflow-hidden bg-ea-green-50 py-12 md:py-16">
+        <section
+            {...defaultSectionProps}
+            className="relative overflow-hidden bg-ea-green-50 py-12 md:py-16"
+        >
 
             <div className="relative z-10 mx-auto max-w-4xl space-y-8 px-4 text-center">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                >
-                    <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 md:text-4xl">
-                        Nu mai pierde timp.
-                    </h2>
-                    <p className="mt-3 text-lg text-zinc-600 md:text-xl">
-                        Utilajele se vând rapid. Asigură-ți tehnologia pentru campania de primăvară.
-                    </p>
-                </motion.div>
+                {!hideMarketingCopy && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 md:text-4xl">
+                            Nu mai pierde timp.
+                        </h2>
+                        <p className="mt-3 text-lg text-zinc-600 md:text-xl">
+                            Utilajele se vând rapid. Asigură-ți tehnologia pentru campania de primăvară.
+                        </p>
+                    </motion.div>
+                )}
 
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}

@@ -2,10 +2,10 @@ import CookieBanner from '@/components/CookieBanner';
 import type { Metadata } from 'next';
 import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
-import { GoogleAnalytics } from '@next/third-parties/google';
-import { CookieConsent } from '@/components/CookieConsent';
+import { ConsentGatedAnalytics } from '@/components/ConsentGatedAnalytics';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { SITE_CONTACT } from '@/lib/site-contact';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
@@ -91,9 +91,16 @@ export default function RootLayout({
                             "url": "https://tehnicagrosupply.ro",
                             "logo": "https://tehnicagrosupply.ro/logos/tehnicagro_logo_v1_1769155922952.png",
                             "description": "Soluții complete pentru agricultura conservativă. Utilaje No-Till, Avers-Agro Multisem ADS \u0026 Fliegl KSE 680. Eligibil APIA PD-04 și GAEC 6.",
+                            "email": SITE_CONTACT.email,
+                            "address": {
+                                "@type": "PostalAddress",
+                                "addressLocality": "Lumina",
+                                "addressRegion": "Constanța",
+                                "addressCountry": "RO"
+                            },
                             "contactPoint": {
                                 "@type": "ContactPoint",
-                                "telephone": "+40723380022",
+                                "telephone": SITE_CONTACT.phoneTel,
                                 "contactType": "sales",
                                 "areaServed": "RO",
                                 "availableLanguage": ["Romanian"]
@@ -149,13 +156,9 @@ export default function RootLayout({
                 {children}
                 <Footer />
 
-                {/* Global UI Components - CookieConsent only (WhatsApp & ExitPopup moved to page.tsx) */}
-                <CookieConsent />
-
-                <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-KR6928Z45R"} />
-              <CookieBanner />
-        <script dangerouslySetInnerHTML={{ __html: "window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('consent', 'default', { 'analytics_storage': 'denied', 'ad_storage': 'denied', 'ad_user_data': 'denied', 'ad_personalization': 'denied' });" }} />
-      </body>
+                <CookieBanner />
+                <ConsentGatedAnalytics />
+            </body>
         </html>
     );
 }

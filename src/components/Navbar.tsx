@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown, Phone, MessageSquare } from 'lucide-react';
+import { Menu, X, ChevronDown, Phone } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -22,12 +22,6 @@ export function Navbar() {
         if (!isHome) return;
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: 'auto' });
-    };
-
-    const scrollToSectionInstant = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
-        if (!isHome) return;
-        e.preventDefault();
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'auto', block: 'start' });
     };
 
     const [isOpen, setIsOpen] = useState(false);
@@ -61,18 +55,16 @@ export function Navbar() {
     const navLinks: {
         name: string;
         href: string;
-        hashId?: string;
         children?: { name: string; href: string }[];
     }[] = [
         { name: 'Acasă', href: '/' },
         {
             name: 'Utilaje',
-            href: '/#oferta',
-            hashId: 'oferta',
+            href: '/utilaje',
             children: utilajeLinks,
         },
         { name: 'Blog Subvenții', href: '/blog' },
-        { name: 'Contact', href: '/#contact', hashId: 'contact' },
+        { name: 'Contact', href: '/contact' },
     ];
 
     return (
@@ -97,13 +89,7 @@ export function Navbar() {
                             <div key={link.name} className="relative group">
                                 <Link
                                     href={link.href}
-                                    onClick={
-                                        link.name === 'Acasă'
-                                            ? scrollTopInstant
-                                            : link.hashId
-                                              ? (e) => scrollToSectionInstant(e, link.hashId!)
-                                              : undefined
-                                    }
+                                    onClick={link.name === 'Acasă' ? scrollTopInstant : undefined}
                                     className={NAV_LINK_CLASS}
                                 >
                                     {link.name}
@@ -159,7 +145,6 @@ export function Navbar() {
                                 href={link.href}
                                 onClick={(e) => {
                                     if (link.name === 'Acasă') scrollTopInstant(e);
-                                    else if (link.hashId) scrollToSectionInstant(e, link.hashId);
                                     setIsOpen(false);
                                 }}
                                 className="text-zinc-900 text-lg font-bold uppercase tracking-widest block py-2"

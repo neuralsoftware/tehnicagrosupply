@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { SITE_CONTACT } from '@/lib/site-contact';
 
 export function Footer() {
     return (
@@ -22,7 +23,7 @@ export function Footer() {
                         <h4 className="text-white font-bold uppercase text-xs tracking-widest">Navigare</h4>
                         <ul className="space-y-4 text-sm text-zinc-500">
                             <li><Link href="/" className="hover:text-ea-green-500 transition-colors">Acasă</Link></li>
-                            <li><Link href="/utilaje/pregatire-sol" className="hover:text-ea-green-500 transition-colors">Utilaje</Link></li>
+                            <li><Link href="/utilaje" className="hover:text-ea-green-500 transition-colors">Utilaje</Link></li>
                             <li><Link href="/piese-schimb" className="hover:text-ea-green-500 transition-colors">Piese de Schimb</Link></li>
                             <li><Link href="/blog" className="hover:text-ea-green-500 transition-colors">Blog & Noutăți</Link></li>
                         </ul>
@@ -49,11 +50,19 @@ export function Footer() {
                         <ul className="space-y-4 text-sm text-zinc-500">
                             <li className="flex flex-col">
                                 <span className="text-[10px] uppercase font-bold text-zinc-600">Telefon Vânzări</span>
-                                <a href="tel:+40723380022" className="text-white hover:text-ea-green-500 transition-colors">0723 380 022</a>
+                                <a href={`tel:${SITE_CONTACT.phoneTel}`} className="text-white hover:text-ea-green-500 transition-colors">{SITE_CONTACT.phoneDisplay}</a>
                             </li>
                             <li className="flex flex-col">
                                 <span className="text-[10px] uppercase font-bold text-zinc-600">Email</span>
-                                <a href="mailto:tehnicagro.supply@gmail.com" className="text-white hover:text-ea-green-500 transition-colors">tehnicagro.supply@gmail.com</a>
+                                <a href={`mailto:${SITE_CONTACT.email}`} className="text-white hover:text-ea-green-500 transition-colors">{SITE_CONTACT.email}</a>
+                            </li>
+                            <li className="flex flex-col pt-2 border-t border-zinc-800/80">
+                                <span className="text-[10px] uppercase font-bold text-zinc-600">Adresă</span>
+                                <span className="text-white text-sm leading-snug">{SITE_CONTACT.addressLine}</span>
+                            </li>
+                            <li className="flex flex-col">
+                                <span className="text-[10px] uppercase font-bold text-zinc-600">Program</span>
+                                <span className="text-white text-sm">{SITE_CONTACT.officeHours}</span>
                             </li>
                         </ul>
                     </div>

@@ -55,7 +55,7 @@ export const BLOG_POSTS: BlogPost[] = [
       </ol>
 
       <h3>Cum îți simplificăm noi procesul</h3>
-      <p>TehnicAgro Supply oferă consultanță tehnică gratuită pentru documentarea utilajului în dosar. <a href="/#contact">Contactează-ne</a> și îți pregătim un raport tehnic al <a href="/utilaje/semanat-fertilizat/multisem-ads">semănătorii Avers-Agro</a> valabil ca dovadă pentru inspectorii APIA.</p>
+      <p>TehnicAgro Supply oferă consultanță tehnică gratuită pentru documentarea utilajului în dosar. <a href="/contact">Contactează-ne</a> și îți pregătim un raport tehnic al <a href="/utilaje/semanat-fertilizat/multisem-ads">semănătorii Avers-Agro</a> valabil ca dovadă pentru inspectorii APIA.</p>
     `,
     author: 'Echipa TehnicAgro',
     date: '2026-03-10',
@@ -93,7 +93,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
       <h3>Concluzia practică</h3>
       <p>La 200 ha, trecerea la No-Till generează o economie de 40-50 L motorină/ha (<strong>~32.000-40.000 RON/an</strong>) plus subvenția PD-04 de <strong>~56.000 RON</strong>. Totalul depășește 90.000 RON anual — amortizarea unui utilaj nou în 2-3 ani.</p>
-      <p>Calculează exact cât câștigă ferma ta cu <a href="/#audit">calculatorul nostru ROI</a> sau <a href="/#contact">solicită o ofertă</a>.</p>
+      <p>Calculează exact cât câștigă ferma ta cu <a href="/#audit">calculatorul nostru ROI</a> sau <a href="/contact">solicită o ofertă</a>.</p>
     `,
     author: 'Echipa TehnicAgro',
     date: '2026-03-17',
@@ -134,7 +134,7 @@ export const BLOG_POSTS: BlogPost[] = [
         <li>Achiziție utilaj și decontare după aprobare</li>
       </ol>
 
-      <p>TehnicAgro emite oferta de preț oficială necesară pentru dosarul DR-12. <a href="/#contact">Solicită documentația</a> și te ghidăm prin întregul proces.</p>
+      <p>TehnicAgro emite oferta de preț oficială necesară pentru dosarul DR-12. <a href="/contact">Solicită documentația</a> și te ghidăm prin întregul proces.</p>
     `,
     author: 'Echipa TehnicAgro',
     date: '2026-03-24',
@@ -167,7 +167,7 @@ export const BLOG_POSTS: BlogPost[] = [
       <h3>Greșeala #5: Nu depui la timp (sau nu în sesiunea corectă)</h3>
       <p>Sesiunea 2026 se închide pe <strong>5 Iunie 2026</strong>. Depunerile după această dată nu sunt acceptate. Depune înainte de 15 Mai pentru a evita aglomerația sistemelor APIA.</p>
 
-      <p>Ai întrebări despre eligibilitatea fermei tale? <a href="/#contact">Contactează-ne</a> — îți răspundem în 24 de ore.</p>
+      <p>Ai întrebări despre eligibilitatea fermei tale? <a href="/contact">Contactează-ne</a> — îți răspundem în 24 de ore.</p>
     `,
     author: 'Echipa TehnicAgro',
     date: '2026-04-01',
@@ -207,7 +207,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
       <h3>Potrivire cu sistemul TehnicAgro</h3>
       <p>Combinația <a href="/utilaje/pregatire-sol/chain-disc-kse-680">Fliegl KSE 680</a> + <a href="/utilaje/semanat-fertilizat/multisem-ads">Avers-Agro Multisem ADS</a> formează un sistem complet de agricultură conservativă: Chain Disc-ul pregătește resturile, semănătoarea No-Till seamănă direct — două treceri în loc de cinci.</p>
-      <p><a href="/#contact">Solicită o demonstrație tehnică</a> sau <a href="/#audit">calculează ROI-ul</a> pentru ferma ta.</p>
+      <p><a href="/contact">Solicită o demonstrație tehnică</a> sau <a href="/#audit">calculează ROI-ul</a> pentru ferma ta.</p>
     `,
     author: 'Echipa TehnicAgro',
     date: '2026-04-15',

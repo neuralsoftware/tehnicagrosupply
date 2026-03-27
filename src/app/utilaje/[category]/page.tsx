@@ -6,6 +6,7 @@ import {
     productMatchesCategorySlug,
     isViticultureCategoryField,
 } from '@/lib/products-store';
+import { formatCategoryTitle } from '@/lib/category-display-titles';
 import {
     collectCategoryHeroMp4Urls,
     CATEGORY_HERO_PROVITIS_MP4,
@@ -18,30 +19,6 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
-
-/** Titlu afișat fără MAJUSCULE FORȚATE; diacritice corecte pentru slug-uri cunoscute. */
-const CATEGORY_DISPLAY_TITLE: Record<string, string> = {
-    viticol: 'Viticultură',
-    viticultura: 'Viticultură',
-    'pregatire-sol': 'Pregătire sol',
-    'semanat-fertilizat': 'Semănat și fertilizat',
-    'recoltare-logistica': 'Recoltare și logistică',
-    'protectia-plantelor': 'Protecția plantelor',
-    legumicol: 'Legumicol',
-};
-
-function formatCategoryTitle(slug: string, rawName: string): string {
-    const mapped = CATEGORY_DISPLAY_TITLE[slug];
-    if (mapped) return mapped;
-    const t = rawName.trim();
-    if (!t) return t;
-    const allShouty = t === t.toUpperCase() && /[A-ZĂÂÎȘȚ]/.test(t);
-    if (allShouty) {
-        const lower = t.toLocaleLowerCase('ro-RO');
-        return lower.charAt(0).toLocaleUpperCase('ro-RO') + lower.slice(1);
-    }
-    return t;
-}
 
 interface PageProps {
     params: Promise<{
@@ -244,7 +221,7 @@ export default async function CategoryPage({ params }: PageProps) {
                             Momentan nu există utilaje adăugate în această categorie.
                         </p>
                         <Link
-                            href="/#contact"
+                            href="/contact"
                             className="mt-6 inline-block text-ea-green-500 font-bold uppercase hover:underline"
                         >
                             Contactează-ne pentru cereri speciale
