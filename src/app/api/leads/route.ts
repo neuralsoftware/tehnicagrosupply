@@ -127,7 +127,14 @@ type CrmLeadInsert = {
     status: string;
     source: string;
     created_at: string;
+    notes?: string;
 };
+
+function toClientIntegerId(id: string | number): number {
+    if (typeof id === 'number' && Number.isFinite(id)) return Math.trunc(id);
+    const n = parseInt(String(id), 10);
+    return Number.isFinite(n) ? n : 0;
+}
 
 export async function POST(request: Request) {
     try {
@@ -189,6 +196,7 @@ export async function POST(request: Request) {
             phone: leadData.phone || '',
             email: leadData.email || '',
             county: leadData.county || '',
+            source: leadData.source?.trim() || 'Website Form',
         };
         if (defaultRepresentative) {
             clientPayload.representative = defaultRepresentative;
@@ -267,6 +275,10 @@ export async function POST(request: Request) {
         }
         const clientId: string | number = rawId;
 
+        const leadNotes =
+            crmSafePlainText(leadData.notes || '').slice(0, 4000) ||
+            'Lead trimis de pe tehnicagrosupply.ro';
+
         const crmLeadPayload: CrmLeadInsert = {
             id: randomUUID(),
             name: leadData.name,
@@ -278,17 +290,28 @@ export async function POST(request: Request) {
             fuel_savings: leadData.fuelSavings ?? 0,
             subsidy_income: leadData.subsidyIncome ?? 0,
             total_benefit: leadData.totalBenefit ?? 0,
-            /** CRM / banner „lead nou”: în DB rândurile care declanșează fluxul folosesc `Lead`, nu `Nou`. */
-            status: 'Lead',
-            /** Aliniat cu lead-uri existente (`Website Form`, formular contact, ROI). */
+            /** Contor / banner „lead nou” în CRM folosesc de obicei `Nou`, nu `Lead` (pipeline client rămâne separat). */
+            status: 'Nou',
             source: leadData.source?.trim() || 'Website Form',
             created_at: new Date().toISOString(),
+            notes: leadNotes,
         };
 
         const leadTableRes = await crm.from('leads').insert([crmLeadPayload]).select().single();
         if (leadTableRes.error) {
             console.error('CRM leads insert:', leadTableRes.error);
             return NextResponse.json(jsonFromPostgrestError(leadTableRes.error), { status: 500 });
+        }
+
+        const clientIntId = toClientIntegerId(clientId);
+        if (clientIntId > 0) {
+            const logAction = process.env.CRM_NEW_LEAD_LOG_ACTION?.trim() || 'new_lead_website';
+            const logRes = await crm
+                .from('logs')
+                .insert([{ action: logAction, client_id: clientIntId, timestamp: Date.now() }]);
+            if (logRes.error) {
+                console.error('CRM logs insert (notificări):', logRes.error);
+            }
         }
 
         if (messageBody.trim().length > 0) {
@@ -299,10 +322,10 @@ export async function POST(request: Request) {
                 description: taskDescription.length > 0 ? taskDescription : messageBody,
                 due_date: crmTaskDueDateIso(3),
                 /**
-                 * Aliniat cu sarcinile deja în CRM (ex. id 14/15): `InProgress` + `resolution` gol.
-                 * `resolution: 'EMPTY'` și `due_date` cu `Z` erau singurele diferenții față de rândurile care apar în meniul Sarcini.
+                 * Coloana 1 în Kanban („De facut”). `InProgress` muta sarcina în „În progres” / „În lucru”
+                 * și în unele ecrane bloca acțiunile de editare de pe fișa clientului.
                  */
-                status: 'InProgress',
+                status: 'De facut',
                 resolution: '',
                 is_completed: 0,
             };
