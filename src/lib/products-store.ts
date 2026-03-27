@@ -14,6 +14,7 @@ import {
     isPublicUrlReachable,
     supabasePublicUrlToPath,
 } from '@/lib/supabase';
+import { resolveProductVideoUrls } from '@/lib/storage-video-public';
 import { PRODUCTS as STATIC_PRODUCTS } from '@/data/products';
 
 const PRODUCTS_BLOB_KEY = 'catalog/products.json';
@@ -340,9 +341,9 @@ export async function getProducts(): Promise<DynamicProduct[]> {
         bySlug.set(d.slug, base ? overlayStaticWithDynamic(base, d) : d);
     }
     const suppressed = await getSuppressedSlugs();
-    return Array.from(bySlug.values()).filter(
-        (p) => !suppressed.has(normalizeLegacyProductSlug(p.slug))
-    );
+    return Array.from(bySlug.values())
+        .filter((p) => !suppressed.has(normalizeLegacyProductSlug(p.slug)))
+        .map((p) => resolveProductVideoUrls(p));
 }
 
 export async function getProductBySlug(slug: string): Promise<DynamicProduct | null> {

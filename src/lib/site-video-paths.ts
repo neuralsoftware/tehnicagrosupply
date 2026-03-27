@@ -18,9 +18,3 @@ export const HOME_SHOWCASE_STORAGE = {
     /** Filmare Fliegl Chain Disc KSE pe teren (pregătire / lucrare sol). */
     flieglKseTeren: 'video/home-showcase/showcase-fliegl-kse-teren.mp4',
 } as const;
-
-/** Fallback când fișierele nu sunt încă în Storage (URL-uri relative site). */
-export const HOME_SHOWCASE_LOCAL_FALLBACK = {
-    aversAds: '/downloads/video ADS 2026.mp4',
-    flieglKseTeren: '/downloads/video KSE teren.mp4',
-} as const;

@@ -25,7 +25,7 @@ export interface Product {
     detailedSpecs: any;
     expertVerdict: string;
     videoUrl?: string;              // URL YouTube/Vimeo embed
-    /** URL către MP4 (absolut sau `/...`) — banner full-bleed deasupra paginii de produs */
+    /** URL MP4 (https… sau cale `video/…` în bucket Supabase tehnicagro) — hero full-bleed pe pagina de produs */
     heroVideoUrl?: string;
     priceRange?: string;
     eligibility?: string;

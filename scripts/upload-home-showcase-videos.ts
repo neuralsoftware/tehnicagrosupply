@@ -1,8 +1,10 @@
 /**
- * Încarcă în Supabase Storage (bucket tehnicagro) cele două MP4 folosite pe home în VideoGallery.
- * Surse locale implicite (nume cu spații, ca în codul vechi):
- *   - public/downloads/video ADS 2026.mp4  → video/home-showcase/showcase-avers-ads.mp4
- *   - public/downloads/video KSE teren.mp4 → video/home-showcase/showcase-fliegl-kse-teren.mp4
+ * Opțional: migrare one-shot — încarcă MP4 locale în bucket `tehnicagro` la căile din site (`video/home-showcase/…`).
+ * Site-ul citește **doar** din Supabase; nu mai folosește `/public/downloads/*.mp4`.
+ *
+ * Surse implicite (dacă le mai ai pe disc):
+ *   - public/downloads/video ADS 2026.mp4  → showcase-avers-ads.mp4
+ *   - public/downloads/video KSE teren.mp4 → showcase-fliegl-kse-teren.mp4
  *
  * Env: NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (recomandat).
  */
