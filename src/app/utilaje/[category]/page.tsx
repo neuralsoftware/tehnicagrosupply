@@ -10,6 +10,7 @@ import {
     collectCategoryHeroMp4Urls,
     CATEGORY_HERO_PROVITIS_MP4,
 } from '@/lib/category-hero-videos';
+import { getCategoryBannerMp4PublicUrl } from '@/lib/category-storage-banner';
 import { CategoryHeroBanner } from '@/components/CategoryHeroBanner';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
@@ -142,12 +143,19 @@ export default async function CategoryPage({ params }: PageProps) {
             isProductVisibleOnSite(p.status) && productMatchesCategorySlug(p.category, categoryKey)
     );
 
-    let categoryHeroMp4s = collectCategoryHeroMp4Urls(filteredProducts);
-    if (
-        categoryHeroMp4s.length === 0 &&
-        isViticultureCategoryUrl(category, categoryKey)
-    ) {
-        categoryHeroMp4s = [CATEGORY_HERO_PROVITIS_MP4];
+    const storageBannerUrl = await getCategoryBannerMp4PublicUrl(catMeta.slug);
+    let categoryHeroMp4s: string[];
+    if (storageBannerUrl) {
+        /** Admin: `tehnicagro/video/{slug}/banner-*.mp4` — înlocuiește fundalul verde și lista din produse pentru hero. */
+        categoryHeroMp4s = [storageBannerUrl];
+    } else {
+        categoryHeroMp4s = collectCategoryHeroMp4Urls(filteredProducts);
+        if (
+            categoryHeroMp4s.length === 0 &&
+            isViticultureCategoryUrl(category, categoryKey)
+        ) {
+            categoryHeroMp4s = [CATEGORY_HERO_PROVITIS_MP4];
+        }
     }
 
     const isViti = isViticultureCategoryUrl(category, categoryKey);

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "postbuild": "next-sitemap",
-    "map-db": "npx tsx scripts/generate-db-map.ts"
+    "map-db": "npx tsx scripts/generate-db-map.ts",
+    "sync-site-folders": "npx tsx scripts/sync-site-folders.ts"
   },
   "dependencies": {
     "@next/third-parties": "^16.1.4",
