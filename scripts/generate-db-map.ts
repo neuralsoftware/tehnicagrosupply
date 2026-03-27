@@ -1,28 +1,74 @@
 /**
  * Generează CRM_DATABASE_MAP.md din schema OpenAPI expusă de PostgREST (Supabase CRM).
- * Încarcă .env.local: CRM_SUPABASE_URL, CRM_SUPABASE_SERVICE_ROLE_KEY.
+ * Încarcă `.env` apoi `.env.local` (local suprascrie). Variabile: CRM_SUPABASE_URL, CRM_SUPABASE_SERVICE_ROLE_KEY.
  *
  * PostgREST poate livra tabele în `definitions` (Swagger 2) sau numai prin `$ref` din `paths`.
  */
 
 import { config } from 'dotenv';
-import { writeFileSync } from 'fs';
+import { existsSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
-config({ path: resolve(process.cwd(), '.env.local') });
+const root = process.cwd();
+const pathEnv = resolve(root, '.env');
+const pathEnvLocal = resolve(root, '.env.local');
 
-const baseUrl = process.env.CRM_SUPABASE_URL?.replace(/\/+$/, '');
-const apikey = process.env.CRM_SUPABASE_SERVICE_ROLE_KEY;
+const loadedEnvFiles: string[] = [];
+if (existsSync(pathEnv)) {
+    config({ path: pathEnv });
+    loadedEnvFiles.push('.env');
+}
+if (existsSync(pathEnvLocal)) {
+    config({ path: pathEnvLocal, override: true });
+    loadedEnvFiles.push('.env.local');
+}
 
-if (!baseUrl || !apikey) {
+/** Elimină ghilimele sau spații din valorile copiate din unele editoare .env */
+function normalizeEnvValue(v: string | undefined): string {
+    if (v === undefined) return '';
+    let s = v.trim();
+    if (
+        (s.startsWith('"') && s.endsWith('"')) ||
+        (s.startsWith("'") && s.endsWith("'"))
+    ) {
+        s = s.slice(1, -1).trim();
+    }
+    return s;
+}
+
+/**
+ * Cheia JWT uneori e lipită din JSON / markdown cu [ ] sau ghilimele în plus — altfel PostgREST răspunde 401.
+ */
+function normalizeServiceRoleKey(v: string | undefined): string {
+    let s = normalizeEnvValue(v);
+    s = s.replace(/^\s*\[\s*["']?/, '').replace(/["']?\s*\]\s*$/, '');
+    s = normalizeEnvValue(s);
+    return s;
+}
+
+const rawUrl = normalizeEnvValue(process.env.CRM_SUPABASE_URL);
+const apikeyRaw = normalizeServiceRoleKey(process.env.CRM_SUPABASE_SERVICE_ROLE_KEY);
+
+if (!rawUrl || !apikeyRaw) {
+    console.error('Eroare: CRM_SUPABASE_URL sau CRM_SUPABASE_SERVICE_ROLE_KEY lipsesc după încărcarea variabilelor.');
+    console.error(`Director de lucru: ${root}`);
+    console.error(`  .env        — ${existsSync(pathEnv) ? 'găsit' : 'LIPSEȘTE'}`);
+    console.error(`  .env.local  — ${existsSync(pathEnvLocal) ? 'găsit' : 'LIPSEȘTE'}`);
     console.error(
-        'Lipsesc CRM_SUPABASE_URL sau CRM_SUPABASE_SERVICE_ROLE_KEY în .env.local — nu pot descărca schema.'
+        `Fișiere încărcate de dotenv: ${loadedEnvFiles.length ? loadedEnvFiles.join(' → ') : 'niciunul (ambele lipsesc?)'}`
     );
     process.exit(1);
 }
 
-/** Unii gateway-uri așteaptă cheia și în query (documentație Supabase / PostgREST). */
-const specUrl = `${baseUrl}/rest/v1/?apikey=${encodeURIComponent(apikey)}`;
+const baseUrl = rawUrl.replace(/\/+$/, '');
+const apikey = apikeyRaw;
+
+console.log(
+    '[map-db] Fișiere env:',
+    loadedEnvFiles.length ? loadedEnvFiles.join(' → ') : '(nici .env, nici .env.local)'
+);
+console.log('[map-db] CRM_SUPABASE_URL:', baseUrl);
+console.log('[map-db] Cheie găsită (primele 10 caractere):', `${apikey.slice(0, 10)}...`);
 
 interface JsonSchemaLike {
     type?: string;
@@ -181,9 +227,12 @@ function renderTableMarkdown(
 }
 
 async function main() {
+    const specUrl = `${baseUrl}/rest/v1/?apikey=${encodeURIComponent(apikey)}`;
+
     const res = await fetch(specUrl, {
         headers: {
             Accept: 'application/openapi+json, application/json',
+            // Obligatoriu Supabase PostgREST: aceeași cheie service_role ca în .env
             apikey,
             Authorization: `Bearer ${apikey}`,
         },
@@ -193,7 +242,9 @@ async function main() {
     lines.push('# Hartă bază de date CRM (Supabase / PostgREST)');
     lines.push('');
     lines.push(`Generat: \`${new Date().toISOString()}\``);
-    lines.push(`Endpoint: \`${specUrl}\``);
+    lines.push(
+        `Endpoint: \`${baseUrl}/rest/v1/\` (GET; \`apikey\` în query + headere \`apikey\` / \`Authorization: Bearer\` — cheia **nu** se pune în acest fișier).`
+    );
     lines.push('');
     lines.push(
         '> Dacă lista de tabele e goală: verifică că `CRM_SUPABASE_URL` și `CRM_SUPABASE_SERVICE_ROLE_KEY` sunt din **același** proiect Supabase CRM și că tabelele sunt în schema `public` expusă la API.'
@@ -205,7 +256,7 @@ async function main() {
         console.error(`Eșec HTTP ${res.status} la descărcarea OpenAPI CRM.`);
         console.error(body.slice(0, 2000));
         console.error(
-            '\nVerifică în .env.local că CRM_SUPABASE_URL și CRM_SUPABASE_SERVICE_ROLE_KEY sunt din același proiect Supabase (Settings → API → service_role).'
+            '\nVerifică în `.env` / `.env.local` că URL-ul și service_role sunt din **același** proiect Supabase CRM (Settings → API).'
         );
         console.error('CRM_DATABASE_MAP.md nu a fost suprascris.');
         process.exit(1);
