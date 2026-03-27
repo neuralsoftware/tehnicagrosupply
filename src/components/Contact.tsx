@@ -94,8 +94,13 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                     localStorage.setItem('tehnicagro_lead_submitted', 'true');
                 }
             } else {
-                setStatusMessage(data.error || "A apărut o eroare la server.");
-                alert(data.error || "A apărut o eroare la server.");
+                const detail =
+                    typeof data.details === 'string' && data.details.trim()
+                        ? `\n\n${data.details}`
+                        : '';
+                const msg = (data.error || 'A apărut o eroare la server.') + detail;
+                setStatusMessage(msg);
+                alert(msg);
             }
         } catch (err) {
             console.error(err);

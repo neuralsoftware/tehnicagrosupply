@@ -57,27 +57,53 @@ export async function POST(request: Request) {
             source: validatedData.source || 'Website Form',
         };
 
-    const dbData = {
+        const notesBlock = [
+            `Sursa: ${leadData.source}`,
+            `Produs interesat: ${validatedData.productName || '-'}`,
+            `Mesaj: ${leadData.notes || '-'}`,
+            `Hectare: ${leadData.hectares ?? 0}`,
+            `Culturi: ${(leadData.crops || []).join(', ') || '-'}`,
+            `Urgență: ${leadData.urgency || '-'}`,
+        ].join('\n');
+
+        const dbRow = {
             name: leadData.name,
             phone: leadData.phone || '',
             email: leadData.email || '',
             county: leadData.county || '',
-            notes: `Sursa: Website Form\nProdus Interesat: ${validatedData.productName || '-'}\nMesaj: ${leadData.notes || '-'}\nHectare: ${leadData.hectares || 0}\nCulturi: ${(leadData.crops || []).join(', ')}\nUrgență: ${leadData.urgency || '-'}`,
-            status: 'Lead'
+            hectares: leadData.hectares ?? 0,
+            crops: leadData.crops ?? [],
+            urgency: leadData.urgency || '',
+            subsidy_income: leadData.subsidyIncome ?? 0,
+            fuel_savings: leadData.fuelSavings ?? 0,
+            total_benefit: leadData.totalBenefit ?? 0,
+            notes: notesBlock,
+            status: 'Lead',
+            source: leadData.source,
+            is_new: true,
+            product_name: validatedData.productName?.trim() || null,
         };
 
         const { data: insertedData, error: dbError } = await supabaseAdmin
-        .from('clients' as any)
-        .insert([dbData] as any)
+            .from('clients')
+            .insert([dbRow])
             .select()
             .single();
 
         if (dbError) {
             console.error('Supabase DB Error:', dbError);
-            return NextResponse.json({ 
-                error: 'Eroare_DB_Noua', 
-                details: dbError?.message || JSON.stringify(dbError) || 'Detalii indisponibile'
-            }, { status: 500 });
+            const human =
+                dbError.code === 'PGRST205' || /schema cache/i.test(String(dbError.message || ''))
+                    ? 'Tabela CRM (clients) lipsește sau nu e expusă în API. Rulează scriptul SQL din repo (scripts/supabase-clients-leads-table.sql) în Supabase.'
+                    : dbError.message || JSON.stringify(dbError);
+            return NextResponse.json(
+                {
+                    error: 'Nu am putut salva cererea în CRM.',
+                    details: human,
+                    code: dbError.code,
+                },
+                { status: 500 }
+            );
         }
 
         return NextResponse.json({ success: true, lead: insertedData });
@@ -97,7 +123,7 @@ export async function GET() {
     try {
         // Use supabaseAdmin to bypass RLS and fetch all leads
         const { data, error } = await supabaseAdmin
-            .from('clients' as any)
+            .from('clients')
             .select('*')
             .eq('status', 'Lead')
             .order('id', { ascending: false });

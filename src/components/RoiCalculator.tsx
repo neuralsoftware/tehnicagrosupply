@@ -19,7 +19,14 @@ const URGENCY_OPTIONS = [
     { id: 'info', label: 'Doar Informativ (Planificare)' }
 ];
 
-function formatLeadApiError(data: { error?: string; details?: Array<{ message?: string } | { path?: unknown; message?: string }> }): string {
+function formatLeadApiError(data: {
+    error?: string;
+    details?: unknown;
+}): string {
+    if (typeof data.details === 'string' && data.details.trim()) {
+        const base = data.error || 'Cererea nu a putut fi procesată';
+        return `${base} ${data.details}`;
+    }
     if (Array.isArray(data.details) && data.details.length > 0) {
         const parts = data.details
             .map((d) => (d && typeof d === 'object' && 'message' in d ? String((d as { message?: string }).message || '') : ''))
@@ -110,7 +117,7 @@ export function RoiCalculator({
                 success?: boolean;
                 lead?: { id?: string | number };
                 error?: string;
-                details?: Array<{ message?: string }>;
+                details?: unknown;
             };
 
             if (!res.ok || !data.success) {
