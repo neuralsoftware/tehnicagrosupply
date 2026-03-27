@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { simpleRateLimit } from '@/lib/leads';
 import { z } from 'zod';
 import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
-import type { PostgrestError } from '@supabase/supabase-js';
+import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 
 const leadSchema = z.object({
     name: z.string().min(2, 'Nume prea scurt').max(100, 'Nume prea lung'),
@@ -63,6 +63,32 @@ function crmSafePlainText(text: string): string {
         .replace(/[ \t]+$/gm, '')
         .replace(/\n{3,}/g, '\n\n')
         .trim();
+}
+
+/**
+ * În CRM, sarcinile din meniul „Sarcini” sunt filtrate după client; clienții fără `representative`
+ * nu apar în același flux cu cei creați manual (care au reprezentant setat).
+ * Suprascrie cu `CRM_DEFAULT_CLIENT_REPRESENTATIVE` (nume complet ca în `users.full_name`).
+ */
+async function resolveDefaultClientRepresentative(crm: SupabaseClient): Promise<string | null> {
+    const fromEnv = process.env.CRM_DEFAULT_CLIENT_REPRESENTATIVE?.trim();
+    if (fromEnv) return fromEnv;
+
+    const { data, error } = await crm
+        .from('users')
+        .select('full_name')
+        .eq('is_active', true)
+        .order('id', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+    if (error || !data?.full_name?.trim()) {
+        console.warn(
+            '[leads] CRM: lipsește representative implicit (setează CRM_DEFAULT_CLIENT_REPRESENTATIVE sau users active).'
+        );
+        return null;
+    }
+    return data.full_name.trim();
 }
 
 /** Tabel sarcini/mesaje în proiectul CRM (mesajul site → task). Supabase: public.<nume>. */
@@ -156,29 +182,37 @@ export async function POST(request: Request) {
             );
         }
 
-        const clientPayload = {
+        const defaultRepresentative = await resolveDefaultClientRepresentative(crm);
+
+        const clientPayload: Record<string, unknown> = {
             name: leadData.name,
             phone: leadData.phone || '',
             email: leadData.email || '',
             county: leadData.county || '',
         };
+        if (defaultRepresentative) {
+            clientPayload.representative = defaultRepresentative;
+        }
+
+        const phoneStr = String(clientPayload.phone ?? '');
+        const emailStr = String(clientPayload.email ?? '');
 
         let insertedRow: Record<string, unknown>;
         const insertRes = await crm.from('clients').insert([clientPayload]).select().single();
 
         if (insertRes.error) {
             if (insertRes.error.code === '23505') {
-                const phone = (clientPayload.phone || '').replace(/^\+/, '');
+                const phone = phoneStr.replace(/^\+/, '');
                 let existingId: string | number | undefined;
 
                 if (phone) {
-                    const byPhone = await crm.from('clients').select('id').eq('phone', clientPayload.phone).maybeSingle();
+                    const byPhone = await crm.from('clients').select('id').eq('phone', phoneStr).maybeSingle();
                     if (!byPhone.error && byPhone.data?.id != null) {
                         existingId = byPhone.data.id as string | number;
                     }
                 }
-                if (existingId === undefined && clientPayload.email) {
-                    const byEmail = await crm.from('clients').select('id').eq('email', clientPayload.email).maybeSingle();
+                if (existingId === undefined && emailStr) {
+                    const byEmail = await crm.from('clients').select('id').eq('email', emailStr).maybeSingle();
                     if (!byEmail.error && byEmail.data?.id != null) {
                         existingId = byEmail.data.id as string | number;
                     }
@@ -188,6 +222,24 @@ export async function POST(request: Request) {
                     return NextResponse.json(jsonFromPostgrestError(insertRes.error), { status: 500 });
                 }
                 insertedRow = { id: existingId };
+
+                if (defaultRepresentative) {
+                    const { data: existingClient } = await crm
+                        .from('clients')
+                        .select('representative')
+                        .eq('id', existingId)
+                        .maybeSingle();
+                    const rep = existingClient?.representative;
+                    if (rep == null || String(rep).trim() === '') {
+                        const patchRes = await crm
+                            .from('clients')
+                            .update({ representative: defaultRepresentative })
+                            .eq('id', existingId);
+                        if (patchRes.error) {
+                            console.error('CRM clients update representative:', patchRes.error);
+                        }
+                    }
+                }
             } else {
                 console.error('CRM clients insert:', insertRes.error);
                 return NextResponse.json(jsonFromPostgrestError(insertRes.error), { status: 500 });
