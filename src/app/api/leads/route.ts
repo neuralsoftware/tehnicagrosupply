@@ -206,8 +206,10 @@ export async function POST(request: Request) {
             fuel_savings: leadData.fuelSavings ?? 0,
             subsidy_income: leadData.subsidyIncome ?? 0,
             total_benefit: leadData.totalBenefit ?? 0,
-            status: 'Nou',
-            source: 'Website',
+            /** CRM / banner „lead nou”: în DB rândurile care declanșează fluxul folosesc `Lead`, nu `Nou`. */
+            status: 'Lead',
+            /** Aliniat cu lead-uri existente (`Website Form`, formular contact, ROI). */
+            source: leadData.source?.trim() || 'Website Form',
             created_at: new Date().toISOString(),
         };
 
@@ -223,7 +225,11 @@ export async function POST(request: Request) {
                 title: '🚨 LEAD NOU: Cerere ofertă website',
                 description: messageBody,
                 due_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-                status: 'Nou',
+                /**
+                 * Aceeași valoare ca în UI când deschizi sarcina: coloana „De facut” din Sarcini.
+                 * Alte valori (`InProgress`, `Nou`) ajungeau pe coloane Kanban diferite — lista din meniu nu se alinia cu cardul clientului.
+                 */
+                status: 'De facut',
                 resolution: 'EMPTY',
                 is_completed: 0,
             };
