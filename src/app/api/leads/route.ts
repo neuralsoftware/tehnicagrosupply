@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { simpleRateLimit } from '@/lib/leads';
 import { z } from 'zod';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
 
 const leadSchema = z.object({
     name: z.string().min(2, 'Nume prea scurt').max(100, 'Nume prea lung'),
@@ -84,17 +84,30 @@ export async function POST(request: Request) {
             product_name: validatedData.productName?.trim() || null,
         };
 
-        const { data: insertedData, error: dbError } = await supabaseAdmin
+        const crm = getSupabaseCrmAdmin();
+        if (!crm) {
+            console.error('[leads] CRM Supabase neconfigurat: CRM_SUPABASE_URL / CRM_SUPABASE_SERVICE_ROLE_KEY');
+            return NextResponse.json(
+                {
+                    error: 'Nu am putut salva cererea în CRM.',
+                    details:
+                        'Lipsește configurarea CRM pe server (CRM_SUPABASE_URL și CRM_SUPABASE_SERVICE_ROLE_KEY — proiectul Supabase CRM, nu marketing).',
+                },
+                { status: 503 }
+            );
+        }
+
+        const { data: insertedData, error: dbError } = await crm
             .from('clients')
             .insert([dbRow])
             .select()
             .single();
 
         if (dbError) {
-            console.error('Supabase DB Error:', dbError);
+            console.error('CRM Supabase DB Error:', dbError);
             const human =
                 dbError.code === 'PGRST205' || /schema cache/i.test(String(dbError.message || ''))
-                    ? 'Tabela CRM (clients) lipsește sau nu e expusă în API. Rulează scriptul SQL din repo (scripts/supabase-clients-leads-table.sql) în Supabase.'
+                    ? 'Tabela CRM (clients) lipsește sau nu e expusă în API în proiectul Supabase CRM.'
                     : dbError.message || JSON.stringify(dbError);
             return NextResponse.json(
                 {
@@ -121,8 +134,15 @@ export async function POST(request: Request) {
 
 export async function GET() {
     try {
-        // Use supabaseAdmin to bypass RLS and fetch all leads
-        const { data, error } = await supabaseAdmin
+        const crm = getSupabaseCrmAdmin();
+        if (!crm) {
+            return NextResponse.json(
+                { error: 'CRM neconfigurat', details: 'CRM_SUPABASE_URL / CRM_SUPABASE_SERVICE_ROLE_KEY lipsă.' },
+                { status: 503 }
+            );
+        }
+
+        const { data, error } = await crm
             .from('clients')
             .select('*')
             .eq('status', 'Lead')

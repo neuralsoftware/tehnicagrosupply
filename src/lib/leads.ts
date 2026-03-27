@@ -1,4 +1,14 @@
-import { supabaseAdmin as supabase } from './supabaseAdmin';
+import { getSupabaseCrmAdmin } from './supabaseCrmAdmin';
+
+function crmOrThrow() {
+    const c = getSupabaseCrmAdmin();
+    if (!c) {
+        throw new Error(
+            'CRM Supabase neconfigurat: setează CRM_SUPABASE_URL și CRM_SUPABASE_SERVICE_ROLE_KEY (proiect CRM, nu marketing).'
+        );
+    }
+    return c;
+}
 
 export interface Lead {
     id: string;
@@ -42,11 +52,12 @@ export function simpleRateLimit(
     return true;
 }
 
-// Supabase-backed LeadsService (persistent storage)
+// Supabase CRM — tabel `clients` în proiectul Tehnicagri CRM (NU marketing).
 export const LeadsService = {
     async addLead(lead: Omit<Lead, 'id' | 'createdAt' | 'status'>) {
+        const supabase = crmOrThrow();
         const { data, error } = await supabase
-            .from('leads')
+            .from('clients')
             .insert([{
                 name: lead.name,
                 phone: lead.phone,
@@ -59,7 +70,10 @@ export const LeadsService = {
                 fuel_savings: lead.fuelSavings || 0,
                 total_benefit: lead.totalBenefit || 0,
                 notes: lead.notes || '',
-                status: 'new'
+                status: 'Lead',
+                source: 'LeadsService',
+                is_new: true,
+                product_name: null,
             }])
             .select()
             .single();
@@ -90,10 +104,11 @@ export const LeadsService = {
     },
 
     async getLeads() {
+        const supabase = crmOrThrow();
         const { data, error } = await supabase
-            .from('leads')
+            .from('clients')
             .select('*')
-            .order('created_at', { ascending: false });
+            .order('id', { ascending: false });
 
         if (error) {
             console.error('Supabase fetch error:', error);
@@ -121,8 +136,9 @@ export const LeadsService = {
     },
 
     async updateStatus(id: string, status: Lead['status']) {
+        const supabase = crmOrThrow();
         const { data, error } = await supabase
-            .from('leads')
+            .from('clients')
             .update({ status })
             .eq('id', id)
             .select()
@@ -169,8 +185,9 @@ export const LeadsService = {
         if (updates.notes !== undefined) supabaseUpdates.notes = updates.notes;
         if (updates.lastContacted !== undefined) supabaseUpdates.last_contacted = updates.lastContacted;
 
+        const supabase = crmOrThrow();
         const { data, error } = await supabase
-            .from('leads')
+            .from('clients')
             .update(supabaseUpdates)
             .eq('id', id)
             .select()
@@ -201,8 +218,9 @@ export const LeadsService = {
     },
 
     async deleteLead(id: string) {
+        const supabase = crmOrThrow();
         const { error } = await supabase
-            .from('leads')
+            .from('clients')
             .delete()
             .eq('id', id);
 

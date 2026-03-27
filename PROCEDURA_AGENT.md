@@ -9,7 +9,7 @@ Acest document este ghidul tehnic complet pentru dezvoltatorii/agenții care pre
 Platforma este un Sales Funnel de conversie ridicată pentru utilaje agricole, construit pe o arhitectură modernă "Serverless":
 
 - **Frontend:** Next.js (React) - găzduit pe Vercel.
-- **Backend/DB:** Supabase (PostgreSQL) - pentru stocarea lead-urilor.
+- **Backend/DB:** Două proiecte Supabase separate: **Marketing** (catalog, produse, Storage PDF) și **CRM** (lead-uri, formulare, tabel `clients`).
 - **Styling:** Tailwind CSS.
 - **Analytics:** Google Analytics 4 + Facebook Pixel (Meta Dataset).
 
@@ -17,8 +17,9 @@ Platforma este un Sales Funnel de conversie ridicată pentru utilaje agricole, c
 
 Sistemul folosește două niveluri de acces la baza de date:
 
-1. **Client Public (Anon):** Folosit de browser. Are acces LIMITAT prin RLS (Row Level Security). Poate doar să *scrie* (INSERT) lead-uri noi, dar NU poate citi nimic.
-2. **Client Admin (Service Role):** Folosit doar de server (`src/lib/supabaseAdmin.ts`). Are acces DEPLIN (Bypass RLS). Este folosit exclusiv pentru Admin Panel.
+1. **Marketing — Client Public (Anon):** `NEXT_PUBLIC_SUPABASE_*` — catalog site, fișiere în Storage.
+2. **Marketing — Service Role:** `src/lib/supabaseAdmin.ts` (`SUPABASE_SERVICE_ROLE_KEY`) — operații admin pe același proiect (ex. sincron catalog). **Nu** scrie lead-uri aici.
+3. **CRM — Service Role:** `src/lib/supabaseCrmAdmin.ts` (`CRM_SUPABASE_URL`, `CRM_SUPABASE_SERVICE_ROLE_KEY`) — **exclusiv** `/api/leads`, `LeadsService`, tabel `clients` în proiectul CRM.
 
 ---
 
@@ -30,15 +31,17 @@ Dacă proiectul este mutat sau clonat, următoarele variabile sunt OBLIGATORII. 
 
 | Variabilă | Rol | Sursă (Unde o găsești) |
 |-----------|-----|------------------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Conectare DB | Supabase -> Settings -> API |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Cheie Publică | Supabase -> Settings -> API |
-| `SUPABASE_SERVICE_ROLE_KEY` | **ACCES ADMIN (CRITIC)** | Supabase -> Settings -> API -> **SERVICE_ROLE (Secret!)** |
+| `NEXT_PUBLIC_SUPABASE_URL` | Proiect **Marketing** — URL | Supabase (Tehnicagro Marketing) → Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Marketing — cheie publică | Idem |
+| `SUPABASE_SERVICE_ROLE_KEY` | Marketing — service role (Storage/catalog admin) | Idem → **service_role** |
+| `CRM_SUPABASE_URL` | Proiect **CRM** — URL | Supabase (Tehnicagri CRM) → Settings → API |
+| `CRM_SUPABASE_SERVICE_ROLE_KEY` | CRM — service role (lead-uri `clients`) | Idem → **service_role** |
 | `ADMIN_PASSWORD` | Parolă Admin Panel | Stabilită de tine (ex: tehnicagro2026) |
 | `NODEMAILER_USER` | Email Notificări | Cont Gmail (<tehnicagro.supply@gmail.com>) |
 | `NODEMAILER_PASS` | Parolă Aplicație Gmail | Google Account -> Security -> App Passwords |
 | `NEXT_PUBLIC_FACEBOOK_PIXEL_ID` | Tracking Conversii | Facebook Events Manager |
 
-> **🚨 NOTĂ CRITICĂ:** `SUPABASE_SERVICE_ROLE_KEY` nu trebuie să ajungă niciodată în codul public (GitHub). Pe Vercel, se adaugă manual în Settings -> Environment Variables.
+> **🚨 NOTĂ CRITICĂ:** `SUPABASE_SERVICE_ROLE_KEY` și `CRM_SUPABASE_SERVICE_ROLE_KEY` nu apar în codul public. Pe Vercel: Environment Variables pentru **ambele** proiecte Supabase. Fără variabilele `CRM_*`, formularele returnează 503.
 
 ---
 
@@ -69,9 +72,9 @@ Dacă vrei să muți proiectul pe un alt calculator sau cont Vercel:
 
 ## 5. 🐛 Depanare Rapidă
 
-**Simptom:** Admin Panel nu arată lead-urile (listă goală sau eroare).
-**Cauză:** Lipsește `SUPABASE_SERVICE_ROLE_KEY` din Vercel sau RLS blochează accesul.
-**Soluție:** Verifică variabilele în Vercel și asigură-te că folosești clientul `supabaseAdmin` în rutele API, nu clientul standard.
+**Simptom:** Formulare / lead-uri — eroare sau 503.
+**Cauză:** Lipsește `CRM_SUPABASE_URL` sau `CRM_SUPABASE_SERVICE_ROLE_KEY`, sau tabelul `clients` lipsește în proiectul CRM.
+**Soluție:** Setează variabilele CRM pe Vercel (proiectul Tehnicagri CRM, nu marketing). Rutele `/api/leads` folosesc `supabaseCrmAdmin`, nu `supabaseAdmin`.
 
 **Simptom:** Butonul WhatsApp nu trak-uiește.
 **Cauză:** Lipsește `NEXT_PUBLIC_FACEBOOK_PIXEL_ID`.

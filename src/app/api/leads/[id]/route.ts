@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const crm = getSupabaseCrmAdmin();
+        if (!crm) {
+            return NextResponse.json(
+                { error: 'CRM neconfigurat', details: 'CRM_SUPABASE_URL / CRM_SUPABASE_SERVICE_ROLE_KEY lipsă.' },
+                { status: 503 }
+            );
+        }
+
         const { id } = await params;
         const updates = await request.json();
 
@@ -12,8 +20,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         if (updates.notes) dbUpdates.notes = updates.notes;
         if (updates.urgency) dbUpdates.urgency = updates.urgency;
 
-        // Use supabaseAdmin to bypass RLS
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await crm
             .from('clients')
             .update(dbUpdates)
             .eq('id', id)
@@ -34,10 +41,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const crm = getSupabaseCrmAdmin();
+        if (!crm) {
+            return NextResponse.json(
+                { error: 'CRM neconfigurat', details: 'CRM_SUPABASE_URL / CRM_SUPABASE_SERVICE_ROLE_KEY lipsă.' },
+                { status: 503 }
+            );
+        }
+
         const { id } = await params;
 
-        // Use supabaseAdmin to bypass RLS
-        const { error } = await supabaseAdmin.from('clients').delete().eq('id', id);
+        const { error } = await crm.from('clients').delete().eq('id', id);
 
         if (error) {
             console.error('Supabase delete error:', error);
