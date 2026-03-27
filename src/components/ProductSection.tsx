@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Check, Info, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { TechSpecsModal } from './TechSpecsModal';
+import { CONTACT_SECTION_ID, scrollToIdSmooth } from '@/lib/scroll-to-anchor';
 
 interface ProductProps {
     title: string;
@@ -129,10 +130,11 @@ export function ProductSection({
                             </div>
                         )}
 
-                        <div className="pt-2">
+                        <div className="pt-2 flex flex-col sm:flex-row flex-wrap gap-3">
                             <button
+                                type="button"
                                 onClick={() => {
-                                    setIsModalOpen(true);
+                                    scrollToIdSmooth(CONTACT_SECTION_ID);
                                     if (typeof window !== 'undefined' && (window as any).fbq) {
                                         (window as any).fbq('track', 'InitiateCheckout', {
                                             content_name: title,
@@ -140,11 +142,22 @@ export function ProductSection({
                                         });
                                     }
                                 }}
-                                className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-zinc-200 text-zinc-900 font-bold rounded shadow-lg hover:shadow-xl transition-all uppercase tracking-wide text-sm"
+                                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-ea-green-600 hover:bg-ea-green-500 text-white font-bold rounded shadow-lg hover:shadow-xl transition-all uppercase tracking-wide text-sm"
                             >
-                                <FileText className="w-4 h-4" />
                                 {ctaLabel}
                             </button>
+                            {detailedSpecs && Object.keys(detailedSpecs).length > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsModalOpen(true);
+                                    }}
+                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-zinc-200 text-zinc-900 font-bold rounded shadow-lg hover:shadow-xl transition-all uppercase tracking-wide text-sm border border-zinc-200"
+                                >
+                                    <FileText className="w-4 h-4" />
+                                    Specificații detaliate
+                                </button>
+                            )}
                         </div>
                     </motion.div>
                 </div>

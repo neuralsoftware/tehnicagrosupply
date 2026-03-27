@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Maximize2 } from 'lucide-react';
+import { onHashLinkClickSmooth } from '@/lib/scroll-to-anchor';
 
 const VIDEO_POSTER_DEFAULT = '/images/category-hero-video-poster.jpg';
 
@@ -122,6 +123,11 @@ export function VideoShowcase({
                 <div className="p-4 bg-zinc-50">
                     <a
                         href={ctaHref}
+                        onClick={
+                            ctaHref.startsWith('#')
+                                ? (e) => onHashLinkClickSmooth(e, ctaHref)
+                                : undefined
+                        }
                         className="block w-full py-3 bg-ea-green-600 hover:bg-ea-green-500 text-white text-center text-sm font-medium rounded-xl transition-all"
                     >
                         {ctaText}

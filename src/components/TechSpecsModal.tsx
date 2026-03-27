@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, FileText, CheckCircle2 } from 'lucide-react';
 import { useEffect } from 'react';
+import { CONTACT_SECTION_ID, onHashLinkClickSmooth } from '@/lib/scroll-to-anchor';
 
 interface TechSpecsModalProps {
     isOpen: boolean;
@@ -135,8 +136,11 @@ export function TechSpecsModal({ isOpen, onClose, productName, specs }: TechSpec
                             Închide
                         </button>
                         <a
-                            href="#contact"
-                            onClick={onClose}
+                            href={`#${CONTACT_SECTION_ID}`}
+                            onClick={(e) => {
+                                onClose();
+                                onHashLinkClickSmooth(e, `#${CONTACT_SECTION_ID}`);
+                            }}
                             className="ml-4 px-6 py-2 bg-ea-green-600 hover:bg-ea-green-500 text-white font-bold rounded shadow-lg shadow-ea-green-600/20 transition-colors"
                         >
                             Cere Ofertă Fermă

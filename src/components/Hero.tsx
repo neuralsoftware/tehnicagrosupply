@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Suspense } from 'react';
+import { CONTACT_SECTION_ID, onHashLinkClickSmooth } from '@/lib/scroll-to-anchor';
 
 function HeroContent() {
     const searchParams = useSearchParams();
@@ -115,12 +116,13 @@ function HeroContent() {
                     >
                         Calculează beneficiul fermei tale
                     </Link>
-                    <Link
-                        href="#contact"
+                    <a
+                        href={`#${CONTACT_SECTION_ID}`}
+                        onClick={(e) => onHashLinkClickSmooth(e, `#${CONTACT_SECTION_ID}`)}
                         className="w-full sm:w-auto px-6 py-3 rounded-lg font-medium text-sm sm:text-base border border-white/35 bg-white/10 text-white hover:bg-white/15 backdrop-blur-sm transition-colors text-center"
                     >
                         Solicită expertiză tehnică
-                    </Link>
+                    </a>
                 </motion.div>
             </div>
         </section>
