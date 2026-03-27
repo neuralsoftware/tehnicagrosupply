@@ -60,6 +60,7 @@ type ClientTaskInsert = {
     description: string;
     due_date: string;
     status: string;
+    resolution: string;
 };
 
 export async function POST(request: Request) {
@@ -182,6 +183,7 @@ export async function POST(request: Request) {
                 description: messageBody,
                 due_date: new Date().toISOString(),
                 status: 'Nou',
+                resolution: 'EMPTY',
             };
             const taskRes = await crm.from(CRM_TASKS_TABLE).insert([taskPayload]).select().single();
             if (taskRes.error) {
