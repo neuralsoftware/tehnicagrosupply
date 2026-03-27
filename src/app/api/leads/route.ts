@@ -54,6 +54,12 @@ function isPostgrestError(x: unknown): x is PostgrestError {
 /** Tabel sarcini/mesaje în proiectul CRM (mesajul site → task). Supabase: public.<nume>. */
 const CRM_TASKS_TABLE = process.env.CRM_TASKS_TABLE?.trim() || 'client_tasks';
 
+/** Aceeași formă ca sarcinile create din CRM: fără sufix `Z` (ex. `2026-03-26T15:23:33.794`). */
+function crmTaskDueDateIso(daysFromNow: number): string {
+    const ms = Date.now() + daysFromNow * 24 * 60 * 60 * 1000;
+    return new Date(ms).toISOString().replace(/Z$/, '');
+}
+
 /** Inserare în `client_tasks` — coloane obligatorii din API acolo unde DB nu are default. */
 type ClientTaskInsert = {
     client_id: string | number;
@@ -224,13 +230,13 @@ export async function POST(request: Request) {
                 client_id: clientId,
                 title: '🚨 LEAD NOU: Cerere ofertă website',
                 description: messageBody,
-                due_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+                due_date: crmTaskDueDateIso(3),
                 /**
-                 * Aceeași valoare ca în UI când deschizi sarcina: coloana „De facut” din Sarcini.
-                 * Alte valori (`InProgress`, `Nou`) ajungeau pe coloane Kanban diferite — lista din meniu nu se alinia cu cardul clientului.
+                 * Aliniat cu sarcinile deja în CRM (ex. id 14/15): `InProgress` + `resolution` gol.
+                 * `resolution: 'EMPTY'` și `due_date` cu `Z` erau singurele diferenții față de rândurile care apar în meniul Sarcini.
                  */
-                status: 'De facut',
-                resolution: 'EMPTY',
+                status: 'InProgress',
+                resolution: '',
                 is_completed: 0,
             };
             const taskRes = await crm.from(CRM_TASKS_TABLE).insert([taskPayload]).select().single();
