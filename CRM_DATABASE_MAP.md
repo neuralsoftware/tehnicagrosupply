@@ -1,6 +1,6 @@
 # Hartă bază de date CRM (Supabase / PostgREST)
 
-Generat: `2026-03-27T09:11:34.378Z`
+Generat: `2026-03-27T09:20:24.576Z`
 Endpoint: `https://ubcjrcuydqmixmpzooam.supabase.co/rest/v1/` (GET; `apikey` în query + headere `apikey` / `Authorization: Bearer` — cheia **nu** se pune în acest fișier).
 
 > Dacă lista de tabele e goală: verifică că `CRM_SUPABASE_URL` și `CRM_SUPABASE_SERVICE_ROLE_KEY` sunt din **același** proiect Supabase CRM și că tabelele sunt în schema `public` expusă la API.

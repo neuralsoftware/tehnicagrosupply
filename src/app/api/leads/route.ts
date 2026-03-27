@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { simpleRateLimit } from '@/lib/leads';
 import { z } from 'zod';
@@ -63,6 +64,23 @@ type ClientTaskInsert = {
     resolution: string;
     /** CRM: coloană integer (0 = deschis, 1 = închis), nu boolean. */
     is_completed: number;
+};
+
+/** Rând nou în `leads` — flux „Lead nou” / bannere în CRM (schema din CRM_DATABASE_MAP.md). */
+type CrmLeadInsert = {
+    id: string;
+    name: string;
+    phone: string;
+    email: string;
+    county: string;
+    hectares: number;
+    crops: string[];
+    fuel_savings: number;
+    subsidy_income: number;
+    total_benefit: number;
+    status: string;
+    source: string;
+    created_at: string;
 };
 
 export async function POST(request: Request) {
@@ -177,6 +195,28 @@ export async function POST(request: Request) {
         }
         const clientId: string | number = rawId;
 
+        const crmLeadPayload: CrmLeadInsert = {
+            id: randomUUID(),
+            name: leadData.name,
+            phone: leadData.phone || '',
+            email: leadData.email || '',
+            county: leadData.county || '',
+            hectares: leadData.hectares ?? 0,
+            crops: Array.isArray(leadData.crops) ? [...leadData.crops] : [],
+            fuel_savings: leadData.fuelSavings ?? 0,
+            subsidy_income: leadData.subsidyIncome ?? 0,
+            total_benefit: leadData.totalBenefit ?? 0,
+            status: 'Nou',
+            source: 'Website',
+            created_at: new Date().toISOString(),
+        };
+
+        const leadTableRes = await crm.from('leads').insert([crmLeadPayload]).select().single();
+        if (leadTableRes.error) {
+            console.error('CRM leads insert:', leadTableRes.error);
+            return NextResponse.json(jsonFromPostgrestError(leadTableRes.error), { status: 500 });
+        }
+
         if (messageBody.trim().length > 0) {
             const taskPayload: ClientTaskInsert = {
                 client_id: clientId,
@@ -194,7 +234,13 @@ export async function POST(request: Request) {
             }
         }
 
-        return NextResponse.json({ success: true, lead: insertedRow });
+        return NextResponse.json({
+            success: true,
+            /** Rând `clients` — același contract ca înainte (ex. ROI: PATCH `/api/leads/[id]` pe id client). */
+            lead: insertedRow,
+            /** Rând `leads` — notificări / banner în CRM. */
+            crmLead: leadTableRes.data,
+        });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json(
