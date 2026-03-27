@@ -316,6 +316,44 @@ function overlayStaticWithDynamic(base: DynamicProduct, overlay: DynamicProduct)
     };
 }
 
+const MAX_PREVIEW_SPECS = 8;
+
+/** Extrage linii „Cheie: Valoare” din detailedSpecs pentru carduri catalog. */
+function deriveSpecsFromDetailed(detailed: unknown): string[] {
+    if (!detailed || typeof detailed !== 'object' || Array.isArray(detailed)) return [];
+    const out: string[] = [];
+    const pushPairs = (obj: Record<string, unknown>) => {
+        for (const [k, v] of Object.entries(obj)) {
+            if (out.length >= MAX_PREVIEW_SPECS) return;
+            if (typeof v === 'string' && v.trim()) out.push(`${k}: ${v}`);
+        }
+    };
+    for (const section of Object.values(detailed as Record<string, unknown>)) {
+        if (out.length >= MAX_PREVIEW_SPECS) break;
+        if (section && typeof section === 'object' && !Array.isArray(section)) {
+            pushPairs(section as Record<string, unknown>);
+        } else if (Array.isArray(section)) {
+            for (const row of section) {
+                if (out.length >= MAX_PREVIEW_SPECS) break;
+                if (row && typeof row === 'object' && !Array.isArray(row)) {
+                    pushPairs(row as Record<string, unknown>);
+                }
+            }
+        }
+    }
+    return out;
+}
+
+/** Carduri categorie / home: completează specs din detailedSpecs dacă lipsesc (viticultură din admin). */
+function ensureProductSpecsPreview(p: DynamicProduct): DynamicProduct {
+    const hasSpecs =
+        Array.isArray(p.specs) && p.specs.some((s) => String(s ?? '').trim().length > 0);
+    if (hasSpecs) return p;
+    const derived = deriveSpecsFromDetailed(p.detailedSpecs);
+    if (!derived.length) return p;
+    return { ...p, specs: derived };
+}
+
 export async function getProducts(): Promise<DynamicProduct[]> {
     const rawDynamicRaw = await readBlob<DynamicProduct[]>(PRODUCTS_BLOB_KEY, []);
     const rawDynamic = Array.isArray(rawDynamicRaw) ? rawDynamicRaw : [];
@@ -345,7 +383,7 @@ export async function getProducts(): Promise<DynamicProduct[]> {
     const suppressed = await getSuppressedSlugs();
     return Array.from(bySlug.values())
         .filter((p) => !suppressed.has(normalizeLegacyProductSlug(p.slug)))
-        .map((p) => resolveProductVideoUrls(p));
+        .map((p) => resolveProductVideoUrls(ensureProductSpecsPreview(p)));
 }
 
 export async function getProductBySlug(slug: string): Promise<DynamicProduct | null> {

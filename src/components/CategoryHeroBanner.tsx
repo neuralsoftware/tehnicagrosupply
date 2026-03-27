@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+/** Poster ușor (~13KB) — gradient verde/slate; LCP până pornește MP4-ul */
+const HERO_VIDEO_POSTER = '/images/category-hero-video-poster.jpg';
+
 export interface CategoryHeroBannerProps {
     categoryTitle: string;
     subtitle: string;
@@ -77,9 +80,10 @@ export function CategoryHeroBanner({ categoryTitle, subtitle, videoUrls }: Categ
                         className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out ${
                             i === activeIndex ? 'opacity-100' : 'opacity-0'
                         }`}
+                        poster={HERO_VIDEO_POSTER}
                         muted
                         playsInline
-                        preload="auto"
+                        preload="metadata"
                         onEnded={() => {
                             if (!multi) return;
                             if (i !== activeIndex) return;

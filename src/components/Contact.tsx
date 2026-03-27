@@ -29,6 +29,13 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
     const isFetchingRef = useRef(false);
     const [gdprConsent, setGdprConsent] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
+    /** aria-invalid: false la încărcare; true doar după încercare submit sau onBlur pe câmp */
+    const [submitAttempted, setSubmitAttempted] = useState(false);
+    const [countyBlurred, setCountyBlurred] = useState(false);
+    const [gdprBlurred, setGdprBlurred] = useState(false);
+
+    const countyInvalid = (submitAttempted || countyBlurred) && !county.trim();
+    const gdprInvalid = (submitAttempted || gdprBlurred) && !gdprConsent;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -82,7 +89,10 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
 
                 setIsSubmitted(true);
                 setStatusMessage("Mesajul a fost trimis cu succes! Vă vom contacta în curând.");
-                
+                setSubmitAttempted(false);
+                setCountyBlurred(false);
+                setGdprBlurred(false);
+
                 // Clear fields
                 setFarmName('');
                 setPhone('');
@@ -242,6 +252,9 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                             <select
                                                 value={county}
                                                 onChange={(e) => setCounty(e.target.value)}
+                                                onBlur={() => setCountyBlurred(true)}
+                                                aria-invalid={countyInvalid}
+                                                aria-describedby={countyInvalid ? 'err-county-split' : undefined}
                                                 className="w-full appearance-none rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all focus:ring-1 focus:ring-ea-green-500"
                                                 required
                                             >
@@ -254,6 +267,11 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                                     </option>
                                                 ))}
                                             </select>
+                                            {countyInvalid ? (
+                                                <p id="err-county-split" className="mt-1 text-xs text-red-600" role="alert">
+                                                    Selectează județul.
+                                                </p>
+                                            ) : null}
                                         </div>
                                         <div>
                                             <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
@@ -274,6 +292,9 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                                 required
                                                 checked={gdprConsent}
                                                 onChange={(e) => setGdprConsent(e.target.checked)}
+                                                onBlur={() => setGdprBlurred(true)}
+                                                aria-invalid={gdprInvalid}
+                                                aria-describedby={gdprInvalid ? 'err-gdpr-split' : undefined}
                                                 className="mt-1 h-4 w-4 rounded border-zinc-300 bg-zinc-50 text-ea-green-600 focus:ring-ea-green-500"
                                             />
                                             <label htmlFor="gdpr-contact-split" className="text-[10px] leading-tight text-zinc-400">
@@ -284,9 +305,15 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                                 .
                                             </label>
                                         </div>
+                                        {gdprInvalid ? (
+                                            <p id="err-gdpr-split" className="text-xs text-red-600" role="alert">
+                                                Bifează acordul GDPR pentru a trimite.
+                                            </p>
+                                        ) : null}
                                         <button
                                             type="submit"
                                             disabled={isSubmitting}
+                                            onClick={() => setSubmitAttempted(true)}
                                             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-ea-green-600 py-4 font-semibold text-white shadow-sm transition-all hover:bg-ea-green-500 disabled:opacity-50"
                                         >
                                             {isSubmitting ? 'Se trimite...' : 'Cere ofertă personalizată'}
@@ -309,7 +336,12 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                         </p>
                                         <button
                                             type="button"
-                                            onClick={() => setIsSubmitted(false)}
+                                            onClick={() => {
+                                                setIsSubmitted(false);
+                                                setSubmitAttempted(false);
+                                                setCountyBlurred(false);
+                                                setGdprBlurred(false);
+                                            }}
                                             className="text-[10px] font-semibold uppercase tracking-wide text-zinc-600 transition-colors hover:text-zinc-400"
                                         >
                                             Trimite altă cerere
@@ -406,6 +438,9 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                 <select
                                     value={county}
                                     onChange={(e) => setCounty(e.target.value)}
+                                    onBlur={() => setCountyBlurred(true)}
+                                    aria-invalid={countyInvalid}
+                                    aria-describedby={countyInvalid ? 'err-county-default' : undefined}
                                     className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all text-sm appearance-none"
                                     required
                                 >
@@ -414,6 +449,11 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                         <option key={j} value={j}>{j}</option>
                                     ))}
                                 </select>
+                                {countyInvalid ? (
+                                    <p id="err-county-default" className="mt-1 text-xs text-red-600" role="alert">
+                                        Selectează județul.
+                                    </p>
+                                ) : null}
                             </div>
 
                             {/* Mesaj */}
@@ -436,6 +476,9 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                     required
                                     checked={gdprConsent}
                                     onChange={(e) => setGdprConsent(e.target.checked)}
+                                    onBlur={() => setGdprBlurred(true)}
+                                    aria-invalid={gdprInvalid}
+                                    aria-describedby={gdprInvalid ? 'err-gdpr-default' : undefined}
                                     className="mt-1 w-4 h-4 rounded border-zinc-300 bg-zinc-50 text-ea-green-600 focus:ring-ea-green-500"
                                 />
                                 <label htmlFor="gdpr-contact" className="text-[10px] text-zinc-400 leading-tight">
@@ -445,11 +488,17 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                                     </a>.
                                 </label>
                             </div>
+                            {gdprInvalid ? (
+                                <p id="err-gdpr-default" className="text-xs text-red-600" role="alert">
+                                    Bifează acordul GDPR pentru a trimite.
+                                </p>
+                            ) : null}
 
                             {/* Submit */}
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
+                                onClick={() => setSubmitAttempted(true)}
                                 className="w-full py-5 bg-ea-green-600 hover:bg-ea-green-500 disabled:opacity-50 text-white font-black uppercase tracking-widest rounded-2xl mt-4 transition-all shadow-xl shadow-ea-green-900/20 flex items-center justify-center gap-2"
                             >
                                 {isSubmitting ? 'Se trimite...' : 'Cere Ofertă Personalizată'}
@@ -468,7 +517,12 @@ export function Contact({ productName, variant = 'default' }: ContactProps = {})
                             <h3 className="text-xl font-bold text-zinc-900 uppercase tracking-tighter">Cerere Recepționată!</h3>
                             <p className="text-sm text-zinc-500">{statusMessage || 'Un specialist TehnicAgro analizează solicitarea ta și te va contacta în cel mai scurt timp.'}</p>
                             <button
-                                onClick={() => setIsSubmitted(false)}
+                                onClick={() => {
+                                    setIsSubmitted(false);
+                                    setSubmitAttempted(false);
+                                    setCountyBlurred(false);
+                                    setGdprBlurred(false);
+                                }}
                                 className="text-[10px] uppercase font-black text-zinc-600 hover:text-zinc-400 tracking-widest transition-colors"
                             >
                                 Trimite altă cerere

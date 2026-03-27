@@ -296,53 +296,9 @@ export function RoiCalculator({
                         </div>
                     </div>
 
-                    {/* Results Block - Hidden/Teaser until submitted */}
-                    {!submitted ? (
-                        <div className={teaserBlockCls}>
-                            <div className={resultGridCls}>
-                                <div className={`flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm`}>
-                                    <Banknote className={`${resultIconCls} text-ea-green-600`} />
-                                    <span className="mb-2 text-xs font-medium text-zinc-600">Venit securizat APIA</span>
-                                    <span className={`font-semibold tabular-nums text-zinc-400 ${compact ? 'text-xl' : 'text-3xl'}`}>— <span className={`font-normal text-zinc-400 ${compact ? 'text-sm' : 'text-lg'}`}>RON</span></span>
-                                </div>
-                                <div className={`flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm`}>
-                                    <Droplets className={`${resultIconCls} text-blue-600`} />
-                                    <span className="mb-2 text-xs font-medium text-zinc-600">Optimizare costuri</span>
-                                    <span className={`font-semibold tabular-nums text-zinc-400 ${compact ? 'text-xl' : 'text-3xl'}`}>— <span className={`font-normal text-zinc-400 ${compact ? 'text-sm' : 'text-lg'}`}>RON</span></span>
-                                </div>
-                                <div className={`flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm`}>
-                                    <TrendingUp className={`${resultIconCls} text-ea-green-600`} />
-                                    <span className="mb-2 text-xs font-medium text-zinc-600">Impact profit net estimat</span>
-                                    <span className={`font-semibold tabular-nums text-zinc-400 ${compact ? 'text-xl' : 'text-3xl'}`}>— <span className={`font-normal text-zinc-400 ${compact ? 'text-sm' : 'text-lg'}`}>RON</span></span>
-                                </div>
-                            </div>
-
-                            {!showForm && (
-                                <div className="flex flex-col items-center gap-3">
-                                    <p className={`text-center text-zinc-500 ${compact ? 'max-w-sm text-xs' : 'max-w-md text-sm'}`}>
-                                        Pornește auditul pentru estimări personalizate — îți cerem câteva date, în deplină siguranță.
-                                    </p>
-                                    <motion.button
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        type="button"
-                                        onClick={() => {
-                                            setFormError(null);
-                                            setShowForm(true);
-                                            if (typeof window !== 'undefined' && (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq) {
-                                                (window as typeof window & { fbq: (...args: unknown[]) => void }).fbq('trackCustom', 'AuditStart');
-                                            }
-                                        }}
-                                        className={`inline-flex items-center gap-2 rounded-lg bg-ea-green-600 font-medium text-white shadow-sm transition-colors hover:bg-ea-green-500 ${compact ? 'px-4 py-2 text-sm' : 'px-6 py-3'}`}
-                                    >
-                                        <Calculator className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
-                                        Află rezultatul pentru {hectares} ha
-                                    </motion.button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className={compact ? 'mb-6 grid grid-cols-3 gap-2 md:gap-3' : 'mb-12 grid gap-6 md:grid-cols-3 md:gap-8'}>
+                    {/* Rezultate live — se actualizează la mișcarea slider-ului (hectare) */}
+                    <div className={teaserBlockCls}>
+                        <div className={resultGridCls}>
                             <div className={`group flex flex-col items-center rounded-2xl border border-slate-200/60 bg-white ${resultCardPad} text-center shadow-sm transition-shadow hover:shadow-md`}>
                                 <Banknote className={`${resultIconCls} text-ea-green-600 transition-transform group-hover:scale-105`} />
                                 <span className="mb-2 text-xs font-medium text-zinc-500">Venit securizat APIA</span>
@@ -368,7 +324,30 @@ export function RoiCalculator({
                                 </span>
                             </div>
                         </div>
-                    )}
+                        {!submitted && !showForm && (
+                            <div className="flex flex-col items-center gap-3">
+                                <p className={`text-center text-zinc-500 ${compact ? 'max-w-sm text-xs' : 'max-w-md text-sm'}`}>
+                                    Vrei raportul PDF pe email și validare cu un specialist? Continuă mai jos — datele sunt protejate (GDPR).
+                                </p>
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    type="button"
+                                    onClick={() => {
+                                        setFormError(null);
+                                        setShowForm(true);
+                                        if (typeof window !== 'undefined' && (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq) {
+                                            (window as typeof window & { fbq: (...args: unknown[]) => void }).fbq('trackCustom', 'AuditStart');
+                                        }
+                                    }}
+                                    className={`inline-flex items-center gap-2 rounded-lg bg-ea-green-600 font-medium text-white shadow-sm transition-colors hover:bg-ea-green-500 ${compact ? 'px-4 py-2 text-sm' : 'px-6 py-3'}`}
+                                >
+                                    <Calculator className={compact ? 'h-4 w-4' : 'h-5 w-5'} />
+                                    Primește raportul pentru {hectares} ha
+                                </motion.button>
+                            </div>
+                        )}
+                    </div>
 
 
 

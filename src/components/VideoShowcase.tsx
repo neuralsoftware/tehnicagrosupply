@@ -4,15 +4,26 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Maximize2 } from 'lucide-react';
 
+const VIDEO_POSTER_DEFAULT = '/images/category-hero-video-poster.jpg';
+
 interface VideoShowcaseProps {
     title: string;
     videoSrc: string;
+    /** Poster comprimat pentru LCP până se încarcă clipul */
+    posterSrc?: string;
     badge?: string;
     ctaText?: string;
     ctaHref?: string;
 }
 
-export function VideoShowcase({ title, videoSrc, badge, ctaText, ctaHref }: VideoShowcaseProps) {
+export function VideoShowcase({
+    title,
+    videoSrc,
+    posterSrc = VIDEO_POSTER_DEFAULT,
+    badge,
+    ctaText,
+    ctaHref,
+}: VideoShowcaseProps) {
     const [isPlaying, setIsPlaying] = useState(false);
 
     const handlePlay = () => {
@@ -60,9 +71,11 @@ export function VideoShowcase({ title, videoSrc, badge, ctaText, ctaHref }: Vide
                 <video
                     id={`video-${title.replace(/\s/g, '')}`}
                     src={videoSrc}
+                    poster={posterSrc}
                     muted
                     loop
                     playsInline
+                    preload="metadata"
                     className="w-full h-full object-cover"
                     onEnded={() => setIsPlaying(false)}
                 />

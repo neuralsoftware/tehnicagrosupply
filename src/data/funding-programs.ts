@@ -179,9 +179,24 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
     ],
 };
 
-// Helper: returnează programele active pentru o categorie
-export function getActiveProgramsForCategory(category: string): FundingProgram[] {
-    return (FUNDING_PROGRAMS[category] || []).filter(p => p.status === 'active');
+/** Slug categorie produs (ex. viticultura, viticol) → cheie în FUNDING_PROGRAMS */
+function resolveFundingCategoryKey(category: unknown): string {
+    const raw = String(category ?? '').trim();
+    if (!raw) return '';
+    const s = raw
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    if (s === 'viticol' || s.startsWith('viticol-') || s.includes('viticult')) {
+        return 'viticol';
+    }
+    return raw;
+}
+
+/** Programe active pentru categorie — aliniază viticultura/viticol la lista viticol. */
+export function getActiveProgramsForCategory(category: unknown): FundingProgram[] {
+    const key = resolveFundingCategoryKey(category);
+    return (FUNDING_PROGRAMS[key] || []).filter((p) => p.status === 'active');
 }
 
 // Helper: toate programele (pentru Admin)

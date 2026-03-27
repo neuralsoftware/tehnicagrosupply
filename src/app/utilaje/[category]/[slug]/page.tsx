@@ -13,7 +13,7 @@ import { ExpertAuthority } from '@/components/ExpertAuthority';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, BadgeCheck, ExternalLink } from 'lucide-react';
-import { FUNDING_PROGRAMS } from '@/data/funding-programs';
+import { getActiveProgramsForCategory } from '@/data/funding-programs';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,7 +75,7 @@ export default async function ProductPage({ params }: PageProps) {
     );
     const postsToShow = exactMatches.length > 0 ? exactMatches.slice(0, 3) : allPosts.slice(0, 3);
 
-    const fundingPrograms = (FUNDING_PROGRAMS[product.category] || []).filter(p => p.status === 'active');
+    const fundingPrograms = getActiveProgramsForCategory(product.category);
 
     const productSchema = {
         '@context': 'https://schema.org', '@type': 'Product',
