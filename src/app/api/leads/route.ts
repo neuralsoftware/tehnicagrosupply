@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { simpleRateLimit } from '@/lib/leads';
 import { z } from 'zod';
 import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
+import type { PostgrestError } from '@supabase/supabase-js';
 
 const leadSchema = z.object({
     name: z.string().min(2, 'Nume prea scurt').max(100, 'Nume prea lung'),
@@ -28,11 +29,34 @@ const leadSchema = z.object({
     productName: z.string().max(200).optional(),
 });
 
+/** Răspuns JSON cu câmpurile erorii PostgREST/Postgres așa cum vin de la Supabase (`error` = alias la message pentru formulare). */
+function jsonFromPostgrestError(err: PostgrestError) {
+    return {
+        error: err.message,
+        message: err.message,
+        details: err.details,
+        code: err.code,
+        hint: err.hint,
+    };
+}
+
+function isPostgrestError(x: unknown): x is PostgrestError {
+    return (
+        x !== null &&
+        typeof x === 'object' &&
+        'message' in x &&
+        'code' in x &&
+        typeof (x as PostgrestError).message === 'string'
+    );
+}
+
+/** Tabel sarcini/mesaje în proiectul CRM (mesajul site → task). Supabase: public.<nume>. */
+const CRM_TASKS_TABLE = process.env.CRM_TASKS_TABLE?.trim() || 'tasks';
+
 export async function POST(request: Request) {
     try {
-        // Rate limiting
         const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-        const allowed = simpleRateLimit(ip, 50, 900000); // 50 requests per 15 minutes pt testare
+        const allowed = simpleRateLimit(ip, 50, 900000);
 
         if (!allowed) {
             return NextResponse.json(
@@ -42,11 +66,8 @@ export async function POST(request: Request) {
         }
 
         const data = await request.json();
-
-        // Validate input with Zod
         const validatedData = leadSchema.parse(data);
 
-        // Ensure all required fields have proper defaults
         const leadData = {
             ...validatedData,
             email: validatedData.email || '',
@@ -57,8 +78,8 @@ export async function POST(request: Request) {
             source: validatedData.source || 'Website Form',
         };
 
-        const notesBlock = [
-            `Sursa: ${leadData.source}`,
+        const messageBody = [
+            `Sursă: ${leadData.source}`,
             `Produs interesat: ${validatedData.productName || '-'}`,
             `Mesaj: ${leadData.notes || '-'}`,
             `Hectare: ${leadData.hectares ?? 0}`,
@@ -66,60 +87,90 @@ export async function POST(request: Request) {
             `Urgență: ${leadData.urgency || '-'}`,
         ].join('\n');
 
-        const dbRow = {
-            name: leadData.name,
-            phone: leadData.phone || '',
-            email: leadData.email || '',
-            county: leadData.county || '',
-            hectares: leadData.hectares ?? 0,
-            crops: leadData.crops ?? [],
-            urgency: leadData.urgency || '',
-            subsidy_income: leadData.subsidyIncome ?? 0,
-            fuel_savings: leadData.fuelSavings ?? 0,
-            total_benefit: leadData.totalBenefit ?? 0,
-            notes: notesBlock,
-            status: 'Lead',
-            source: leadData.source,
-            is_new: true,
-            product_name: validatedData.productName?.trim() || null,
-        };
-
         const crm = getSupabaseCrmAdmin();
         if (!crm) {
-            console.error('[leads] CRM Supabase neconfigurat: CRM_SUPABASE_URL / CRM_SUPABASE_SERVICE_ROLE_KEY');
+            const missing =
+                'CRM_SUPABASE_URL sau CRM_SUPABASE_SERVICE_ROLE_KEY lipsă în environment.';
             return NextResponse.json(
                 {
-                    error: 'Nu am putut salva cererea în CRM.',
-                    details:
-                        'Lipsește configurarea CRM pe server (CRM_SUPABASE_URL și CRM_SUPABASE_SERVICE_ROLE_KEY — proiectul Supabase CRM, nu marketing).',
+                    error: missing,
+                    message: missing,
+                    details: null,
+                    code: 'CRM_ENV_MISSING',
+                    hint: 'Configurează variabilele pentru proiectul CRM pe server (Vercel / .env.local).',
                 },
                 { status: 503 }
             );
         }
 
-        const { data: insertedData, error: dbError } = await crm
-            .from('clients')
-            .insert([dbRow])
-            .select()
-            .single();
+        const clientPayload = {
+            name: leadData.name,
+            phone: leadData.phone || '',
+            email: leadData.email || '',
+            county: leadData.county || '',
+        };
 
-        if (dbError) {
-            console.error('CRM Supabase DB Error:', dbError);
-            const human =
-                dbError.code === 'PGRST205' || /schema cache/i.test(String(dbError.message || ''))
-                    ? 'Tabela CRM (clients) lipsește sau nu e expusă în API în proiectul Supabase CRM.'
-                    : dbError.message || JSON.stringify(dbError);
+        let insertedRow: Record<string, unknown>;
+        const insertRes = await crm.from('clients').insert([clientPayload]).select().single();
+
+        if (insertRes.error) {
+            if (insertRes.error.code === '23505') {
+                const phone = (clientPayload.phone || '').replace(/^\+/, '');
+                let existingId: string | number | undefined;
+
+                if (phone) {
+                    const byPhone = await crm.from('clients').select('id').eq('phone', clientPayload.phone).maybeSingle();
+                    if (!byPhone.error && byPhone.data?.id != null) {
+                        existingId = byPhone.data.id as string | number;
+                    }
+                }
+                if (existingId === undefined && clientPayload.email) {
+                    const byEmail = await crm.from('clients').select('id').eq('email', clientPayload.email).maybeSingle();
+                    if (!byEmail.error && byEmail.data?.id != null) {
+                        existingId = byEmail.data.id as string | number;
+                    }
+                }
+
+                if (existingId === undefined) {
+                    return NextResponse.json(jsonFromPostgrestError(insertRes.error), { status: 500 });
+                }
+                insertedRow = { id: existingId };
+            } else {
+                console.error('CRM clients insert:', insertRes.error);
+                return NextResponse.json(jsonFromPostgrestError(insertRes.error), { status: 500 });
+            }
+        } else {
+            insertedRow = insertRes.data as Record<string, unknown>;
+        }
+
+        const clientId = insertedRow.id;
+        if (clientId == null) {
+            const msg = 'Insert client fără id în răspuns.';
             return NextResponse.json(
                 {
-                    error: 'Nu am putut salva cererea în CRM.',
-                    details: human,
-                    code: dbError.code,
+                    error: msg,
+                    message: msg,
+                    details: JSON.stringify(insertedRow),
+                    code: null,
+                    hint: null,
                 },
                 { status: 500 }
             );
         }
 
-        return NextResponse.json({ success: true, lead: insertedData });
+        if (messageBody.trim().length > 0) {
+            const taskPayload: Record<string, unknown> = {
+                client_id: clientId,
+                description: messageBody,
+            };
+            const taskRes = await crm.from(CRM_TASKS_TABLE).insert([taskPayload]).select().single();
+            if (taskRes.error) {
+                console.error(`CRM ${CRM_TASKS_TABLE} insert:`, taskRes.error);
+                return NextResponse.json(jsonFromPostgrestError(taskRes.error), { status: 500 });
+            }
+        }
+
+        return NextResponse.json({ success: true, lead: insertedRow });
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json(
@@ -128,7 +179,21 @@ export async function POST(request: Request) {
             );
         }
         console.error('Lead processing error:', error);
-        return NextResponse.json({ error: error instanceof Error ? error.message : 'Eroare internă server' }, { status: 500 });
+        if (isPostgrestError(error)) {
+            return NextResponse.json(jsonFromPostgrestError(error), { status: 500 });
+        }
+        const err = error as Error & { details?: string; code?: string; hint?: string };
+        const msg = err?.message ?? String(error);
+        return NextResponse.json(
+            {
+                error: msg,
+                message: msg,
+                details: err?.details ?? null,
+                code: err?.code ?? null,
+                hint: err?.hint ?? null,
+            },
+            { status: 500 }
+        );
     }
 }
 
@@ -136,8 +201,16 @@ export async function GET() {
     try {
         const crm = getSupabaseCrmAdmin();
         if (!crm) {
+            const missing =
+                'CRM_SUPABASE_URL sau CRM_SUPABASE_SERVICE_ROLE_KEY lipsă în environment.';
             return NextResponse.json(
-                { error: 'CRM neconfigurat', details: 'CRM_SUPABASE_URL / CRM_SUPABASE_SERVICE_ROLE_KEY lipsă.' },
+                {
+                    error: missing,
+                    message: missing,
+                    details: null,
+                    code: 'CRM_ENV_MISSING',
+                    hint: null,
+                },
                 { status: 503 }
             );
         }
@@ -150,11 +223,10 @@ export async function GET() {
 
         if (error) {
             console.error('Supabase fetch error:', error);
-            return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
+            return NextResponse.json(jsonFromPostgrestError(error), { status: 500 });
         }
 
-        // Map data to match frontend expectations camelCase
-        const leads = data.map(row => ({
+        const leads = data.map((row) => ({
             id: row.id,
             name: row.name,
             phone: row.phone,
@@ -167,6 +239,20 @@ export async function GET() {
         return NextResponse.json({ leads });
     } catch (error) {
         console.error('Admin leads fetch error:', error);
-        return NextResponse.json({ error: 'Failed to fetch leads' }, { status: 500 });
+        if (isPostgrestError(error)) {
+            return NextResponse.json(jsonFromPostgrestError(error), { status: 500 });
+        }
+        const err = error as Error & { details?: string; code?: string; hint?: string };
+        const msg = err?.message ?? String(error);
+        return NextResponse.json(
+            {
+                error: msg,
+                message: msg,
+                details: err?.details ?? null,
+                code: err?.code ?? null,
+                hint: err?.hint ?? null,
+            },
+            { status: 500 }
+        );
     }
 }
