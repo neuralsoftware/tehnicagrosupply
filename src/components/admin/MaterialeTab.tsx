@@ -280,7 +280,7 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                         <label className="block text-[10px] text-zinc-500 uppercase font-black tracking-widest">Alege Domeniu Simplu</label>
                         <div className="flex flex-wrap gap-2">
                             {Object.entries({
-                                viticol: 'Viticulture',
+                                viticol: 'Viticultură',
                                 'pregatire-sol': 'Soil Prep',
                                 'semanat-fertilizat': 'Se seeding',
                                 'recoltare-logistica': 'Harvesting',

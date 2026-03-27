@@ -22,6 +22,7 @@ export const dynamic = 'force-dynamic';
 /** Titlu afișat fără MAJUSCULE FORȚATE; diacritice corecte pentru slug-uri cunoscute. */
 const CATEGORY_DISPLAY_TITLE: Record<string, string> = {
     viticol: 'Viticultură',
+    viticultura: 'Viticultură',
     'pregatire-sol': 'Pregătire sol',
     'semanat-fertilizat': 'Semănat și fertilizat',
     'recoltare-logistica': 'Recoltare și logistică',
@@ -48,6 +49,21 @@ interface PageProps {
     }>;
 }
 
+/** SEO comun pentru orice slug viticol (viticol, viticultura, …). */
+const CATEGORY_SEO_VITICULTURE: { title: string; description: string; keywords: string[] } = {
+    title: 'Utilaje pentru Viticultură | TehnicAgro Supply',
+    description:
+        'Soluții pentru viticultură: maști și echipamente Provitis, consultanță și finanțare. TehnicAgro Supply — partener pentru plantația ta.',
+    keywords: [
+        'utilaje viticultura',
+        'utilaje viticole',
+        'provitis',
+        'vie',
+        'echipamente viticultura',
+        'tehnicagro viticol',
+    ],
+};
+
 const CATEGORY_SEO: Record<string, { title: string; description: string; keywords: string[] }> = {
     'pregatire-sol': {
         title: 'Utilaje Pregătire Sol Agricol | Grape, Chain Disc | TehnicAgro Supply',
@@ -68,12 +84,6 @@ const CATEGORY_SEO: Record<string, { title: string; description: string; keyword
         title: 'Remorci & Utilaje Logistică Agricolă | K-Factor | TehnicAgro Supply',
         description: 'Remorci de transbordare cereale K-Factor Powerbank & Booster. Eficientizează recoltarea, reduce pierderile și costurile de transport. Eligibile DR-12.',
         keywords: ['remorca transbordare cereale', 'k-factor powerbank', 'remorca agricola cereale', 'logistica recoltare romania', 'remorca cereale pret'],
-    },
-    viticol: {
-        title: 'Utilaje Viticole Premium | Provitis | TehnicAgro Supply',
-        description:
-            'Soluții pentru viticultură: maști și echipamente Provitis, consultanță și finanțare. TehnicAgro Supply — partener pentru plantația ta.',
-        keywords: ['utilaje viticole', 'provitis', 'vie', 'echipamente viticultura', 'tehnicagro viticol'],
     },
 };
 
@@ -96,7 +106,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const categories = await getCategories();
     const cat = categories.find((c) => normalizeCategorySlugParam(c.slug) === categoryKey);
     if (!cat) return {};
-    const seo = CATEGORY_SEO[cat.slug];
+    const seo = isViticultureCategoryField(cat.slug) ? CATEGORY_SEO_VITICULTURE : CATEGORY_SEO[cat.slug];
     const title =
         seo?.title ?? `Utilaje ${cat.name} Agricole | TehnicAgro Supply`;
     const description =
@@ -159,7 +169,7 @@ export default async function CategoryPage({ params }: PageProps) {
     }
 
     const isViti = isViticultureCategoryUrl(category, categoryKey);
-    const seo = CATEGORY_SEO[catMeta.slug];
+    const seo = isViticultureCategoryField(catMeta.slug) ? CATEGORY_SEO_VITICULTURE : CATEGORY_SEO[catMeta.slug];
     const subtitleSource = isViti
         ? 'Soluții premium pentru vie și plantație — utilaje Provitis și consultanță TehnicAgro.'
         : catMeta.description?.trim() ||

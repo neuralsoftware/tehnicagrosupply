@@ -27,6 +27,8 @@ const SUPPRESSED_SLUGS_KEY = 'catalog/suppressed-slugs.json';
 /** Slug-uri vechi salvate în Blob / istoric → slug canonic din cod (redirect URL în next.config). */
 const LEGACY_PRODUCT_SLUGS: Record<string, string> = {
     'green-plains-ads': 'multisem-ads',
+    /** URL vechi viticultură — canonic cu cratime */
+    masinacarnit: 'masina-de-carnit-st120',
 };
 
 export function normalizeLegacyProductSlug(slug: string): string {

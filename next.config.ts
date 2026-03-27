@@ -22,6 +22,16 @@ const nextConfig = {
         destination: '/utilaje/semanat-fertilizat/multisem-ads',
         permanent: true,
       },
+      {
+        source: '/utilaje/viticultura/masinacarnit',
+        destination: '/utilaje/viticultura/masina-de-carnit-st120',
+        permanent: true,
+      },
+      {
+        source: '/utilaje/viticol/masinacarnit',
+        destination: '/utilaje/viticol/masina-de-carnit-st120',
+        permanent: true,
+      },
     ];
   },
 };

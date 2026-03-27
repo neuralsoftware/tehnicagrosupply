@@ -1,4 +1,12 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Condiții de Utilizare | TehnicAgro Supply',
+    description:
+        'Termenii și condițiile de utilizare ale site-ului TehnicAgro Supply (tehnicagrosupply.ro): proprietate intelectuală, calculator ROI, limitarea răspunderii și legislație aplicabilă.',
+    alternates: { canonical: 'https://tehnicagrosupply.ro/conditii-utilizare' },
+};
 
 export default function TermsOfUse() {
     return (

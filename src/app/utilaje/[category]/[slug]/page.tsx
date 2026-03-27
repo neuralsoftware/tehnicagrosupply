@@ -1,4 +1,9 @@
-import { getProducts, productMatchesCategorySlug } from '@/lib/products-store';
+import {
+    getProducts,
+    productMatchesCategorySlug,
+    normalizeLegacyProductSlug,
+} from '@/lib/products-store';
+import { formatProductSeoDisplayName } from '@/lib/product-seo-display-name';
 import { getPublishedPosts } from '@/data/blog';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { ProductSection } from '@/components/ProductSection';
@@ -18,20 +23,27 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { category, slug } = await params;
+    const resolvedSlug = normalizeLegacyProductSlug(slug);
     const products = await getProducts();
-    const product = products.find((p) => p.slug === slug && productMatchesCategorySlug(p.category, category));
+    const product = products.find(
+        (p) => p.slug === resolvedSlug && productMatchesCategorySlug(p.category, category)
+    );
     if (!product) return {};
 
-    const seoTitle = product.metaTitle || `${product.brand} ${product.name} — Preț & Detalii Tehnice | TehnicAgro Supply`;
+    const displayName = formatProductSeoDisplayName(product);
+    const seoTitle =
+        product.metaTitle || `${displayName} — Preț & Detalii Tehnice | TehnicAgro Supply`;
     const seoDesc = product.metaDescription || `${product.description} Eligibil finanțare DR-12 și eco-scheme APIA. Solicită ofertă personalizată.`;
     const absImage = `https://tehnicagrosupply.ro${product.imageSrc}`;
 
     return {
         title: seoTitle,
         description: seoDesc,
-        alternates: { canonical: `https://tehnicagrosupply.ro/utilaje/${product.category}/${slug}` },
+        alternates: {
+            canonical: `https://tehnicagrosupply.ro/utilaje/${product.category}/${resolvedSlug}`,
+        },
         openGraph: {
-            title: `${product.brand} ${product.name} | TehnicAgro`,
+            title: `${displayName} | TehnicAgro`,
             description: seoDesc,
             images: [{ url: absImage, width: 1200, height: 630, alt: product.name }],
             type: 'website',
@@ -43,13 +55,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductPage({ params }: PageProps) {
     const { category, slug } = await params;
+    const resolvedSlug = normalizeLegacyProductSlug(slug);
     const products = await getProducts();
-    const product = products.find((p) => p.slug === slug && productMatchesCategorySlug(p.category, category));
+    const product = products.find(
+        (p) => p.slug === resolvedSlug && productMatchesCategorySlug(p.category, category)
+    );
 
     if (!product || product.status === 'draft') notFound();
 
-    if (category !== product.category) {
-        permanentRedirect(`/utilaje/${product.category}/${slug}`);
+    if (category !== product.category || slug !== resolvedSlug) {
+        permanentRedirect(`/utilaje/${product.category}/${resolvedSlug}`);
     }
 
     const allPosts = getPublishedPosts();
