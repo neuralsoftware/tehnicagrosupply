@@ -53,11 +53,12 @@ function isPostgrestError(x: unknown): x is PostgrestError {
 /** Tabel sarcini/mesaje în proiectul CRM (mesajul site → task). Supabase: public.<nume>. */
 const CRM_TASKS_TABLE = process.env.CRM_TASKS_TABLE?.trim() || 'client_tasks';
 
-/** Inserare în `client_tasks` — doar coloanele trimise explicit; restul la default în DB. */
+/** Inserare în `client_tasks` — coloane obligatorii din API acolo unde DB nu are default. */
 type ClientTaskInsert = {
     client_id: string | number;
     title: string;
     description: string;
+    due_date: string;
     status: string;
 };
 
@@ -179,6 +180,7 @@ export async function POST(request: Request) {
                 client_id: clientId,
                 title: `Lead nou website: ${productLabel}`,
                 description: messageBody,
+                due_date: new Date().toISOString(),
                 status: 'Nou',
             };
             const taskRes = await crm.from(CRM_TASKS_TABLE).insert([taskPayload]).select().single();
