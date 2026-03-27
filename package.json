@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postbuild": "next-sitemap",
     "map-db": "npx tsx scripts/generate-db-map.ts",
     "sync-site-folders": "npx tsx scripts/sync-site-folders.ts",
     "upload-home-videos": "npx tsx scripts/upload-home-showcase-videos.ts"
@@ -21,7 +20,6 @@
     "framer-motion": "^12.27.5",
     "lucide-react": "^0.562.0",
     "next": "16.1.4",
-    "next-sitemap": "^4.2.3",
     "nodemailer": "^7.0.12",
     "react": "19.2.3",
     "react-dom": "19.2.3",

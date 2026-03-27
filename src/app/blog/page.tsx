@@ -1,23 +1,35 @@
 import { getPublishedPosts, resolveBlogPostImage } from '@/data/blog';
 import Link from 'next/link';
-import { Calendar, ArrowRight } from 'lucide-react';
+import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Metadata } from 'next';
 
-// ISR: Vercel revalidă pagina la fiecare 3600 secunde (1 oră).
-// Articolele programate apar automat la data publicării fără deploy manual.
 export const revalidate = 3600;
+
+const PER_PAGE = 9;
 
 export const metadata: Metadata = {
     title: "Blog & Resurse Tehnice Agricole | TehnicAgro Supply",
     description: "Ghiduri despre subvenții APIA, reglementări GAEC 6, tehnologia No-Till și bune practici pentru fermieri.",
 };
 
-export default function BlogPage() {
-    const posts = getPublishedPosts();
+type PageProps = {
+    searchParams?: Promise<{ page?: string }>;
+};
+
+export default async function BlogPage({ searchParams }: PageProps) {
+    const allPosts = getPublishedPosts();
+    const sp = searchParams ? await searchParams : {};
+    const rawPage = parseInt(String(sp.page || '1'), 10);
+    const totalPages = Math.max(1, Math.ceil(allPosts.length / PER_PAGE));
+    const page = Number.isFinite(rawPage) ? Math.min(Math.max(1, rawPage), totalPages) : 1;
+    const start = (page - 1) * PER_PAGE;
+    const posts = allPosts.slice(start, start + PER_PAGE);
+
+    const qs = (p: number) => (p <= 1 ? '/blog' : `/blog?page=${p}`);
+
     return (
         <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
             <div className="max-w-7xl mx-auto px-4">
-                {/* Header */}
                 <div className="text-center mb-16 space-y-4">
                     <h1 className="text-5xl md:text-6xl font-black text-zinc-900 uppercase tracking-tighter">
                         Blog & <span className="text-ea-green-600">Resurse</span>
@@ -27,7 +39,6 @@ export default function BlogPage() {
                     </p>
                 </div>
 
-                {/* Blog Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {posts.map((post) => (
                         <Link
@@ -35,7 +46,6 @@ export default function BlogPage() {
                             href={`/blog/${post.slug}`}
                             className="group bg-white rounded-3xl overflow-hidden border border-zinc-200 hover:border-ea-green-300 transition-all flex flex-col shadow-sm hover:shadow-lg"
                         >
-                            {/* Image */}
                             <div className="aspect-[16/9] overflow-hidden relative">
                                 <img
                                     src={resolveBlogPostImage(post)}
@@ -49,7 +59,6 @@ export default function BlogPage() {
                                 </div>
                             </div>
 
-                            {/* Content */}
                             <div className="p-8 space-y-4 flex-grow flex flex-col">
                                 <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-widest">
                                     <Calendar className="w-3 h-3" />
@@ -69,6 +78,49 @@ export default function BlogPage() {
                         </Link>
                     ))}
                 </div>
+
+                {totalPages > 1 ? (
+                    <nav
+                        className="mt-14 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-100 pt-10"
+                        aria-label="Paginare articole blog"
+                    >
+                        <p className="text-sm text-zinc-500">
+                            Pagina <span className="font-semibold text-zinc-900">{page}</span> din{' '}
+                            <span className="font-semibold text-zinc-900">{totalPages}</span>
+                            {` — ${allPosts.length} articole`}
+                        </p>
+                        <div className="flex items-center gap-2">
+                            {page > 1 ? (
+                                <Link
+                                    href={qs(page - 1)}
+                                    className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-900 hover:border-ea-green-300 hover:text-ea-green-700 transition-colors"
+                                >
+                                    <ChevronLeft className="h-4 w-4" aria-hidden />
+                                    Pagina anterioară
+                                </Link>
+                            ) : (
+                                <span className="inline-flex items-center gap-2 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-2.5 text-sm font-medium text-zinc-400 cursor-not-allowed">
+                                    <ChevronLeft className="h-4 w-4" aria-hidden />
+                                    Pagina anterioară
+                                </span>
+                            )}
+                            {page < totalPages ? (
+                                <Link
+                                    href={qs(page + 1)}
+                                    className="inline-flex items-center gap-2 rounded-xl bg-ea-green-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-ea-green-500 transition-colors"
+                                >
+                                    Pagina următoare
+                                    <ChevronRight className="h-4 w-4" aria-hidden />
+                                </Link>
+                            ) : (
+                                <span className="inline-flex items-center gap-2 rounded-xl bg-zinc-100 px-4 py-2.5 text-sm font-medium text-zinc-400 cursor-not-allowed">
+                                    Pagina următoare
+                                    <ChevronRight className="h-4 w-4" aria-hidden />
+                                </span>
+                            )}
+                        </div>
+                    </nav>
+                ) : null}
             </div>
         </main>
     );
