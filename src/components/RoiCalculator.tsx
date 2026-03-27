@@ -329,8 +329,8 @@ export function RoiCalculator({
                                         onClick={() => {
                                             setFormError(null);
                                             setShowForm(true);
-                                            if (typeof window !== 'undefined' && (window as typeof window & { fbq?: (ev: string) => void }).fbq) {
-                                                (window as typeof window & { fbq: (ev: string) => void }).fbq('trackCustom', 'AuditStart');
+                                            if (typeof window !== 'undefined' && (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq) {
+                                                (window as typeof window & { fbq: (...args: unknown[]) => void }).fbq('trackCustom', 'AuditStart');
                                             }
                                         }}
                                         className={`inline-flex items-center gap-2 rounded-lg bg-ea-green-600 font-medium text-white shadow-sm transition-colors hover:bg-ea-green-500 ${compact ? 'px-4 py-2 text-sm' : 'px-6 py-3'}`}

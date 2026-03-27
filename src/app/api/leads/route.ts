@@ -53,6 +53,14 @@ function isPostgrestError(x: unknown): x is PostgrestError {
 /** Tabel sarcini/mesaje în proiectul CRM (mesajul site → task). Supabase: public.<nume>. */
 const CRM_TASKS_TABLE = process.env.CRM_TASKS_TABLE?.trim() || 'client_tasks';
 
+/** Inserare în `client_tasks` — doar coloanele trimise explicit; restul la default în DB. */
+type ClientTaskInsert = {
+    client_id: string | number;
+    title: string;
+    description: string;
+    status: string;
+};
+
 export async function POST(request: Request) {
     try {
         const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
@@ -85,6 +93,9 @@ export async function POST(request: Request) {
             `Hectare: ${leadData.hectares ?? 0}`,
             `Culturi: ${(leadData.crops || []).join(', ') || '-'}`,
             `Urgență: ${leadData.urgency || '-'}`,
+            `Subvenție estimată (RON): ${leadData.subsidyIncome ?? 0}`,
+            `Economie combustibil estimată (RON): ${leadData.fuelSavings ?? 0}`,
+            `Beneficiu total estimat (RON): ${leadData.totalBenefit ?? 0}`,
         ].join('\n');
 
         const crm = getSupabaseCrmAdmin();
@@ -143,8 +154,11 @@ export async function POST(request: Request) {
             insertedRow = insertRes.data as Record<string, unknown>;
         }
 
-        const clientId = insertedRow.id;
-        if (clientId == null) {
+        const rawId = insertedRow.id;
+        if (
+            rawId == null ||
+            (typeof rawId !== 'string' && typeof rawId !== 'number')
+        ) {
             const msg = 'Insert client fără id în răspuns.';
             return NextResponse.json(
                 {
@@ -157,11 +171,15 @@ export async function POST(request: Request) {
                 { status: 500 }
             );
         }
+        const clientId: string | number = rawId;
 
         if (messageBody.trim().length > 0) {
-            const taskPayload: Record<string, unknown> = {
+            const productLabel = validatedData.productName?.trim() || 'General';
+            const taskPayload: ClientTaskInsert = {
                 client_id: clientId,
+                title: `Lead nou website: ${productLabel}`,
                 description: messageBody,
+                status: 'Nou',
             };
             const taskRes = await crm.from(CRM_TASKS_TABLE).insert([taskPayload]).select().single();
             if (taskRes.error) {
