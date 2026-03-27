@@ -51,6 +51,20 @@ function isPostgrestError(x: unknown): x is PostgrestError {
     );
 }
 
+/**
+ * Aplicația CRM (board / meniul Sarcini) poate să nu listeze rânduri al căror titlu sau descriere
+ * conțin emoji; în DB sarcinile tale „vechi” sunt ASCII-only.
+ */
+function crmSafePlainText(text: string): string {
+    return text
+        .replace(/\p{Extended_Pictographic}/gu, '')
+        .replace(/\uFE0F/g, '')
+        .replace(/[\u200D\u200C]/g, '')
+        .replace(/[ \t]+$/gm, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+}
+
 /** Tabel sarcini/mesaje în proiectul CRM (mesajul site → task). Supabase: public.<nume>. */
 const CRM_TASKS_TABLE = process.env.CRM_TASKS_TABLE?.trim() || 'client_tasks';
 
@@ -226,10 +240,11 @@ export async function POST(request: Request) {
         }
 
         if (messageBody.trim().length > 0) {
+            const taskDescription = crmSafePlainText(messageBody);
             const taskPayload: ClientTaskInsert = {
                 client_id: clientId,
-                title: '🚨 LEAD NOU: Cerere ofertă website',
-                description: messageBody,
+                title: 'LEAD NOU: Cerere ofertă website',
+                description: taskDescription.length > 0 ? taskDescription : messageBody,
                 due_date: crmTaskDueDateIso(3),
                 /**
                  * Aliniat cu sarcinile deja în CRM (ex. id 14/15): `InProgress` + `resolution` gol.
