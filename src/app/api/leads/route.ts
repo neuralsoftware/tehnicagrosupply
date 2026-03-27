@@ -61,7 +61,8 @@ type ClientTaskInsert = {
     due_date: string;
     status: string;
     resolution: string;
-    is_completed: boolean;
+    /** CRM: coloană integer (0 = deschis, 1 = închis), nu boolean. */
+    is_completed: number;
 };
 
 export async function POST(request: Request) {
@@ -184,7 +185,7 @@ export async function POST(request: Request) {
                 due_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
                 status: 'Nou',
                 resolution: 'EMPTY',
-                is_completed: false,
+                is_completed: 0,
             };
             const taskRes = await crm.from(CRM_TASKS_TABLE).insert([taskPayload]).select().single();
             if (taskRes.error) {
