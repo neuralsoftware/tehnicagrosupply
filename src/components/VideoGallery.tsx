@@ -1,10 +1,29 @@
 'use client';
 
+/**
+ * Filmări secțiunea „în acțiune” pe home.
+ * Surse: `HOME_SHOWCASE_STORAGE` + fallback `HOME_SHOWCASE_LOCAL_FALLBACK` în `@/lib/site-video-paths`.
+ * Server (`page.tsx`) rezolvă URL-ul final (Storage dacă fișierul există, altfel `/downloads/...`).
+ */
+
 import { motion } from 'framer-motion';
 import { VideoShowcase } from './VideoShowcase';
 import { Play, Sparkles } from 'lucide-react';
+import {
+    HOME_SHOWCASE_LOCAL_FALLBACK,
+} from '@/lib/site-video-paths';
 
-export function VideoGallery() {
+export interface VideoGalleryProps {
+    /** MP4 Avers-Agro ADS — implicit local sau din Storage după rezolvare pe server. */
+    videoSrcAds?: string;
+    /** MP4 Fliegl KSE pe teren — implicit local sau din Storage. */
+    videoSrcKse?: string;
+}
+
+export function VideoGallery({
+    videoSrcAds = HOME_SHOWCASE_LOCAL_FALLBACK.aversAds,
+    videoSrcKse = HOME_SHOWCASE_LOCAL_FALLBACK.flieglKseTeren,
+}: VideoGalleryProps) {
     return (
         <section id="demo" className="relative overflow-hidden bg-zinc-50 py-12 md:py-16">
             <div className="max-w-7xl mx-auto px-4 relative z-10">
@@ -33,14 +52,14 @@ export function VideoGallery() {
                 <div className="grid md:grid-cols-2 gap-8">
                     <VideoShowcase
                         title="Avers-Agro Multisem ADS"
-                        videoSrc="/downloads/video ADS 2026.mp4"
+                        videoSrc={videoSrcAds}
                         badge="Semănătoare No-Till"
                         ctaText="Solicită Ofertă ADS"
                         ctaHref="#contact"
                     />
                     <VideoShowcase
                         title="Fliegl Chain Disc KSE 680"
-                        videoSrc="/downloads/video KSE teren.mp4"
+                        videoSrc={videoSrcKse}
                         badge="Grapă cu Lanțuri"
                         ctaText="Solicită Ofertă KSE"
                         ctaHref="#contact"

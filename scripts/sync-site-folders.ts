@@ -39,6 +39,7 @@ function normalizeEnvValue(v: string | undefined): string {
 
 async function main() {
     const { getActiveCategories, normalizeCategorySlugParam } = await import('../src/lib/products-store');
+    const { EXTRA_VIDEO_FOLDER_SLUGS } = await import('../src/lib/site-video-paths');
 
     const url = normalizeEnvValue(process.env.NEXT_PUBLIC_SUPABASE_URL).replace(/\/+$/, '');
     const serviceKey = normalizeEnvValue(process.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -62,9 +63,10 @@ async function main() {
 
     const categories = await getActiveCategories();
     const slugs = [
-        ...new Set(
-            categories.map((c) => normalizeCategorySlugParam(c.slug)).filter(Boolean)
-        ),
+        ...new Set([
+            ...categories.map((c) => normalizeCategorySlugParam(c.slug)).filter(Boolean),
+            ...EXTRA_VIDEO_FOLDER_SLUGS.map((s) => normalizeCategorySlugParam(s)).filter(Boolean),
+        ]),
     ].sort((a, b) => a.localeCompare(b, 'en'));
 
     console.log('[sync-site-folders] Categorii active (site):', slugs.length, slugs.join(', '));

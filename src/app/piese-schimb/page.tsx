@@ -1,5 +1,8 @@
 import { Contact } from '@/components/Contact';
 import { TrustSignals } from '@/components/TrustSignals';
+import { CategoryHeroBanner } from '@/components/CategoryHeroBanner';
+import { getCategoryBannerMp4PublicUrl } from '@/lib/category-storage-banner';
+import { PIESE_SCHIMB_BANNER_SLUG } from '@/lib/site-video-paths';
 import { Settings, Wrench, ShieldCheck, Droplets, Cog, Filter, Disc3 } from 'lucide-react';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -27,7 +30,9 @@ export const metadata: Metadata = {
     },
 };
 
-export default function PieseSchimbPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function PieseSchimbPage() {
     const sparePartsSchema = {
         "@context": "https://schema.org",
         "@type": "Service",
@@ -138,6 +143,9 @@ export default function PieseSchimbPage() {
         ]
     };
 
+    const pieseBannerUrl = await getCategoryBannerMp4PublicUrl(PIESE_SCHIMB_BANNER_SLUG);
+    const pieseHeroVideos = pieseBannerUrl ? [pieseBannerUrl] : [];
+
     const wearParts = [
         { icon: <Droplets className="w-6 h-6 text-ea-green-500" />, label: 'Duze Erbicidator', desc: 'Duze plat-fan, antidrift, TeeJet, Lechler' },
         { icon: <Cog className="w-6 h-6 text-ea-green-500" />, label: 'Pompă Instalație', desc: 'Pompe Comet, AR, Annovi – erbicidatoare' },
@@ -146,7 +154,7 @@ export default function PieseSchimbPage() {
     ];
 
     return (
-        <main className="min-h-screen bg-white text-zinc-900 pt-32 pb-24">
+        <main className="min-h-screen bg-white text-zinc-900 pt-16 pb-24">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(sparePartsSchema) }}
@@ -155,17 +163,15 @@ export default function PieseSchimbPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
             />
-            <div className="max-w-7xl mx-auto px-4">
-                {/* Header */}
-                <div className="text-center mb-16 space-y-4">
-                    <h1 className="text-5xl md:text-6xl font-black text-zinc-900 uppercase tracking-tighter">
-                        Piese de <span className="text-ea-green-500">Schimb</span> & Mentenanță
-                    </h1>
-                    <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-                        Piese OEM și aftermarket pentru semănători Kurt ALP, erbicidatoare Bargam, Avers-Agro, Fliegl și utilaje multimarcă — livrare rapidă prin Kramp.
-                    </p>
-                </div>
+            <CategoryHeroBanner
+                categoryTitle="Piese de Schimb & Mentenanță"
+                subtitle={
+                    'Piese OEM și aftermarket pentru semănători Kurt ALP, erbicidatoare Bargam, Avers-Agro, Fliegl și utilaje multimarcă — livrare rapidă prin Kramp.'
+                }
+                videoUrls={pieseHeroVideos}
+            />
 
+            <div className="max-w-7xl mx-auto px-4">
                 {/* Service cards */}
                 <div className="grid lg:grid-cols-3 gap-8 mb-16">
                     <div className="bg-white p-8 rounded-3xl border border-zinc-200 space-y-4 shadow-sm">

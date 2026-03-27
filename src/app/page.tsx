@@ -2,6 +2,8 @@ import { Hero } from '@/components/Hero';
 import { FeaturedMachinery } from '@/components/FeaturedMachinery';
 import { Contact } from '@/components/Contact';
 import { VideoGallery } from '@/components/VideoGallery';
+import { resolveShowcaseVideoUrl } from '@/lib/home-showcase-videos';
+import { HOME_SHOWCASE_LOCAL_FALLBACK, HOME_SHOWCASE_STORAGE } from '@/lib/site-video-paths';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 import { HomeViticultureSeason } from '@/components/HomeViticultureSeason';
@@ -25,9 +27,14 @@ export default async function Home() {
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 3);
 
-    const [catalogProducts, viticultureCatalogHref] = await Promise.all([
+    const [catalogProducts, viticultureCatalogHref, videoSrcAds, videoSrcKse] = await Promise.all([
         getProducts(),
         getViticultureCategoryCatalogPath(),
+        resolveShowcaseVideoUrl(HOME_SHOWCASE_STORAGE.aversAds, HOME_SHOWCASE_LOCAL_FALLBACK.aversAds),
+        resolveShowcaseVideoUrl(
+            HOME_SHOWCASE_STORAGE.flieglKseTeren,
+            HOME_SHOWCASE_LOCAL_FALLBACK.flieglKseTeren
+        ),
     ]);
     const viticolHomePreview = catalogProducts
         .filter(
@@ -82,7 +89,7 @@ export default async function Home() {
 
             <FeaturedMachinery />
 
-            <VideoGallery />
+            <VideoGallery videoSrcAds={videoSrcAds} videoSrcKse={videoSrcKse} />
 
             <Contact variant="homeSplit" />
 
