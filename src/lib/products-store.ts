@@ -98,7 +98,6 @@ export interface DynamicProduct {
     name: string;
     brand: string;
     badge?: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     description: string;
     longDescription?: string;
     imageSrc: string;
@@ -113,7 +112,7 @@ export interface DynamicProduct {
     referenceLinks?: ProductReferenceLink[];
     specs: string[];
     specIcons?: { icon: string; label: string; value: string }[];
-    detailedSpecs: Record<string, Record<string, string>>;
+    detailedSpecs: Record<string, unknown>;
     expertVerdict: string;
     videoUrl?: string;
     /** Opțional: filmare MP4 pentru hero cinematic full-bleed pe pagina de produs */
@@ -189,7 +188,7 @@ export interface Brochure {
     publicUrl: string;
     createdAt: string;
     productSlugs: string[];
-    config: Record<string, any>;
+    config: Record<string, unknown>;
 }
 
 /** Conținut bogat doar pentru broșuri PDF — nu este folosit pe site public */

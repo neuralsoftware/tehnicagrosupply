@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -26,10 +27,12 @@ export function FeaturedProductCard({ product, index }: { product: FeaturedProdu
             className="group relative flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-zinc-200 hover:border-ea-green-500/50 hover:shadow-lg transition-all"
         >
             <div className="aspect-[16/9] overflow-hidden relative shrink-0">
-                <img
+                <Image
                     src={product.imageSrc}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-all duration-700"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-all duration-700"
                 />
                 {product.badge ? (
                     <div className="absolute top-4 left-4">

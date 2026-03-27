@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { DynamicProduct, ProductFeatureBlock } from '@/lib/products-store';
 import { Pencil, Trash2, Plus, X, Save, FileStack, RefreshCw } from 'lucide-react';
@@ -326,9 +327,11 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                 className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-white text-xs font-mono outline-none focus:ring-1 focus:ring-ea-green-500 opacity-70"
                             />
                             {(imageUrl || editing.imageSrc) && (
-                                <img
-                                    src={imageUrl || editing.imageSrc}
+                                <Image
+                                    src={(imageUrl || editing.imageSrc) as string}
                                     alt=""
+                                    width={48}
+                                    height={48}
                                     className="w-12 h-12 rounded-lg object-cover border border-zinc-800"
                                 />
                             )}
@@ -631,9 +634,11 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                                 <td className="px-6 py-5">
                                     {p.imageSrc ? (
                                         <div className="relative group/img">
-                                            <img
+                                            <Image
                                                 src={p.imageSrc}
                                                 alt=""
+                                                width={48}
+                                                height={48}
                                                 className="w-12 h-12 rounded-xl object-cover border border-zinc-800 transition-transform group-hover/img:scale-110"
                                             />
                                             {/public\.blob\.vercel-storage\.com|supabase\.co\/storage\//i.test(

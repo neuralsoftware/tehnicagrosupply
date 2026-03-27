@@ -2,29 +2,28 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-/** Poster ușor (~13KB) — gradient verde/slate; LCP până pornește MP4-ul */
 const HERO_VIDEO_POSTER = '/images/category-hero-video-poster.jpg';
 
 export interface CategoryHeroBannerProps {
     categoryTitle: string;
     subtitle: string;
-    /** Listă MP4 (gol = hero static gradient) */
     videoUrls: string[];
 }
 
-export function CategoryHeroBanner({ categoryTitle, subtitle, videoUrls }: CategoryHeroBannerProps) {
-    const hasVideo = videoUrls.length > 0;
+function CategoryHeroBannerVideos({
+    categoryTitle,
+    subtitle,
+    videoUrls,
+}: {
+    categoryTitle: string;
+    subtitle: string;
+    videoUrls: string[];
+}) {
     const multi = videoUrls.length > 1;
     const [activeIndex, setActiveIndex] = useState(0);
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-    const urlsKey = videoUrls.join('\0');
 
     useEffect(() => {
-        setActiveIndex(0);
-    }, [urlsKey]);
-
-    useEffect(() => {
-        if (!hasVideo) return;
         const refs = videoRefs.current;
         videoUrls.forEach((_, i) => {
             const el = refs[i];
@@ -41,32 +40,7 @@ export function CategoryHeroBanner({ categoryTitle, subtitle, videoUrls }: Categ
                 }
             }
         });
-    }, [activeIndex, hasVideo, multi, urlsKey]);
-
-    if (!hasVideo) {
-        return (
-            <div className="relative mb-12 h-[250px] w-full overflow-hidden md:h-[350px]">
-                <div
-                    className="absolute inset-0 z-0 bg-gradient-to-br from-slate-900 via-green-950 to-slate-900"
-                    aria-hidden
-                />
-                <div
-                    className="pointer-events-none absolute inset-0 z-[1] opacity-40"
-                    style={{
-                        backgroundImage:
-                            'radial-gradient(circle at 75% 25%, rgba(34,197,94,0.12), transparent 42%), radial-gradient(circle at 25% 75%, rgba(15,118,110,0.1), transparent 45%)',
-                    }}
-                    aria-hidden
-                />
-                <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center">
-                    <h1 className="normal-case text-3xl font-semibold tracking-tight text-white drop-shadow-lg md:text-4xl">
-                        {categoryTitle}
-                    </h1>
-                    <p className="mt-3 max-w-3xl text-sm text-gray-100 drop-shadow-md md:text-base">{subtitle}</p>
-                </div>
-            </div>
-        );
-    }
+    }, [activeIndex, multi, videoUrls]);
 
     return (
         <div className="relative mb-12 h-[250px] w-full overflow-hidden md:h-[350px]">
@@ -102,5 +76,39 @@ export function CategoryHeroBanner({ categoryTitle, subtitle, videoUrls }: Categ
                 <p className="mt-3 max-w-3xl text-sm text-gray-100 drop-shadow-md md:text-base">{subtitle}</p>
             </div>
         </div>
+    );
+}
+
+export function CategoryHeroBanner({ categoryTitle, subtitle, videoUrls }: CategoryHeroBannerProps) {
+    const hasVideo = videoUrls.length > 0;
+    const urlsKey = videoUrls.join('\0');
+
+    if (!hasVideo) {
+        return (
+            <div className="relative mb-12 h-[250px] w-full overflow-hidden md:h-[350px]">
+                <div
+                    className="absolute inset-0 z-0 bg-gradient-to-br from-slate-900 via-green-950 to-slate-900"
+                    aria-hidden
+                />
+                <div
+                    className="pointer-events-none absolute inset-0 z-[1] opacity-40"
+                    style={{
+                        backgroundImage:
+                            'radial-gradient(circle at 75% 25%, rgba(34,197,94,0.12), transparent 42%), radial-gradient(circle at 25% 75%, rgba(15,118,110,0.1), transparent 45%)',
+                    }}
+                    aria-hidden
+                />
+                <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center">
+                    <h1 className="normal-case text-3xl font-semibold tracking-tight text-white drop-shadow-lg md:text-4xl">
+                        {categoryTitle}
+                    </h1>
+                    <p className="mt-3 max-w-3xl text-sm text-gray-100 drop-shadow-md md:text-base">{subtitle}</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <CategoryHeroBannerVideos key={urlsKey} categoryTitle={categoryTitle} subtitle={subtitle} videoUrls={videoUrls} />
     );
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { saveCategory, deleteCategory, getProducts, getCategories, Category } from '@/lib/products-store';
+import { saveCategory, deleteCategory, getProducts, Category } from '@/lib/products-store';
 
 function isAuthenticated(request: Request): boolean {
     const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
@@ -16,7 +16,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
         const updates: Category = await request.json();
         await saveCategory({ ...updates, slug });
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Failed to update category' }, { status: 500 });
     }
 }
@@ -38,7 +38,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
         }
         await deleteCategory(slug);
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
     }
 }

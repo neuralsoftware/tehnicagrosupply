@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import { Zap, ShieldCheck, Target, Rocket, CheckCircle2, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 
 export function ExpertAuthority() {
     const advantages = [

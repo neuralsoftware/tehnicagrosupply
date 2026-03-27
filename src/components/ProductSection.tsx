@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Check, Info, FileText } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { TechSpecsModal } from './TechSpecsModal';
 import { CONTACT_SECTION_ID, scrollToIdSmooth } from '@/lib/scroll-to-anchor';
@@ -15,7 +16,7 @@ interface ProductProps {
     reversed?: boolean;
     id?: string;
     badge?: string;
-    detailedSpecs?: any;
+    detailedSpecs?: Record<string, unknown>;
     expertVerdict?: string;
 }
 
@@ -32,6 +33,7 @@ export function ProductSection({
     expertVerdict,
 }: ProductProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [heroImageOk, setHeroImageOk] = useState(true);
 
     return (
         <section id={id} className="pt-12 pb-24 md:pt-14 bg-zinc-50 text-zinc-900 overflow-hidden relative">
@@ -44,8 +46,8 @@ export function ProductSection({
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, amount: 0.5 }}
                         onViewportEnter={() => {
-                            if (typeof window !== 'undefined' && (window as any).fbq) {
-                                (window as any).fbq('track', 'ViewContent', {
+                            if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+                                window.fbq('track', 'ViewContent', {
                                     content_name: title,
                                     content_category: 'Agricultural Machinery',
                                     content_ids: [id || title.replace(/\s/g, '_')],
@@ -68,17 +70,20 @@ export function ProductSection({
                             </div>
 
                             <div className="w-full h-full relative">
-                                <img
-                                    src={imageSrc}
-                                    alt={`${title} - Utilaje Agricole TehnicAgro Supply`}
-                                    title={`${title} - Soluții No-Till & GAEC 6`}
-                                    className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-500"
-                                    onError={(e) => {
-                                        e.currentTarget.style.display = 'none';
-                                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                                    }}
-                                />
-                                <div className="hidden absolute inset-0 flex flex-col items-center justify-center text-zinc-600 bg-zinc-800">
+                                {heroImageOk ? (
+                                    <Image
+                                        src={imageSrc}
+                                        alt={`${title} - Utilaje Agricole TehnicAgro Supply`}
+                                        title={`${title} - Soluții No-Till & GAEC 6`}
+                                        fill
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
+                                        className="object-cover opacity-90 hover:opacity-100 transition-opacity duration-500"
+                                        onError={() => setHeroImageOk(false)}
+                                    />
+                                ) : null}
+                                <div
+                                    className={`${heroImageOk ? 'hidden' : 'flex'} absolute inset-0 flex-col items-center justify-center text-zinc-600 bg-zinc-800`}
+                                >
                                     <div className="w-20 h-20 bg-zinc-700/50 rounded-full flex items-center justify-center mb-4">
                                         <Info className="w-8 h-8 opacity-50" />
                                     </div>
@@ -135,8 +140,8 @@ export function ProductSection({
                                 type="button"
                                 onClick={() => {
                                     scrollToIdSmooth(CONTACT_SECTION_ID);
-                                    if (typeof window !== 'undefined' && (window as any).fbq) {
-                                        (window as any).fbq('track', 'InitiateCheckout', {
+                                    if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+                                        window.fbq('track', 'InitiateCheckout', {
                                             content_name: title,
                                             content_category: 'Agricultural Machinery',
                                         });

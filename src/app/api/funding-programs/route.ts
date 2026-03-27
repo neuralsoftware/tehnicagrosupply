@@ -25,7 +25,7 @@ export async function GET() {
             }));
         }
         return NextResponse.json({ programs: merged });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Failed to fetch programs' }, { status: 500 });
     }
 }
@@ -44,7 +44,7 @@ export async function PUT(request: Request) {
             'application/json'
         );
         return NextResponse.json({ success: true });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Failed to update program' }, { status: 500 });
     }
 }

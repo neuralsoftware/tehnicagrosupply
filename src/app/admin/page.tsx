@@ -65,16 +65,18 @@ export default function AdminPage() {
     };
 
     useEffect(() => {
-        const auth = localStorage.getItem('admin_auth');
-        const pass = localStorage.getItem('admin_pass') || '';
-        if (auth === 'true') {
-            setIsAuthenticated(true);
-            setAdminAuth(pass);
-            fetchProducts();
-        }
-        setCheckingAuth(false);
+        const bootstrap = () => {
+            const auth = localStorage.getItem('admin_auth');
+            const pass = localStorage.getItem('admin_pass') || '';
+            if (auth === 'true') {
+                setIsAuthenticated(true);
+                setAdminAuth(pass);
+                fetchProducts();
+            }
+            setCheckingAuth(false);
+        };
+        bootstrap();
 
-        // Reîmprospătează lista de produse când revii pe tab-ul browserului — fără remount (nu pierzi formularele).
         const onVisibility = () => {
             if (document.visibilityState === 'visible') fetchProducts();
         };

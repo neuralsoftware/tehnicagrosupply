@@ -1,8 +1,9 @@
 import { getPublishedPosts, resolveBlogPostImage } from '@/data/blog';
 import { notFound } from 'next/navigation';
 import { Contact } from '@/components/Contact';
-import { ChevronLeft, Calendar, User, Tag } from 'lucide-react';
+import { ChevronLeft, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Metadata } from 'next';
 
 // ISR: revalidează la fiecare 1 oră — articolele apar automat la data programată.
@@ -109,11 +110,14 @@ export default async function BlogPostPage({ params }: PageProps) {
                 </header>
 
                 {/* Featured Image */}
-                <div className="aspect-video bg-zinc-100 rounded-3xl overflow-hidden mb-12 border border-zinc-200">
-                    <img
+                <div className="aspect-video bg-zinc-100 rounded-3xl overflow-hidden mb-12 border border-zinc-200 relative">
+                    <Image
                         src={resolveBlogPostImage(post)}
                         alt={post.title}
-                        className="w-full h-full object-cover opacity-80"
+                        fill
+                        sizes="(max-width: 896px) 100vw, 896px"
+                        className="object-cover opacity-80"
+                        priority
                     />
                 </div>
 

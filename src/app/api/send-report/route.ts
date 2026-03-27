@@ -29,8 +29,6 @@ export async function POST(request: Request) {
             },
         });
 
-        const cropsList = lead.crops?.join(', ') || 'Nespecificat';
-
         const mailOptions = {
             from: `"TehnicAgro Expert" <${process.env.NODEMAILER_USER}>`,
             replyTo: process.env.NODEMAILER_USER,

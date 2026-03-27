@@ -18,7 +18,7 @@ import {
     normalizeLegacyProductSlug,
 } from '@/lib/products-store';
 import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps, Image, Font } from '@react-pdf/renderer';
-import { FUNDING_PROGRAMS } from '@/data/funding-programs';
+import { FUNDING_PROGRAMS, type FundingProgram } from '@/data/funding-programs';
 import { CATEGORIES as CATEGORY_LABELS } from '@/data/products';
 import {
     PDF_COMPANY,
@@ -1158,11 +1158,6 @@ function renderUnifiedTechnicalSpecs(product: DynamicProduct): React.ReactElemen
     return React.createElement(View, { style: styles.unifiedSpecsBox }, ...parts);
 }
 
-function pdfCatalogLogoUrl(): string {
-    const absolute = resolvePublicUrl('/logos/tehnicagro-supply-logo-catalog.png');
-    return `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=png&w=320`;
-}
-
 /** Logo încorporat ca data-URI — evită eșecul încărcării în react-pdf pe server */
 export function loadCatalogLogoDataUri(): string | undefined {
     try {
@@ -1172,11 +1167,6 @@ export function loadCatalogLogoDataUri(): string | undefined {
     } catch {
         return undefined;
     }
-}
-
-function pdfCatalogLogoSrc(config: { logoDataUri?: string }): string {
-    if (config.logoDataUri && config.logoDataUri.startsWith('data:')) return config.logoDataUri;
-    return pdfCatalogLogoUrl();
 }
 
 /** Textul titlului fără prefix de marcă (pentru parsare denumire / cod). */
@@ -1640,7 +1630,19 @@ function buildMultiProductCatalogCover(
     });
 }
 
-function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Category[]): React.ReactElement<DocumentProps> {
+interface BrochurePdfConfig {
+    title?: string;
+    subtitle?: string;
+    phone?: string;
+    email?: string;
+    logoDataUri?: string;
+}
+
+function buildPDF(
+    config: BrochurePdfConfig,
+    products: DynamicProduct[],
+    categoriesFromDb: Category[]
+): React.ReactElement<DocumentProps> {
     const productsToDisplay = products || [];
     let currentPage = 1;
 
@@ -1683,8 +1685,12 @@ function buildPDF(config: any, products: DynamicProduct[], categoriesFromDb: Cat
 
             // 2. Produse: paginare controlată, simetrică
             const productPages = catProducts.flatMap((product, idx) => {
-                const progList = (product?.category && (FUNDING_PROGRAMS as any)[product.category]) || [];
-                const activePrograms = Array.isArray(progList) ? progList.filter((p: any) => p.status === 'active').slice(0, 1) : [];
+                const catKey = product?.category;
+                const progList: FundingProgram[] =
+                    catKey && Object.prototype.hasOwnProperty.call(FUNDING_PROGRAMS, catKey)
+                        ? FUNDING_PROGRAMS[catKey]
+                        : [];
+                const activePrograms = progList.filter((p) => p.status === 'active').slice(0, 1);
 
                 const descText = getProfessionalProductLead(product);
                 const secTitle = categoryDisplayName(catName, categoriesFromDb);
@@ -1930,13 +1936,18 @@ export async function POST(request: Request) {
         await saveBrochure(data);
 
         return NextResponse.json({ success: true, brochure: { ...data, downloadUrl: publicUrl } });
-    } catch (err: any) {
-        console.error('CRITICAL API ERROR in /api/materiale:', err.stack || err);
-        return NextResponse.json({ 
-            error: 'Failed to generate brochure', 
-            details: err?.message, 
-            stack: process.env.NODE_ENV === 'development' ? err?.stack : undefined 
-        }, { status: 500 });
+    } catch (err: unknown) {
+        console.error('CRITICAL API ERROR in /api/materiale:', err instanceof Error ? err.stack || err : err);
+        const message = err instanceof Error ? err.message : String(err);
+        const stack = err instanceof Error ? err.stack : undefined;
+        return NextResponse.json(
+            {
+                error: 'Failed to generate brochure',
+                details: message,
+                stack: process.env.NODE_ENV === 'development' ? stack : undefined,
+            },
+            { status: 500 }
+        );
     }
 }
 
@@ -1951,8 +1962,8 @@ export async function GET() {
                 },
             }
         );
-    } catch (err: any) {
-        console.error('GET error:', err.stack || err);
+    } catch (err: unknown) {
+        console.error('GET error:', err instanceof Error ? err.stack || err : err);
         return NextResponse.json({ error: 'Failed to fetch brochures' }, { status: 500 });
     }
 }

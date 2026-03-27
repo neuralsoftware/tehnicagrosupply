@@ -35,10 +35,10 @@ export function VideoShowcase({
             } else {
                 video.play();
                 // Track Video Play
-                if (typeof window !== 'undefined' && (window as any).fbq) {
-                    (window as any).fbq('trackCustom', 'VideoPlay', {
+                if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+                    window.fbq('trackCustom', 'VideoPlay', {
                         content_name: title,
-                        video_title: title
+                        video_title: title,
                     });
                 }
             }

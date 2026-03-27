@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, Banknote, Droplets, Download, Send, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone, Scale } from 'lucide-react';
+import { Calculator, Banknote, Droplets, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone, Scale } from 'lucide-react';
 
 const COUNTIES = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila', 'București',
@@ -75,7 +75,6 @@ export function RoiCalculator({
     const inputSavings = hectares * INPUT_COST_PER_HA_RON * OVERLAP_REDUCTION_PERCENT;
 
     const totalBenefit = subsidyIncome + fuelSavings + inputSavings;
-    const monthlyBenefit = totalBenefit / 12;
 
     const toggleCrop = (crop: string) => {
         setSelectedCrops(prev =>

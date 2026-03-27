@@ -26,7 +26,25 @@ export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
         setLoaded(true);
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => {
+        let cancelled = false;
+        void (async () => {
+            try {
+                const res = await fetch('/api/categories', { cache: 'no-store' });
+                const data = await res.json();
+                if (cancelled) return;
+                const cats = data.categories || [];
+                setCategories(cats);
+                onCategoriesChange(cats);
+                setLoaded(true);
+            } catch {
+                if (!cancelled) setLoaded(true);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [onCategoriesChange]);
 
     const save = async () => {
         if (!editing?.slug || !editing?.name) return;

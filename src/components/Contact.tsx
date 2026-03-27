@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useState, useRef } from 'react';
 
 const JUDETE = [
@@ -53,22 +54,19 @@ export function Contact({
         isFetchingRef.current = true;
         setIsSubmitting(true);
 
-        // Dual Tracking: GA4 + Facebook Pixel
         if (typeof window !== 'undefined') {
-            // GA4 Lead Event
-            if ((window as any).gtag) {
-                (window as any).gtag('event', 'generate_lead', {
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'generate_lead', {
                     event_category: 'Contact',
                     event_label: 'General Inquiry',
-                    transport_type: 'beacon'
+                    transport_type: 'beacon',
                 });
             }
 
-            // Facebook Pixel Lead Event
-            if ((window as any).fbq) {
-                (window as any).fbq('track', 'Lead', {
+            if (typeof window.fbq === 'function') {
+                window.fbq('track', 'Lead', {
                     content_name: 'General Contact Form',
-                    content_category: 'Lead Generation'
+                    content_category: 'Lead Generation',
                 });
             }
         }
@@ -152,24 +150,32 @@ export function Contact({
                             <div>
                                 <p className="text-xs font-medium text-zinc-500">Producători reprezentați</p>
                                 <div className="mt-4 flex flex-wrap items-center gap-6 md:gap-8">
-                                    <img
+                                    <Image
                                         src="/logos/brands/avers-agro.png"
                                         alt="Avers-Agro"
-                                        className="h-10 object-contain opacity-80 transition-opacity hover:opacity-100 md:h-11"
+                                        width={200}
+                                        height={48}
+                                        className="h-10 w-auto object-contain opacity-80 transition-opacity hover:opacity-100 md:h-11"
                                     />
-                                    <img
+                                    <Image
                                         src="/logos/brands/fliegl.svg"
                                         alt="Fliegl"
-                                        className="h-8 object-contain opacity-80 transition-opacity hover:opacity-100 md:h-9"
+                                        width={160}
+                                        height={40}
+                                        className="h-8 w-auto object-contain opacity-80 transition-opacity hover:opacity-100 md:h-9"
                                     />
-                                    <img
+                                    <Image
                                         src="/logos/brands/k-factor.webp"
                                         alt="K-Factor"
-                                        className="h-8 object-contain brightness-0 opacity-70 transition-opacity hover:opacity-100 md:h-9"
+                                        width={160}
+                                        height={40}
+                                        className="h-8 w-auto object-contain brightness-0 opacity-70 transition-opacity hover:opacity-100 md:h-9"
                                     />
-                                    <img
+                                    <Image
                                         src="/logos/brands/provitis.svg"
                                         alt="Provitis"
+                                        width={180}
+                                        height={48}
                                         className="h-9 w-auto object-contain object-left opacity-80 transition-opacity hover:opacity-100 md:h-10"
                                     />
                                 </div>

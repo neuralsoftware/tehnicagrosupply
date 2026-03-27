@@ -1,37 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
 export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    const consent = localStorage.getItem('cookie_consent');
-    if (!consent) {
-      setIsVisible(true);
-    } else if (consent === 'granted') {
-      updateConsent(true);
-      window.dispatchEvent(new Event('tehnicagro-cookie-consent'));
-    }
-
-    // Ascultăm comanda de redeschidere din Footer
-    const handleOpenSettings = () => setIsVisible(true);
-    window.addEventListener('openCookieSettings', handleOpenSettings);
-    
-    return () => window.removeEventListener('openCookieSettings', handleOpenSettings);
-  }, []);
-
-  const updateConsent = (granted: boolean) => {
-    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
-      (window as any).gtag('consent', 'update', {
-        'analytics_storage': granted ? 'granted' : 'denied',
-        'ad_storage': granted ? 'granted' : 'denied',
-        'ad_user_data': granted ? 'granted' : 'denied',
-        'ad_personalization': granted ? 'granted' : 'denied',
+  const updateConsent = useCallback((granted: boolean) => {
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', {
+        analytics_storage: granted ? 'granted' : 'denied',
+        ad_storage: granted ? 'granted' : 'denied',
+        ad_user_data: granted ? 'granted' : 'denied',
+        ad_personalization: granted ? 'granted' : 'denied',
       });
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      const consent = localStorage.getItem('cookie_consent');
+      if (!consent) {
+        setIsVisible(true);
+      } else if (consent === 'granted') {
+        updateConsent(true);
+        window.dispatchEvent(new Event('tehnicagro-cookie-consent'));
+      }
+    });
+
+    const handleOpenSettings = () => setIsVisible(true);
+    window.addEventListener('openCookieSettings', handleOpenSettings);
+
+    return () => window.removeEventListener('openCookieSettings', handleOpenSettings);
+  }, [updateConsent]);
 
   const handleAccept = () => {
     localStorage.setItem('cookie_consent', 'granted');

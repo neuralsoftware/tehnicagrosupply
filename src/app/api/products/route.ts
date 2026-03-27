@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getProducts, saveProduct, DynamicProduct } from '@/lib/products-store';
 
-function isAuthenticated(request: Request): boolean {
-    const auth = request.headers.get('x-admin-auth');
-    return auth === process.env.ADMIN_PASSWORD;
-}
-
 export async function GET() {
     try {
         const products = await getProducts();
@@ -17,7 +12,7 @@ export async function GET() {
                 },
             }
         );
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
 }

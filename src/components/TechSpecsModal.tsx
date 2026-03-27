@@ -5,11 +5,15 @@ import { X, FileText, CheckCircle2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { CONTACT_SECTION_ID, onHashLinkClickSmooth } from '@/lib/scroll-to-anchor';
 
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+    return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
 interface TechSpecsModalProps {
     isOpen: boolean;
     onClose: () => void;
     productName: string;
-    specs: Record<string, any>;
+    specs: Record<string, unknown>;
 }
 
 export function TechSpecsModal({ isOpen, onClose, productName, specs }: TechSpecsModalProps) {
@@ -61,62 +65,70 @@ export function TechSpecsModal({ isOpen, onClose, productName, specs }: TechSpec
                     <div className="p-6 overflow-y-auto space-y-8">
 
                         {/* Dynamic Rendering of Specs */}
-                        {Object.entries(specs).map(([category, items], idx) => (
-                            <div key={idx} className="space-y-4">
-                                <h3 className="text-lg font-bold text-zinc-900 border-l-4 border-ea-green-600 pl-4 uppercase">
-                                    {category.replace(/_/g, ' ')}
-                                </h3>
+                        {Object.entries(specs).map(([category, itemsRaw], idx) => {
+                            const items = itemsRaw as unknown;
+                            const title = category.replace(/_/g, ' ');
+                            return (
+                                <div key={idx} className="space-y-4">
+                                    <h3 className="text-lg font-bold text-zinc-900 border-l-4 border-ea-green-600 pl-4 uppercase">
+                                        {title}
+                                    </h3>
 
-                                {Array.isArray(items) ? (
-                                    // Render List or Comparison Table if array of objects
-                                    Array.isArray(items) && typeof items[0] === 'object' ? (
+                                    {Array.isArray(items) && items.length > 0 && isPlainObject(items[0]) ? (
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-sm text-left text-zinc-700">
                                                 <thead className="text-xs text-zinc-500 uppercase bg-zinc-50">
                                                     <tr>
-                                                        {Object.keys(items[0]).map((header) => (
-                                                            <th key={header} className="px-4 py-3 rounded-t-lg">{header.replace(/_/g, ' ')}</th>
+                                                        {Object.keys(items[0] as Record<string, unknown>).map((header) => (
+                                                            <th key={header} className="px-4 py-3 rounded-t-lg">
+                                                                {header.replace(/_/g, ' ')}
+                                                            </th>
                                                         ))}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {items.map((row: any, i: number) => (
+                                                    {(items as Record<string, unknown>[]).map((row, i: number) => (
                                                         <tr key={i} className="border-b border-zinc-100 hover:bg-zinc-50">
-                                                            {Object.values(row).map((val: any, j: number) => (
-                                                                <td key={j} className="px-4 py-3 font-medium text-zinc-900">{val}</td>
+                                                            {Object.values(row).map((val, j: number) => (
+                                                                <td key={j} className="px-4 py-3 font-medium text-zinc-900">
+                                                                    {String(val ?? '')}
+                                                                </td>
                                                             ))}
                                                         </tr>
                                                     ))}
                                                 </tbody>
                                             </table>
                                         </div>
-                                    ) : (
+                                    ) : Array.isArray(items) && items.every((x) => typeof x === 'string') ? (
                                         <ul className="grid sm:grid-cols-2 gap-3">
-                                            {items.map((item: string, i: number) => (
-                                                <li key={i} className="flex items-start gap-2 text-zinc-700 text-sm bg-zinc-50 p-3 rounded border border-zinc-200">
+                                            {(items as string[]).map((item, i: number) => (
+                                                <li
+                                                    key={i}
+                                                    className="flex items-start gap-2 text-zinc-700 text-sm bg-zinc-50 p-3 rounded border border-zinc-200"
+                                                >
                                                     <CheckCircle2 className="w-4 h-4 text-ea-green-600 mt-0.5 shrink-0" />
                                                     <span>{item}</span>
                                                 </li>
                                             ))}
                                         </ul>
-                                    )
-                                ) : (
-                                    // Render Key-Value Object
-                                    <div className="grid sm:grid-cols-2 gap-4">
-                                        {Object.entries(items).map(([key, value]) => (
-                                            <div key={key} className="bg-zinc-50 p-4 rounded-lg border border-zinc-200 flex flex-col">
-                                                <span className="text-xs text-zinc-400 uppercase tracking-wide mb-1 flex items-center gap-1">
-                                                    {key.replace(/_/g, ' ')}
-                                                </span>
-                                                <span className="text-zinc-900 font-medium break-words">
-                                                    {String(value)}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                                    ) : isPlainObject(items) ? (
+                                        <div className="grid sm:grid-cols-2 gap-4">
+                                            {Object.entries(items).map(([key, value]) => (
+                                                <div
+                                                    key={key}
+                                                    className="bg-zinc-50 p-4 rounded-lg border border-zinc-200 flex flex-col"
+                                                >
+                                                    <span className="text-xs text-zinc-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                                                        {key.replace(/_/g, ' ')}
+                                                    </span>
+                                                    <span className="text-zinc-900 font-medium break-words">{String(value)}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : null}
+                                </div>
+                            );
+                        })}
 
                         {/* Legal / Data Disclaimer */}
                         <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">

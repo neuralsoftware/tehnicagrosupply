@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { BLOG_POST_IMAGE_FALLBACK, type BlogPost } from '@/data/blog';
 import { ArrowRight, BookOpen } from 'lucide-react';
@@ -24,12 +25,13 @@ function PostCoverImage({ imageSrc, href }: { imageSrc?: string | null; href: st
     const [src, setSrc] = useState(initial);
 
     return (
-        <Link href={href} className="block aspect-[16/10] overflow-hidden bg-zinc-100">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+        <Link href={href} className="block aspect-[16/10] overflow-hidden bg-zinc-100 relative">
+            <Image
                 src={src}
                 alt=""
-                className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover group-hover:scale-[1.03] transition-transform duration-500"
                 onError={() => setSrc(BLOG_POST_IMAGE_FALLBACK)}
             />
         </Link>

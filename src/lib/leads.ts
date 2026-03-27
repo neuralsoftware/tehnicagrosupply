@@ -170,7 +170,10 @@ export const LeadsService = {
 
     async updateLead(id: string, updates: Partial<Lead>) {
         // Map Lead interface fields to Supabase column names
-        const supabaseUpdates: any = {};
+        const supabaseUpdates: Record<
+            string,
+            string | number | boolean | null | undefined | string[]
+        > = {};
         if (updates.name !== undefined) supabaseUpdates.name = updates.name;
         if (updates.phone !== undefined) supabaseUpdates.phone = updates.phone;
         if (updates.email !== undefined) supabaseUpdates.email = updates.email;

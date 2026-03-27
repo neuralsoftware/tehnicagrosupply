@@ -53,7 +53,7 @@ export default function PrivacyPolicy() {
           <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
             <li><strong>Dreptul de acces:</strong> de a afla ce date prelucrăm despre dvs.</li>
             <li><strong>Dreptul la rectificare:</strong> de a corecta datele inexacte.</li>
-            <li><strong>Dreptul la ștergere:</strong> ("dreptul de a fi uitat") al datelor dumneavoastră.</li>
+            <li><strong>Dreptul la ștergere:</strong> (&quot;dreptul de a fi uitat&quot;) al datelor dumneavoastră.</li>
             <li><strong>Dreptul la restricționarea prelucrării</strong> și <strong>Dreptul la portabilitate</strong>.</li>
             <li><strong>Dreptul de a depune o plângere</strong> la autoritatea de supraveghere (ANSPDCP - www.dataprotection.ro).</li>
           </ul>

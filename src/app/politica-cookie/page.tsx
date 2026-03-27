@@ -24,7 +24,7 @@ export default function CookiePolicy() {
           <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">2. Ce tipuri de cookie-uri folosim?</h2>
           <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
             <li><strong>Cookie-uri strict necesare:</strong> Acestea sunt esențiale pentru funcționarea site-ului și nu pot fi oprite în sistemele noastre. De obicei, sunt setate doar ca răspuns la acțiunile pe care le faceți, cum ar fi setarea preferințelor de confidențialitate (cookie-ul <code>cookie_consent</code>).</li>
-            <li><strong>Cookie-uri de analiză (Google Analytics):</strong> Ne permit să numărăm vizitele și sursele de trafic, astfel încât să putem măsura și îmbunătăți performanța site-ului nostru. Acestea colectează informații în mod agregat și anonim. Acestea sunt activate doar dacă apăsați butonul "Accept Toate".</li>
+            <li><strong>Cookie-uri de analiză (Google Analytics):</strong> Ne permit să numărăm vizitele și sursele de trafic, astfel încât să putem măsura și îmbunătăți performanța site-ului nostru. Acestea colectează informații în mod agregat și anonim. Acestea sunt activate doar dacă apăsați butonul &quot;Accept Toate&quot;.</li>
             <li><strong>Cookie-uri de marketing:</strong> Pot fi setate prin intermediul site-ului nostru de către partenerii noștri de publicitate pentru a vă construi un profil al intereselor și a vă afișa reclame relevante pe alte site-uri.</li>
           </ul>
 

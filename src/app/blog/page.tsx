@@ -1,5 +1,6 @@
 import { getPublishedPosts, resolveBlogPostImage } from '@/data/blog';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Metadata } from 'next';
 
@@ -47,10 +48,12 @@ export default async function BlogPage({ searchParams }: PageProps) {
                             className="group bg-white rounded-3xl overflow-hidden border border-zinc-200 hover:border-ea-green-300 transition-all flex flex-col shadow-sm hover:shadow-lg"
                         >
                             <div className="aspect-[16/9] overflow-hidden relative">
-                                <img
+                                <Image
                                     src={resolveBlogPostImage(post)}
                                     alt={post.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                                    fill
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
                                 />
                                 <div className="absolute top-4 left-4">
                                     <span className="bg-ea-green-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">

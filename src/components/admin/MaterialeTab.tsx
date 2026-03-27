@@ -141,7 +141,6 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
         setGeneratingDeepDive(true);
         try {
             const cleanToken = (adminAuth || '').trim();
-            const prod = allProducts.find((p) => p.slug === slug);
             const res = await fetch('/api/materiale/single', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

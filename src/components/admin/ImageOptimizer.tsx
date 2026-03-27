@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useCallback, useRef } from 'react';
 import { Check, Upload } from 'lucide-react';
 
@@ -222,8 +223,15 @@ export function ImageOptimizer({
                             {optimizedSize > 0 ? `Optimizat: ${(optimizedSize / 1024).toFixed(1)} KB` : ''}
                         </span>
                     </div>
-                    <div className="relative rounded-lg overflow-hidden border border-zinc-800 group">
-                        <img src={preview} alt="previzualizare" className="w-full h-32 object-cover transition-all group-hover:scale-105" />
+                    <div className="relative rounded-lg overflow-hidden border border-zinc-800 group h-32">
+                        <Image
+                            src={preview}
+                            alt="previzualizare"
+                            fill
+                            unoptimized
+                            className="object-cover transition-all group-hover:scale-105"
+                            sizes="100vw"
+                        />
                         {uploading && (
                             <div className="absolute inset-0 bg-zinc-950/80 flex items-center justify-center gap-2">
                                 <div className="w-4 h-4 border-2 border-ea-green-500 border-t-transparent rounded-full animate-spin" />

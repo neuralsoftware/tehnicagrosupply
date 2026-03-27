@@ -33,19 +33,17 @@ export function WhatsAppButton() {
     const openWhatsApp = (customMessage?: string) => {
         // Dual Tracking: GA4 + Facebook Pixel
         if (typeof window !== 'undefined') {
-            // GA4 Contact Event
-            if ((window as any).gtag) {
-                (window as any).gtag('event', 'contact', {
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'contact', {
                     method: 'whatsapp',
                     event_category: 'Contact',
-                    event_label: customMessage ? 'Quick Message' : 'Direct Message'
+                    event_label: customMessage ? 'Quick Message' : 'Direct Message',
                 });
             }
 
-            // Facebook Pixel Contact Event
-            if ((window as any).fbq) {
-                (window as any).fbq('track', 'Contact', {
-                    content_name: 'WhatsApp Button'
+            if (typeof window.fbq === 'function') {
+                window.fbq('track', 'Contact', {
+                    content_name: 'WhatsApp Button',
                 });
             }
         }

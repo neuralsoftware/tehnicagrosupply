@@ -22,7 +22,8 @@ export interface Product {
     referenceLinks?: { label: string; url: string }[];
     specs: string[];
     specIcons?: { icon: string; label: string; value: string }[]; // 3 specs cu iconițe
-    detailedSpecs: any;
+    /** Secțiuni: obiecte tip cheie→valoare, liste de șiruri sau tabele (array de rânduri). */
+    detailedSpecs: Record<string, unknown>;
     expertVerdict: string;
     videoUrl?: string;              // URL YouTube/Vimeo embed
     /** URL MP4 (https… sau cale `video/…` în bucket Supabase tehnicagro) — hero full-bleed pe pagina de produs */

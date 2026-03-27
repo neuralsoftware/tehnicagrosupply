@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import { DynamicProduct, ProductBrochureProfile } from '@/lib/products-store';
 import { ImageOptimizer } from './ImageOptimizer';
 import {
     Save,
     Sparkles,
     Loader,
-    Link2,
     Plus,
     BookOpen,
     ChevronLeft,
@@ -51,7 +51,7 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
     const [importPreview, setImportPreview] = useState<ImportPreviewResult | null>(null);
     const [useAiImport, setUseAiImport] = useState(false);
 
-    const loadProfiles = async () => {
+    const loadProfiles = useCallback(async () => {
         const res = await fetch(`/api/brochure-profiles?_=${Date.now()}`, {
             headers: { 'x-admin-auth': adminAuth },
             cache: 'no-store',
@@ -60,11 +60,11 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
         const data = await res.json();
         setProfiles(data.profiles || {});
         setLoaded(true);
-    };
+    }, [adminAuth]);
 
     useEffect(() => {
-        loadProfiles();
-    }, [adminAuth]);
+        void loadProfiles();
+    }, [loadProfiles]);
 
     const productsSorted = useMemo(
         () =>
@@ -276,9 +276,11 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
                                 {(draft.gallery || []).map((gurl, gi) => (
                                     <div key={`${gurl}-${gi}`} className="flex flex-col items-center gap-1 group/thumb">
                                         <div className="relative">
-                                            <img
+                                            <Image
                                                 src={gurl}
                                                 alt=""
+                                                width={96}
+                                                height={96}
                                                 className="w-24 h-24 rounded-xl object-cover border border-zinc-800"
                                             />
                                             <button

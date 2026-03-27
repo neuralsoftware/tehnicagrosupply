@@ -13,6 +13,7 @@ import {
 } from '@/lib/category-hero-videos';
 import { getCategoryBannerMp4PublicUrl } from '@/lib/category-storage-banner';
 import { CategoryHeroBanner } from '@/components/CategoryHeroBanner';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -170,11 +171,13 @@ export default async function CategoryPage({ params }: PageProps) {
                                 key={product.id}
                                 className="bg-white rounded-3xl overflow-hidden border border-zinc-200 flex flex-col md:flex-row group shadow-sm hover:shadow-lg transition-all"
                             >
-                                <div className="md:w-2/5 aspect-[4/5] md:aspect-auto relative overflow-hidden">
-                                    <img
+                                <div className="md:w-2/5 aspect-[4/5] md:aspect-auto relative overflow-hidden md:min-h-[280px]">
+                                    <Image
                                         src={product.imageSrc}
                                         alt={product.name}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 280px"
+                                        className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
                                     />
                                     {product.badge && (
                                         <div className="absolute top-4 left-4">

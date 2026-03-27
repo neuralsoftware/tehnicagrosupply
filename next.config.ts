@@ -1,20 +1,40 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import path from 'path';
+import { fileURLToPath } from 'url';
+import type { NextConfig } from 'next';
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
+
+const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'wsrv.nl',
+        pathname: '/**',
+      },
+    ],
   },
   experimental: {
     optimizeCss: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
+  turbopack: {
+    root: projectRoot,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
-  // Redirect pentru domeniu final (când va fi custom)
   async redirects() {
     return [
       {

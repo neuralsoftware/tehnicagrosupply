@@ -32,7 +32,23 @@ export function ProgrameTab({ adminAuth }: Props) {
         setLoaded(true);
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => {
+        let cancelled = false;
+        void (async () => {
+            try {
+                const res = await fetch('/api/funding-programs', { cache: 'no-store' });
+                const data = await res.json();
+                if (cancelled) return;
+                setPrograms(data.programs || {});
+                setLoaded(true);
+            } catch {
+                if (!cancelled) setLoaded(true);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     const update = async (code: string, updates: Partial<FundingProgram>) => {
         setSaving(code);
