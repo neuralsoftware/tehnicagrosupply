@@ -61,6 +61,7 @@ type ClientTaskInsert = {
     due_date: string;
     status: string;
     resolution: string;
+    is_completed: boolean;
 };
 
 export async function POST(request: Request) {
@@ -176,14 +177,14 @@ export async function POST(request: Request) {
         const clientId: string | number = rawId;
 
         if (messageBody.trim().length > 0) {
-            const productLabel = validatedData.productName?.trim() || 'General';
             const taskPayload: ClientTaskInsert = {
                 client_id: clientId,
-                title: `Lead nou website: ${productLabel}`,
+                title: '🚨 LEAD NOU: Cerere ofertă website',
                 description: messageBody,
-                due_date: new Date().toISOString(),
+                due_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
                 status: 'Nou',
                 resolution: 'EMPTY',
+                is_completed: false,
             };
             const taskRes = await crm.from(CRM_TASKS_TABLE).insert([taskPayload]).select().single();
             if (taskRes.error) {
