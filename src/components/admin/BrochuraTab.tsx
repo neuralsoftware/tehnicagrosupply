@@ -172,9 +172,11 @@ export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; all
                         Date broșură (PDF)
                     </h2>
                     <p className="text-[10px] text-zinc-500 mt-2 leading-relaxed">
-                        Conținut suplimentar doar pentru PDF-ul TehnicAgro: text detaliat și galerie. Pe site rămâne varianta din
-                        Catalog. După ce apeși <strong className="text-zinc-400">Salvează</strong>, mergi la tab-ul{' '}
-                        <strong className="text-ea-green-500/90">Materiale publicitare</strong> și generezi documentul.
+                        <strong className="text-zinc-400">Opțional</strong> față de Catalog: dacă ai deja descriere și poză la produs,
+                        broșura multi-produs din Materiale le folosește direct. Aici adaugi doar ce vrei{' '}
+                        <em>exclusiv în PDF</em> (text mai lung, mai multe poze). Pe site rămâne varianta din Catalog. După{' '}
+                        <strong className="text-zinc-400">Salvează</strong>, în{' '}
+                        <strong className="text-ea-green-500/90">Materiale publicitare</strong> generezi documentul.
                     </p>
                     <ol className="mt-4 space-y-2 text-[10px] text-zinc-400 leading-relaxed list-decimal list-inside border-t border-zinc-800 pt-4">
                         <li>

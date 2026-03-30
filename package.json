@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "eslint . --max-warnings 0 && next build",
+    "deploy": "npx vercel --prod --yes",
     "start": "next start",
     "lint": "eslint",
     "map-db": "npx tsx scripts/generate-db-map.ts",

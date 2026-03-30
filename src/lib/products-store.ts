@@ -513,17 +513,20 @@ export function mergeProductForPdf(
     profiles: Record<string, ProductBrochureProfile>
 ): DynamicProduct {
     const bp = profiles[product.slug];
-    const merged: DynamicProduct =
-        !bp
-            ? {
-                  ...product,
-                  longDescription: product.longDescription || product.description,
-              }
-            : {
-                  ...product,
-                  gallery: bp.gallery !== undefined ? bp.gallery : product.gallery,
-                  longDescription: bp.brochureDescription ?? product.longDescription ?? product.description,
-              };
+    const profileTextTrimmed = bp ? String(bp.brochureDescription ?? '').trim() : '';
+    const profileGalleryUrls = bp
+        ? (bp.gallery ?? []).filter((u) => typeof u === 'string' && u.trim().length > 0)
+        : [];
+
+    const catalogGallery = Array.isArray(product.gallery) ? product.gallery.filter((u) => u && String(u).trim()) : [];
+    const catalogLead = String(product.longDescription || product.description || '').trim();
+
+    const merged: DynamicProduct = {
+        ...product,
+        gallery: profileGalleryUrls.length > 0 ? profileGalleryUrls : catalogGallery,
+        longDescription:
+            profileTextTrimmed.length > 0 ? profileTextTrimmed : catalogLead || product.longDescription || product.description || '',
+    };
     const pdfOnly = { ...merged };
     delete (pdfOnly as Partial<DynamicProduct>).manufacturerUrl;
     delete (pdfOnly as Partial<DynamicProduct>).referenceLinks;

@@ -17,6 +17,13 @@ import {
     mergeProductForPdf,
     normalizeLegacyProductSlug,
 } from '@/lib/products-store';
+import { MAX_MULTI_BROCHURE_PRODUCTS } from '@/lib/materiale-limits';
+import {
+    getBrochureDetailPageBody,
+    getBrochureIntroBullets,
+    buildDetailMoodboardUrls,
+} from '@/lib/product-brochure-detail';
+import { tryExtractTrailingModelCode } from '@/lib/product-hero-display';
 import { renderToBuffer, Document, Page, Text, View, StyleSheet, DocumentProps, Image, Font } from '@react-pdf/renderer';
 import { FUNDING_PROGRAMS, type FundingProgram } from '@/data/funding-programs';
 import { CATEGORIES as CATEGORY_LABELS } from '@/data/products';
@@ -1179,43 +1186,6 @@ function getProductNameRestWithoutBrand(product: DynamicProduct): string {
     return rest;
 }
 
-/**
- * Detectează cod model la sfârșitul denumirii (ex. „… SRBH 22”, „… KSE680”, „… ADS” când e descriptiv lung).
- * Returnează null dacă nu e clar unde se separă.
- */
-function tryExtractTrailingModelCode(rest: string): { descriptive: string; code: string } | null {
-    const t = rest.trim();
-    if (t.length < 5) return null;
-
-    const wordCount = (s: string) => s.split(/\s+/).filter(Boolean).length;
-
-    // „... LITERE CIFRE” (ex. SRBH 22, KSE 680)
-    const mLettersDigits = t.match(/^(.+?)\s+([A-Za-zĂÂÎȘȚăâîșț]{2,12})\s+(\d{1,4}[A-Za-z0-9./\-]*)\s*$/);
-    if (mLettersDigits) {
-        const descriptive = mLettersDigits[1].trim();
-        if (wordCount(descriptive) >= 2 && descriptive.length >= 4) {
-            return { descriptive, code: `${mLettersDigits[2]} ${mLettersDigits[3]}`.trim() };
-        }
-    }
-
-    // „... COD” o singură bucată alfanumerică (ex. KSE680)
-    const mFused = t.match(/^(.+?)\s+([A-Za-z]{1,5}\d{2,4}[A-Za-z0-9]*)\s*$/);
-    if (mFused && mFused[1].includes(' ') && wordCount(mFused[1].trim()) >= 2) {
-        return { descriptive: mFused[1].trim(), code: mFused[2] };
-    }
-
-    // „... ADS” — doar dacă partea descriptivă are suficiente cuvinte (reduce fals pozitive)
-    const mShortAlpha = t.match(/^(.+?)\s+([A-Z]{2,5})\s*$/);
-    if (mShortAlpha) {
-        const descriptive = mShortAlpha[1].trim();
-        if (wordCount(descriptive) >= 4 && /^[A-Z]{2,5}$/.test(mShortAlpha[2])) {
-            return { descriptive, code: mShortAlpha[2] };
-        }
-    }
-
-    return null;
-}
-
 /** Împarte denumirea pe 1–2 linii (aceeași logică ca înainte, dar doar pe partea descriptivă). */
 function chunkDescriptiveTitleLines(descriptive: string): string[] {
     const parts = descriptive.trim().split(/\s+/).filter(Boolean);
@@ -1296,27 +1266,6 @@ function renderProductOverviewGiantTitleNodes(
     return parts.lines.map((line, li) =>
         React.createElement(Text, { key: `${keyPrefix}-stack-${pSlug}-${li}`, style: styles.productOverviewGiant }, line)
     );
-}
-
-function getProfessionalProductLead(product: DynamicProduct): string {
-    if (product.slug === 'multisem-ads') {
-        return 'Avers-Agro Multisem ADS este o semănătoare proiectată pentru lucrări conservative, cu utilizare posibilă în semănat direct, mini-till sau convențional, în funcție de configurația echipată. Ansamblul de brăzdare cu dublu disc, presiunea ridicată pe brăzdar și suspensia paralelogram urmăresc pătrunderea constantă în rest vegetal și menținerea unei adâncimi de semănat stabile.';
-    }
-    return product.longDescription || product.description || 'Prezentare tehnică în curs de actualizare.';
-}
-
-function getProfessionalIntroBullets(product: DynamicProduct): string[] {
-    if (product.slug === 'multisem-ads') {
-        return [
-            'Configurația se alege în funcție de lățimea de lucru, numărul de rânduri, puterea tractorului și nivelul de rest vegetal din câmp.',
-            'Stabilitatea la adâncime, copierea terenului și contactul sămânță-sol sunt criteriile principale urmărite în exploatare.',
-            'Parametrii de lucru, echiparea și eligibilitatea pentru scheme de sprijin se confirmă separat, pe modelul ofertat.',
-        ];
-    }
-    return [
-        'Configurația finală se stabilește în raport cu lățimea de lucru, puterea tractorului și condițiile de exploatare.',
-        'Datele tehnice complete, opționalele și cerințele de utilizare se validează pe modelul ofertat.',
-    ];
 }
 
 const renderPageHeader = (title: string) => (
@@ -1461,7 +1410,7 @@ export function buildSingleProductDeepDivePDF(
             'Un utilaj ales pentru rezultate concrete în câmp — fiabilitate, precizie și eficiență pentru ferma dumneavoastră.',
         leftEditionLine: 'Performanță de excepție · recomandare tehnică',
     });
-    const descText = getProfessionalProductLead(product);
+    const descText = getBrochureDetailPageBody(product.slug, product.description, product.longDescription);
     const heroTitleParts = getProductHeroTitleParts(product);
     const overviewEyebrowText = (() => {
         const b = (product?.brand || '').trim();
@@ -1692,13 +1641,16 @@ function buildPDF(
                         : [];
                 const activePrograms = progList.filter((p) => p.status === 'active').slice(0, 1);
 
-                const descText = getProfessionalProductLead(product);
+                const descText = getBrochureDetailPageBody(product.slug, product.description, product.longDescription);
                 const secTitle = categoryDisplayName(catName, categoriesFromDb);
-                const extraGallery = (
-                    Array.isArray(product.gallery)
-                        ? product.gallery.filter((u) => u && u !== product.imageSrc).slice(0, 2)
-                        : []
-                ) as string[];
+                const mainImg = String(product?.imageSrc || '').trim();
+                const galleryList = Array.isArray(product.gallery) ? product.gallery : [];
+                const blockImages = (product.featureBlocks || [])
+                    .map((b) => String(b?.image || '').trim())
+                    .filter(Boolean);
+                const moodboardExtraPool = [...galleryList, ...blockImages].filter(
+                    (u, i, arr) => Boolean(u && String(u).trim()) && arr.indexOf(u) === i
+                );
                 const pSlug = product?.slug || `p-${catName}-${idx}`;
 
                 const verdictEl =
@@ -1718,7 +1670,7 @@ function buildPDF(
                         )
                     );
 
-                const introBullets = getProfessionalIntroBullets(product);
+                const introBullets = getBrochureIntroBullets(product.slug);
                 const heroTitleParts = getProductHeroTitleParts(product);
                 const overviewEyebrowText = (() => {
                     const b = (product?.brand || '').trim();
@@ -1787,13 +1739,7 @@ function buildPDF(
 
                 // ═══ PAGINA 2 PRODUS: DETALII ═══
                 // Grid: stânga imagini, dreapta prezentare + specs; jos verdict + finanțare
-                const detailGallery = (
-                    extraGallery.length >= 2
-                        ? extraGallery.slice(0, 2)
-                        : extraGallery.length === 1
-                          ? [extraGallery[0], product?.imageSrc].filter(Boolean)
-                          : [product?.imageSrc, product?.imageSrc].filter(Boolean)
-                ) as string[];
+                const detailGallery = buildDetailMoodboardUrls(mainImg, galleryList, moodboardExtraPool);
                 const detailPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-detail-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productDetailPage },
@@ -1903,6 +1849,16 @@ export async function POST(request: Request) {
         const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
         const authOk = (adminAuth || '').trim() === serverPass || (request.headers.get('x-admin-auth') || '').trim() === serverPass;
         if (!authOk) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const slugList = Array.isArray(productSlugs) ? productSlugs : [];
+        if (slugList.length > MAX_MULTI_BROCHURE_PRODUCTS) {
+            return NextResponse.json(
+                {
+                    error: `Maximum ${MAX_MULTI_BROCHURE_PRODUCTS} produse într-o broșură. Selectezi mai puține sau împărți în două documente.`,
+                },
+                { status: 400 }
+            );
+        }
 
         const all: DynamicProduct[] = await getProducts();
         const categories: Category[] = await getCategories();

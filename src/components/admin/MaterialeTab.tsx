@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { DynamicProduct, Brochure, ProductBrochureProfile } from '@/lib/products-store';
+import { MAX_MULTI_BROCHURE_PRODUCTS } from '@/lib/materiale-limits';
 import { FileText, Download, Link2, MessageSquare, Mail, RefreshCcw, Loader, Sparkles, Layers, ImageIcon, Trash2, FileStack } from 'lucide-react';
 
 interface Props {
@@ -10,10 +11,18 @@ interface Props {
     tabVisible?: boolean;
 }
 
-function pdfContentHints(profile: ProductBrochureProfile | undefined) {
-    const textOk = ((profile?.brochureDescription || '').trim().length >= 40);
-    const extraPhotos = (profile?.gallery?.length || 0) > 0;
-    return { textOk, extraPhotos };
+const MIN_PDF_TEXT_HINT = 40;
+
+/** Indicii pentru PDF: date din Catalog (Descriere / descriere lungă) sau din tab-ul Date broșură (opțional, suprascrie). */
+function pdfContentHints(product: DynamicProduct, profile: ProductBrochureProfile | undefined) {
+    const fromProfile = (profile?.brochureDescription || '').trim();
+    const fromCatalog = (product.longDescription || product.description || '').trim();
+    const textOk =
+        fromProfile.length >= MIN_PDF_TEXT_HINT || fromCatalog.length >= MIN_PDF_TEXT_HINT;
+    const profPhotos = (profile?.gallery || []).filter((u) => u && String(u).trim()).length;
+    const catPhotos = (product.gallery || []).filter((u) => u && String(u).trim()).length;
+    const extraPhotos = profPhotos > 0 || catPhotos > 0;
+    return { textOk, extraPhotos, hasProfile: Boolean(profile) };
 }
 
 const PHONE = '+40 723 380 022';
@@ -266,10 +275,11 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                         <FileText className="w-4 h-4 text-ea-green-500" /> Configurare Broșură
                     </h3>
                     <p className="text-[10px] text-zinc-500 leading-relaxed max-w-2xl">
-                        <strong className="text-zinc-400">Flux recomandat:</strong> mai întâi completezi fiecare produs în tab-ul{' '}
-                        <strong className="text-ea-green-500/90">Date broșură</strong> (text PDF + galerie — poți încărca mai multe poze
-                        odată). Apoi revii aici, alegi template-ul și bifezi produsele. Lângă nume vezi dacă există deja text suficient
-                        și poze extra pentru PDF.
+                        <strong className="text-zinc-400">Important:</strong> broșura multi-produs folosește datele din{' '}
+                        <strong className="text-zinc-300">Catalog → Produse</strong> (descriere, specificații, poză principală, galerie
+                        veche din produs). Tab-ul <strong className="text-ea-green-500/90">Date broșură</strong> este{' '}
+                        <strong className="text-zinc-400">opțional</strong>: îl folosești doar dacă vrei text și poze{' '}
+                        <em>suplimentare</em> doar pentru PDF (înlocuiesc automat golurile din catalog, nu șterg ce ai completat acolo).
                     </p>
                 </div>
 
@@ -371,7 +381,9 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4 shadow-xl">
                 <div className="flex justify-between items-center pb-2 border-b border-zinc-800">
                     <h3 className="text-sm font-black text-white uppercase tracking-widest">Selectează Produse</h3>
-                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{selectedSlugs.length}/8 selectate</span>
+                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                        {selectedSlugs.length}/{MAX_MULTI_BROCHURE_PRODUCTS} selectate
+                    </span>
                 </div>
                 {Object.keys(byCategory).length === 0 ? (
                     <p className="text-zinc-600 text-sm italic">Nu există produse în catalog. Adaugă produse din tab-ul Catalog.</p>
@@ -385,7 +397,16 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                                 <div className="grid grid-cols-2 gap-3">
                                     {prods.map(p => (
                                         <label key={p.slug} className={`flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${selectedSlugs.includes(p.slug) ? 'border-ea-green-600 bg-ea-green-900/10 text-white shadow-lg shadow-ea-green-900/10' : 'border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800/50'}`}>
-                                            <input type="checkbox" checked={selectedSlugs.includes(p.slug)} onChange={() => toggleProduct(p.slug)} disabled={!selectedSlugs.includes(p.slug) && selectedSlugs.length >= 8} className="w-4 h-4 rounded accent-ea-green-500 bg-zinc-950 border-zinc-700" />
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedSlugs.includes(p.slug)}
+                                                onChange={() => toggleProduct(p.slug)}
+                                                disabled={
+                                                    !selectedSlugs.includes(p.slug) &&
+                                                    selectedSlugs.length >= MAX_MULTI_BROCHURE_PRODUCTS
+                                                }
+                                                className="w-4 h-4 rounded accent-ea-green-500 bg-zinc-950 border-zinc-700"
+                                            />
                                             <div className="min-w-0 flex-1">
                                                 <div className="text-xs font-black truncate flex flex-wrap items-center gap-2">
                                                     <span>{p.name}</span>
@@ -397,18 +418,20 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                                                 </div>
                                                 <div className="text-[10px] text-zinc-600 font-bold uppercase">{p.brand}</div>
                                                 {(() => {
-                                                    const { textOk, extraPhotos } = pdfContentHints(brochureProfiles[p.slug]);
-                                                    if (!brochureProfiles[p.slug]) {
-                                                        return (
-                                                            <div className="mt-2 flex flex-wrap gap-1.5">
-                                                                <span className="text-[9px] uppercase font-bold text-amber-500/90 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                                                                    Fără profil broșură
-                                                                </span>
-                                                            </div>
-                                                        );
-                                                    }
+                                                    const prof = brochureProfiles[p.slug];
+                                                    const { textOk, extraPhotos, hasProfile } = pdfContentHints(p, prof);
                                                     return (
                                                         <div className="mt-2 flex flex-wrap gap-1.5">
+                                                            {!hasProfile && (
+                                                                <span className="text-[9px] uppercase font-bold text-sky-400/90 bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/25">
+                                                                    PDF din catalog
+                                                                </span>
+                                                            )}
+                                                            {hasProfile && (
+                                                                <span className="text-[9px] uppercase font-bold text-zinc-500 bg-zinc-800/80 px-1.5 py-0.5 rounded border border-zinc-700">
+                                                                    + PDF extra
+                                                                </span>
+                                                            )}
                                                             <span
                                                                 className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded border ${textOk ? 'text-ea-green-400 border-ea-green-500/30 bg-ea-green-500/10' : 'text-zinc-500 border-zinc-700 bg-zinc-900/80'}`}
                                                             >
@@ -417,7 +440,7 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
                                                             <span
                                                                 className={`text-[9px] uppercase font-bold px-1.5 py-0.5 rounded border inline-flex items-center gap-0.5 ${extraPhotos ? 'text-sky-400 border-sky-500/30 bg-sky-500/10' : 'text-zinc-500 border-zinc-700 bg-zinc-900/80'}`}
                                                             >
-                                                                <ImageIcon className="w-2.5 h-2.5" /> Extra {extraPhotos ? '✓' : '…'}
+                                                                <ImageIcon className="w-2.5 h-2.5" /> Galerie {extraPhotos ? '✓' : '…'}
                                                             </span>
                                                         </div>
                                                     );

@@ -89,6 +89,18 @@ export default async function ProductPage({ params }: PageProps) {
         catRow?.slug ?? String(product.category),
         catRow?.name ?? ''
     );
+
+    const mainImage = (product.imageSrc || '').trim();
+    const fromGallery = (product.gallery || []).filter(
+        (u) => u && String(u).trim() && String(u).trim() !== mainImage
+    );
+    const fromFeatureBlocks = (product.featureBlocks || [])
+        .map((b) => String(b?.image || '').trim())
+        .filter((u) => u.length > 0 && u !== mainImage);
+    const secondaryImages = [...fromGallery, ...fromFeatureBlocks].filter(
+        (u, i, arr) => arr.indexOf(u) === i
+    );
+
     const breadcrumbItems = [
         { label: 'Acasă', href: '/' },
         { label: 'Utilaje', href: '/utilaje' },
@@ -111,12 +123,19 @@ export default async function ProductPage({ params }: PageProps) {
 
             <ProductSection
                 title={product.name}
+                slug={product.slug}
                 badge={product.badge}
+                brand={product.brand}
+                categoryLabel={categoryLabel}
                 description={product.description}
+                longDescription={product.longDescription}
                 imageSrc={product.imageSrc}
                 specs={product.specs}
                 detailedSpecs={product.detailedSpecs}
                 expertVerdict={product.expertVerdict}
+                gallery={product.gallery}
+                secondaryImages={secondaryImages}
+                featureBlocks={product.featureBlocks}
                 ctaLabel="Solicită Ofertă Tehnică"
             />
 
