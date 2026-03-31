@@ -97,6 +97,24 @@ const HEADER_BLOCK = 72;
 const FOOTER_BLOCK = 52;
 /** Bandă solidă subsol — pag. și contact, ca în broșurile tip PA 5000 */
 const FOOTER_BAND_HEIGHT = 36;
+/** A4 în puncte (react-pdf) */
+const PDF_A4_HEIGHT_PT = 842;
+/**
+ * Pag. 2 produs: înălțime utilă între padding-ul de conținut (sub antet fix / deasupra zonei footer).
+ * Grila 2×2 are înălțime fixă + rânduri egale; sub ea rămâne spațiu pentru verdict (marginTop: auto).
+ */
+const PRODUCT_DETAIL_INNER_HEIGHT_PT =
+    PDF_A4_HEIGHT_PT - (HEADER_BLOCK + 8) - (FOOTER_BLOCK + 10);
+/** Minimum rezervat jos pentru caseta + finanțare (nu depășește grila) */
+const PRODUCT_DETAIL_VERDICT_MIN_RESERVE_PT = 120;
+const PRODUCT_DETAIL_CHECKER_GUTTER = 10;
+const PRODUCT_DETAIL_GRID_TOTAL_PT = Math.max(
+    340,
+    PRODUCT_DETAIL_INNER_HEIGHT_PT - PRODUCT_DETAIL_VERDICT_MIN_RESERVE_PT - 12
+);
+const PRODUCT_DETAIL_CHECKER_ROW_PT = Math.floor(
+    (PRODUCT_DETAIL_GRID_TOTAL_PT - PRODUCT_DETAIL_CHECKER_GUTTER) / 2
+);
 /** Accent secțiuni „curate” pagina 2 produs */
 const PDF_SECTION_ACCENT = '#064e3b';
 /** Copertă spate / contact — full-bleed */
@@ -433,34 +451,41 @@ const styles = StyleSheet.create({
         alignItems: 'center' as const,
         width: '100%',
     },
-    /** Grilă 2×2 pag. 2 produs: rând 1 [imagine | prezentare], rând 2 [specificații | imagine] */
+    /** Grilă 2×2 pag. 2 produs: rânduri de înălțime egală, lățime coloane 50/50 (flex 1 + gutter) */
     productDetailCheckerboard: {
-        flex: 1,
-        flexDirection: 'column' as const,
         width: '100%',
-        minHeight: 0,
+        height: PRODUCT_DETAIL_GRID_TOTAL_PT,
+        flexShrink: 0,
+        flexDirection: 'column' as const,
+        alignSelf: 'stretch' as const,
     },
     productDetailCheckerRow: {
-        flex: 1,
+        height: PRODUCT_DETAIL_CHECKER_ROW_PT,
         flexDirection: 'row' as const,
         alignItems: 'stretch' as const,
         width: '100%',
-        minHeight: 0,
     },
     productDetailCheckerCell: {
         flex: 1,
+        flexBasis: 0,
         minWidth: 0,
-        minHeight: 0,
+        height: '100%',
         ...PDF_BORDER_GREY_1,
         backgroundColor: COLORS.white,
-        padding: 8,
+        padding: 7,
         borderRadius: 4,
         overflow: 'hidden' as const,
     },
     productDetailCheckerImageInner: {
         flex: 1,
         width: '100%',
-        minHeight: 110,
+        minHeight: 0,
+    },
+    /** Zona verdict + finanțare: lipită de subsolul conținutului, după spațiul liber sub grilă */
+    productDetailVerdictBlock: {
+        marginTop: 'auto' as const,
+        flexShrink: 0,
+        width: '100%',
     },
     unifiedSpecsBoxChecker: {
         marginTop: 0,
@@ -1804,10 +1829,10 @@ function buildPDF(
                                 { style: styles.productDetailCheckerboard },
                                 React.createElement(
                                     View,
-                                    { style: { ...styles.productDetailCheckerRow, marginBottom: 10 } },
+                                    { style: { ...styles.productDetailCheckerRow, marginBottom: PRODUCT_DETAIL_CHECKER_GUTTER } },
                                     React.createElement(
                                         View,
-                                        { style: { ...styles.productDetailCheckerCell, marginRight: 10 } },
+                                        { style: { ...styles.productDetailCheckerCell, marginRight: PRODUCT_DETAIL_CHECKER_GUTTER } },
                                         React.createElement(
                                             View,
                                             { style: styles.productDetailCheckerImageInner },
@@ -1837,7 +1862,7 @@ function buildPDF(
                                     { style: styles.productDetailCheckerRow },
                                     React.createElement(
                                         View,
-                                        { style: { ...styles.productDetailCheckerCell, marginRight: 10 } },
+                                        { style: { ...styles.productDetailCheckerCell, marginRight: PRODUCT_DETAIL_CHECKER_GUTTER } },
                                         renderUnifiedTechnicalSpecs(product, {
                                             maxDetailedSpecLines: 10,
                                             specsWrapperStyle: styles.unifiedSpecsBoxChecker,
@@ -1862,19 +1887,23 @@ function buildPDF(
                             (verdictEl || fundingEl) &&
                                 React.createElement(
                                     View,
-                                    { style: styles.verdictFundingRow },
-                                    verdictEl &&
-                                        React.createElement(
-                                            View,
-                                            { style: fundingEl ? styles.verdictOrFundingHalf : { width: '100%', minWidth: 0 } },
-                                            verdictEl
-                                        ),
-                                    fundingEl &&
-                                        React.createElement(
-                                            View,
-                                            { style: verdictEl ? styles.verdictOrFundingHalf : { width: '100%', minWidth: 0 } },
-                                            fundingEl
-                                        )
+                                    { style: styles.productDetailVerdictBlock },
+                                    React.createElement(
+                                        View,
+                                        { style: styles.verdictFundingRow },
+                                        verdictEl &&
+                                            React.createElement(
+                                                View,
+                                                { style: fundingEl ? styles.verdictOrFundingHalf : { width: '100%', minWidth: 0 } },
+                                                verdictEl
+                                            ),
+                                        fundingEl &&
+                                            React.createElement(
+                                                View,
+                                                { style: verdictEl ? styles.verdictOrFundingHalf : { width: '100%', minWidth: 0 } },
+                                                fundingEl
+                                            )
+                                    )
                                 )
                         )
                     ),
