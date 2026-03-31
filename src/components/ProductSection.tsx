@@ -12,7 +12,7 @@ import {
     type WebHeroTitleParts,
 } from '@/lib/product-hero-display';
 import {
-    buildDetailMoodboardUrls,
+    getWebProductDetailImagePlan,
     getBrochureDetailPageBody,
     getBrochureIntroBullets,
 } from '@/lib/product-brochure-detail';
@@ -139,7 +139,7 @@ export function ProductSection({
     const [moodImgOk, setMoodImgOk] = useState<Record<number, boolean>>({});
     const [overflowImgOk, setOverflowImgOk] = useState<Record<number, boolean>>({});
 
-    const { principle } = useMemo(
+    const { principle, presentation } = useMemo(
         () => splitPrincipleAndPresentation(description, longDescription),
         [description, longDescription]
     );
@@ -159,31 +159,27 @@ export function ProductSection({
         [secondaryImages]
     );
 
-    const moodboardUrls = useMemo(
-        () => buildDetailMoodboardUrls(imageSrc, galleryProp, secondaryDeduped),
+    const { slotLeft, slotRight, overflow: overflowGalleryUrls } = useMemo(
+        () => getWebProductDetailImagePlan(imageSrc, galleryProp, secondaryDeduped),
         [imageSrc, galleryProp, secondaryDeduped]
     );
 
-    const brochureBody = useMemo(
+    const brochureCanonical = useMemo(
         () => getBrochureDetailPageBody(slug, description, longDescription),
         [slug, description, longDescription]
     );
 
+    /** Evită același paragraf în „Principiu” (hero) și din nou la „Prezentare tehnică”. */
+    const prezentareParagraph = useMemo(() => {
+        const pr = (presentation || '').trim();
+        const prin = (principle || '').trim();
+        const brochure = brochureCanonical.trim();
+        if (pr && pr !== prin) return pr;
+        if (brochure && brochure !== prin) return brochure;
+        return '';
+    }, [brochureCanonical, principle, presentation]);
+
     const introBullets = useMemo(() => getBrochureIntroBullets(slug), [slug]);
-
-    const moodboardSet = useMemo(() => new Set(moodboardUrls), [moodboardUrls]);
-
-    const overflowGalleryUrls = useMemo(
-        () => secondaryDeduped.filter((u) => u && !moodboardSet.has(u)),
-        [secondaryDeduped, moodboardSet]
-    );
-
-    const brochurePairImages = useMemo(() => {
-        const main = (imageSrc || '').trim();
-        const u0 = (moodboardUrls[0] || main).trim();
-        const u1 = (moodboardUrls[1] || u0 || main).trim();
-        return { u0, u1 };
-    }, [imageSrc, moodboardUrls]);
 
     return (
         <section id={id} className="bg-white text-zinc-900 overflow-hidden">
@@ -267,32 +263,40 @@ export function ProductSection({
                 <div className={sectionContainer}>
                     <div className="flex flex-col gap-16 md:gap-24">
 
-                        {/* RÂNDUL 1 (Poză Stânga, Text Dreapta) */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
-                            <div className="w-full aspect-[4/3] relative rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
-                                {moodImgOk[0] !== false && brochurePairImages.u0 ? (
-                                    <Image
-                                        src={brochurePairImages.u0}
-                                        alt={`${title} — vedere 1`}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 1024px) 100vw, 50vw"
-                                        onError={() => setMoodImgOk((prev) => ({ ...prev, 0: false }))}
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center text-zinc-500 text-sm p-4 text-center">
-                                        Imagine indisponibilă
-                                    </div>
-                                )}
-                            </div>
+                        {/* Rând 1: opțional poză stânga (doar dacă e diferită de hero), text dreapta sau tot rândul pentru text */}
+                        <div
+                            className={`grid grid-cols-1 gap-8 md:gap-16 items-center ${
+                                slotLeft ? 'lg:grid-cols-2' : ''
+                            }`}
+                        >
+                            {slotLeft ? (
+                                <div className="w-full aspect-[4/3] relative rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
+                                    {moodImgOk[0] !== false ? (
+                                        <Image
+                                            src={slotLeft}
+                                            alt={`${title} — vedere suplimentară 1`}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 1024px) 100vw, 50vw"
+                                            onError={() => setMoodImgOk((prev) => ({ ...prev, 0: false }))}
+                                        />
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center text-zinc-500 text-sm p-4 text-center">
+                                            Imagine indisponibilă
+                                        </div>
+                                    )}
+                                </div>
+                            ) : null}
                             <div className="flex flex-col justify-center">
                                 <h2 className="text-xs font-black uppercase tracking-[0.28em] text-[#1B4332] mb-4 border-l-4 border-[#2d6a4f] pl-4">
                                     Prezentare tehnică
                                 </h2>
-                                <div className="text-zinc-700 text-base sm:text-[17px] leading-relaxed whitespace-pre-line text-pretty font-medium">
-                                    {brochureBody}
-                                </div>
-                                <ul className="mt-5 space-y-3">
+                                {prezentareParagraph ? (
+                                    <div className="text-zinc-700 text-base sm:text-[17px] leading-relaxed whitespace-pre-line text-pretty font-medium">
+                                        {prezentareParagraph}
+                                    </div>
+                                ) : null}
+                                <ul className={`space-y-3 ${prezentareParagraph ? 'mt-5' : ''}`}>
                                     {introBullets.map((line, i) => (
                                         <li key={i} className="flex gap-3 text-zinc-800 text-sm sm:text-base">
                                             <span className="mt-0.5 shrink-0 font-black text-[#2d6a4f]" aria-hidden>
@@ -305,9 +309,17 @@ export function ProductSection({
                             </div>
                         </div>
 
-                        {/* RÂNDUL 2 (Text Stânga, Poză Dreapta) */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center">
-                            <div className="order-2 lg:order-1 flex flex-col justify-center">
+                        {/* Rând 2: specificații; poză dreapta doar dacă există a doua imagine diferită de hero */}
+                        <div
+                            className={`grid grid-cols-1 gap-8 md:gap-16 items-center ${
+                                slotRight ? 'lg:grid-cols-2' : ''
+                            }`}
+                        >
+                            <div
+                                className={`flex flex-col justify-center ${
+                                    slotRight ? 'order-2 lg:order-1' : ''
+                                }`}
+                            >
                                 <h2 className="text-xs font-black uppercase tracking-[0.28em] text-[#1B4332] mb-4 border-l-4 border-[#2d6a4f] pl-4">
                                     Specificații tehnice
                                 </h2>
@@ -331,22 +343,24 @@ export function ProductSection({
                                     </p>
                                 )}
                             </div>
-                            <div className="order-1 lg:order-2 w-full aspect-[4/3] relative rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
-                                {moodImgOk[1] !== false && brochurePairImages.u1 ? (
-                                    <Image
-                                        src={brochurePairImages.u1}
-                                        alt={`${title} — vedere 2`}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 1024px) 100vw, 50vw"
-                                        onError={() => setMoodImgOk((prev) => ({ ...prev, 1: false }))}
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center text-zinc-500 text-sm p-4 text-center">
-                                        Imagine indisponibilă
-                                    </div>
-                                )}
-                            </div>
+                            {slotRight ? (
+                                <div className="order-1 lg:order-2 w-full aspect-[4/3] relative rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm">
+                                    {moodImgOk[1] !== false ? (
+                                        <Image
+                                            src={slotRight}
+                                            alt={`${title} — vedere suplimentară 2`}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 1024px) 100vw, 50vw"
+                                            onError={() => setMoodImgOk((prev) => ({ ...prev, 1: false }))}
+                                        />
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center text-zinc-500 text-sm p-4 text-center">
+                                            Imagine indisponibilă
+                                        </div>
+                                    )}
+                                </div>
+                            ) : null}
                         </div>
                     </div>
 

@@ -3,6 +3,36 @@
  */
 
 /**
+ * Plan imagini pentru pagina de produs pe **site** (nu PDF).
+ * - Niciodată nu repetăm imaginea principală (hero) în sloturile din secțiunea de detaliu.
+ * - Două sloturi max. în layout-ul zig-zag (stânga/dreapta); restul intră în blocul „Galerie”.
+ * - Ordonare: mai întâi `gallery`, apoi `extraPool`, fără duplicate.
+ */
+export function getWebProductDetailImagePlan(
+    mainImageSrc: string,
+    gallery?: string[] | null,
+    extraPool?: string[] | null
+): { slotLeft: string | null; slotRight: string | null; overflow: string[] } {
+    const main = (mainImageSrc || '').trim();
+    const norm = (u: string) => String(u || '').trim();
+    const seen = new Set<string>();
+    const ordered: string[] = [];
+    const push = (u: string) => {
+        const x = norm(u);
+        if (!x || x === main || seen.has(x)) return;
+        seen.add(x);
+        ordered.push(x);
+    };
+    for (const u of Array.isArray(gallery) ? gallery : []) push(u);
+    for (const u of Array.isArray(extraPool) ? extraPool : []) push(u);
+    return {
+        slotLeft: ordered[0] ?? null,
+        slotRight: ordered[1] ?? null,
+        overflow: ordered.slice(2),
+    };
+}
+
+/**
  * Coloana stângă pag. 2: până la 2 imagini, ca în PDF (moodboard).
  * - Întâi `gallery` (fără imaginea principală).
  * - Completează din `extraPool` (ex. poze din blocuri detaliu sau galerie deduplicată pe site).
