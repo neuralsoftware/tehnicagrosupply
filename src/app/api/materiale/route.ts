@@ -433,6 +433,41 @@ const styles = StyleSheet.create({
         alignItems: 'center' as const,
         width: '100%',
     },
+    /** Grilă 2×2 pag. 2 produs: rând 1 [imagine | prezentare], rând 2 [specificații | imagine] */
+    productDetailCheckerboard: {
+        flex: 1,
+        flexDirection: 'column' as const,
+        width: '100%',
+        minHeight: 0,
+    },
+    productDetailCheckerRow: {
+        flex: 1,
+        flexDirection: 'row' as const,
+        alignItems: 'stretch' as const,
+        width: '100%',
+        minHeight: 0,
+    },
+    productDetailCheckerCell: {
+        flex: 1,
+        minWidth: 0,
+        minHeight: 0,
+        ...PDF_BORDER_GREY_1,
+        backgroundColor: COLORS.white,
+        padding: 8,
+        borderRadius: 4,
+        overflow: 'hidden' as const,
+    },
+    productDetailCheckerImageInner: {
+        flex: 1,
+        width: '100%',
+        minHeight: 110,
+    },
+    unifiedSpecsBoxChecker: {
+        marginTop: 0,
+        paddingTop: 0,
+        paddingBottom: 2,
+        paddingHorizontal: 0,
+    },
     productMoodboardStackSymmetric: {
         width: '42%',
         marginRight: 14,
@@ -965,6 +1000,7 @@ const ProductImage = ({
     detail,
     immersive,
     moodboard,
+    checkerboard,
     deepDiveFeature,
     /** Aceeași înălțime ca imaginea principală catalog (coloană stângă) */
     catalogStack,
@@ -979,6 +1015,7 @@ const ProductImage = ({
     detail?: boolean;
     immersive?: boolean;
     moodboard?: boolean;
+    checkerboard?: boolean;
     deepDiveFeature?: boolean;
     catalogStack?: boolean;
     compact?: boolean;
@@ -996,21 +1033,23 @@ const ProductImage = ({
                   ? 456
                   : deepDiveFeature
                     ? 250
-                    : moodboard
-                      ? 180
-                      : hero
-                        ? 410
-                        : detail
-                          ? 160
-                          : catalog || catalogStack
-                            ? 200
-                            : 220;
-        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || immersive || moodboard || deepDiveFeature || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
+                    : checkerboard
+                      ? 120
+                      : moodboard
+                        ? 180
+                        : hero
+                          ? 410
+                          : detail
+                            ? 160
+                            : catalog || catalogStack
+                              ? 200
+                              : 220;
+        return React.createElement(View, { style: { ...styles.placeholderBox, height: h, marginVertical: catalog || hero || detail || immersive || moodboard || checkerboard || deepDiveFeature || catalogStack || galleryThumb || stripThumb ? 0 : 14 } },
             React.createElement(Text, { style: styles.placeholderText }, `[FĂRĂ IMAGINE: ${fallback || 'Echipament'}]`)
         );
     }
     const absolute = resolvePublicUrl(url);
-    const wSrv = hero || immersive ? 1400 : deepDiveFeature || moodboard ? 1200 : 800;
+    const wSrv = hero || immersive ? 1400 : deepDiveFeature || moodboard || checkerboard ? 1200 : 800;
     const safeJpgUrl = `https://wsrv.nl/?url=${encodeURIComponent(absolute.replace(/^https?:\/\//, ''))}&output=jpg&w=${wSrv}`;
     const imgStyle = stripThumb
         ? { width: '100%', height: 56, objectFit: 'contain' as const }
@@ -1022,15 +1061,17 @@ const ProductImage = ({
               ? { width: '100%', height: '100%', objectFit: 'cover' as const }
               : deepDiveFeature
                 ? { width: '100%', height: 250, objectFit: 'cover' as const }
-                : moodboard
-                  ? { width: '100%', height: 180, objectFit: 'cover' as const }
-                  : hero
-                    ? { width: '100%', height: 410, objectFit: 'contain' as const }
-                    : detail
-                      ? { width: '100%', height: 160, objectFit: 'contain' as const }
-                      : catalog || catalogStack
-                        ? { width: '100%', height: 200, objectFit: 'contain' as const }
-                        : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
+                : checkerboard
+                  ? { width: '100%', height: '100%', objectFit: 'cover' as const, minHeight: 110 }
+                  : moodboard
+                    ? { width: '100%', height: 180, objectFit: 'cover' as const }
+                    : hero
+                      ? { width: '100%', height: 410, objectFit: 'contain' as const }
+                      : detail
+                        ? { width: '100%', height: 160, objectFit: 'contain' as const }
+                        : catalog || catalogStack
+                          ? { width: '100%', height: 200, objectFit: 'contain' as const }
+                          : { width: '100%', height: 220, objectFit: 'contain' as const, marginVertical: 14 };
     return React.createElement(Image, { src: safeJpgUrl, style: imgStyle });
 };
 
@@ -1109,8 +1150,8 @@ function detailedSpecBlocks(product: DynamicProduct, maxLines: number): { group:
 type SpecPdfLine = { kind: 'group'; text: string } | { kind: 'line'; text: string };
 
 /** Toate liniile pentru specificații extinse (paginare explicită — evită suprapunere cu antet fix) */
-function flattenDetailedSpecLines(product: DynamicProduct): SpecPdfLine[] {
-    const blocks = detailedSpecBlocks(product, 12);
+function flattenDetailedSpecLines(product: DynamicProduct, maxLines = 12): SpecPdfLine[] {
+    const blocks = detailedSpecBlocks(product, maxLines);
     const out: SpecPdfLine[] = [];
     for (const b of blocks) {
         out.push({ kind: 'group', text: b.group });
@@ -1131,9 +1172,21 @@ function renderProductMetaOnly(product: DynamicProduct): React.ReactElement[] {
 }
 
 /** O singură casetă: specificații din catalog + detalii din JSON, fără denumire „extinse” separată */
-function renderUnifiedTechnicalSpecs(product: DynamicProduct): React.ReactElement {
+function renderUnifiedTechnicalSpecs(
+    product: DynamicProduct,
+    opts?: { maxDetailedSpecLines?: number; specsWrapperStyle?: (typeof styles)['unifiedSpecsBox'] }
+): React.ReactElement {
+    const maxDet = opts?.maxDetailedSpecLines ?? 12;
+    const wrapStyle = opts?.specsWrapperStyle ?? styles.unifiedSpecsBox;
     const parts: React.ReactElement[] = [];
-    parts.push(renderAccentSectionTitle('utt', 'Specificații tehnice', undefined, 'leftRule'));
+    parts.push(
+        renderAccentSectionTitle(
+            'utt',
+            'Specificații tehnice',
+            { marginTop: 0, marginBottom: 4 },
+            'leftRule'
+        )
+    );
     if (Array.isArray(product.specs) && product.specs.length > 0) {
         product.specs.forEach((spec, i) => {
             parts.push(
@@ -1144,7 +1197,7 @@ function renderUnifiedTechnicalSpecs(product: DynamicProduct): React.ReactElemen
             );
         });
     }
-    const detLines = flattenDetailedSpecLines(product);
+    const detLines = flattenDetailedSpecLines(product, maxDet);
     if (detLines.length > 0) {
         if (product.specs?.length) {
             parts.push(React.createElement(View, { key: 'sp-div', style: { height: 8 } }));
@@ -1162,7 +1215,7 @@ function renderUnifiedTechnicalSpecs(product: DynamicProduct): React.ReactElemen
             React.createElement(Text, { key: 'ph', style: { ...styles.productSheetBody, fontStyle: 'italic' } }, 'Date tehnice complete la cerere.')
         );
     }
-    return React.createElement(View, { style: styles.unifiedSpecsBox }, ...parts);
+    return React.createElement(View, { style: wrapStyle }, ...parts);
 }
 
 /** Logo încorporat ca data-URI — evită eșecul încărcării în react-pdf pe server */
@@ -1738,62 +1791,92 @@ function buildPDF(
                 );
 
                 // ═══ PAGINA 2 PRODUS: DETALII ═══
-                // Grid: stânga imagini, dreapta prezentare + specs; jos verdict + finanțare
+                // Grilă 2×2 simetrică: [poză | prezentare] / [specificații | poză]; apoi verdict + finanțare
                 const detailGallery = buildDetailMoodboardUrls(mainImg, galleryList, moodboardExtraPool);
+                const imgCheckerTL = detailGallery[0] || mainImg;
+                const imgCheckerBR = detailGallery[1] || detailGallery[0] || mainImg;
                 const detailPage = React.createElement(Page, { size: 'A4', style: styles.page, key: `p-detail-${pSlug}` },
                     renderPageHeader(secTitle.toUpperCase()),
                     React.createElement(View, { style: styles.productDetailPage },
-                        React.createElement(
-                            View,
-                            { style: styles.productDetailMainSymmetric },
+                        React.createElement(View, { style: { flex: 1, flexDirection: 'column', minHeight: 0 } },
                             React.createElement(
                                 View,
-                                { style: { ...styles.productDetailGrid, ...styles.productDetailGridCentered, flex: 1 } },
+                                { style: styles.productDetailCheckerboard },
                                 React.createElement(
                                     View,
-                                    { style: styles.productMoodboardStackSymmetric },
-                                    ...detailGallery.map((u, gi) =>
+                                    { style: { ...styles.productDetailCheckerRow, marginBottom: 10 } },
+                                    React.createElement(
+                                        View,
+                                        { style: { ...styles.productDetailCheckerCell, marginRight: 10 } },
                                         React.createElement(
                                             View,
-                                            { key: `detail-${pSlug}-${gi}`, style: styles.productMoodboardCellSymmetric },
-                                            React.createElement(ProductImage, { url: u, fallback: product?.name, moodboard: true })
+                                            { style: styles.productDetailCheckerImageInner },
+                                            React.createElement(ProductImage, {
+                                                url: imgCheckerTL,
+                                                fallback: product?.name,
+                                                checkerboard: true,
+                                            })
                                         )
                                     ),
+                                    React.createElement(
+                                        View,
+                                        { style: styles.productDetailCheckerCell },
+                                        renderAccentSectionTitle(`desc-${pSlug}`, 'Prezentare tehnică', { marginTop: 0, marginBottom: 4 }, 'leftRule'),
+                                        React.createElement(Text, { style: styles.productSheetBody }, descText),
+                                        ...introBullets.map((line, bi) =>
+                                            renderChevronBullet(
+                                                `intro-${pSlug}-${bi}`,
+                                                styles.productIntroBullets as Record<string, unknown>,
+                                                line
+                                            )
+                                        )
+                                    )
                                 ),
                                 React.createElement(
                                     View,
-                                    { style: styles.productRightColSymmetric },
-                                    renderAccentSectionTitle(`desc-${pSlug}`, 'Prezentare tehnică', undefined, 'leftRule'),
-                                    React.createElement(Text, { style: styles.productSheetBody }, descText),
-                                    ...introBullets.slice(0, 2).map((line, bi) =>
-                                        renderChevronBullet(
-                                            `intro-${pSlug}-${bi}`,
-                                            styles.productIntroBullets as Record<string, unknown>,
-                                            line
+                                    { style: styles.productDetailCheckerRow },
+                                    React.createElement(
+                                        View,
+                                        { style: { ...styles.productDetailCheckerCell, marginRight: 10 } },
+                                        renderUnifiedTechnicalSpecs(product, {
+                                            maxDetailedSpecLines: 10,
+                                            specsWrapperStyle: styles.unifiedSpecsBoxChecker,
+                                        }),
+                                        ...renderProductMetaOnly(product)
+                                    ),
+                                    React.createElement(
+                                        View,
+                                        { style: styles.productDetailCheckerCell },
+                                        React.createElement(
+                                            View,
+                                            { style: styles.productDetailCheckerImageInner },
+                                            React.createElement(ProductImage, {
+                                                url: imgCheckerBR,
+                                                fallback: product?.name,
+                                                checkerboard: true,
+                                            })
                                         )
-                                    ),
-                                    renderUnifiedTechnicalSpecs(product),
-                                    ...renderProductMetaOnly(product)
-                                )
-                            )
-                        ),
-                        (verdictEl || fundingEl) &&
-                            React.createElement(
-                                View,
-                                { style: styles.verdictFundingRow },
-                                verdictEl &&
-                                    React.createElement(
-                                        View,
-                                        { style: fundingEl ? styles.verdictOrFundingHalf : { width: '100%', minWidth: 0 } },
-                                        verdictEl
-                                    ),
-                                fundingEl &&
-                                    React.createElement(
-                                        View,
-                                        { style: verdictEl ? styles.verdictOrFundingHalf : { width: '100%', minWidth: 0 } },
-                                        fundingEl
                                     )
-                            )
+                                )
+                            ),
+                            (verdictEl || fundingEl) &&
+                                React.createElement(
+                                    View,
+                                    { style: styles.verdictFundingRow },
+                                    verdictEl &&
+                                        React.createElement(
+                                            View,
+                                            { style: fundingEl ? styles.verdictOrFundingHalf : { width: '100%', minWidth: 0 } },
+                                            verdictEl
+                                        ),
+                                    fundingEl &&
+                                        React.createElement(
+                                            View,
+                                            { style: verdictEl ? styles.verdictOrFundingHalf : { width: '100%', minWidth: 0 } },
+                                            fundingEl
+                                        )
+                                )
+                        )
                     ),
                     renderPageFooter(currentPage += 1, config.phone)
                 );
