@@ -65,6 +65,70 @@ function normalizeDynamicProductRow(p: DynamicProduct): DynamicProduct {
     return p;
 }
 
+/**
+ * Înlocuiește denumirea veche „Green Plains” cu „Multisem ADS” (insensibil la majuscule / spații).
+ * Tratează și forma „Green Plains ADS” ca să nu rămână „Multisem ADS ADS”.
+ */
+export function renameGreenPlainsToMultisemText(input: string): string {
+    if (!input || !/green\s*plains/i.test(input)) return input;
+    let s = input.replace(/green\s*plains\s*ads/gi, 'Multisem ADS');
+    s = s.replace(/green\s*plains/gi, 'Multisem ADS');
+    return s;
+}
+
+function renameGreenPlainsInUnknown(value: unknown): unknown {
+    if (typeof value === 'string') return renameGreenPlainsToMultisemText(value);
+    if (Array.isArray(value)) return value.map(renameGreenPlainsInUnknown);
+    if (value !== null && typeof value === 'object') {
+        const o = value as Record<string, unknown>;
+        const out: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(o)) {
+            out[k] = renameGreenPlainsInUnknown(v);
+        }
+        return out;
+    }
+    return value;
+}
+
+/**
+ * Pentru semănătoarea A (`multisem-ads`), corectează textele încărcate din Storage care păstrează „Green Plains”.
+ */
+export function applyMultisemGreenPlainsRenaming(p: DynamicProduct): DynamicProduct {
+    if (normalizeLegacyProductSlug(p.slug) !== 'multisem-ads') return p;
+    const re = (s: string | undefined) => (s === undefined ? s : renameGreenPlainsToMultisemText(s));
+    const specs = Array.isArray(p.specs)
+        ? p.specs.map((line) => renameGreenPlainsToMultisemText(String(line)))
+        : p.specs;
+    const specIcons = p.specIcons?.map((ic) => ({
+        ...ic,
+        label: renameGreenPlainsToMultisemText(ic.label),
+        value: renameGreenPlainsToMultisemText(ic.value),
+        icon: renameGreenPlainsToMultisemText(ic.icon),
+    }));
+    const featureBlocks = p.featureBlocks?.map((b) => ({
+        ...b,
+        title: renameGreenPlainsToMultisemText(b.title),
+        description: renameGreenPlainsToMultisemText(b.description),
+    }));
+    const detailedSpecs = renameGreenPlainsInUnknown(p.detailedSpecs) as Record<string, unknown>;
+    return {
+        ...p,
+        name: re(p.name) ?? p.name,
+        badge: re(p.badge),
+        description: re(p.description) ?? p.description,
+        longDescription: re(p.longDescription),
+        expertVerdict: re(p.expertVerdict) ?? p.expertVerdict,
+        metaTitle: re(p.metaTitle),
+        metaDescription: re(p.metaDescription),
+        eligibility: re(p.eligibility),
+        priceRange: re(p.priceRange),
+        specs,
+        specIcons,
+        detailedSpecs,
+        featureBlocks,
+    };
+}
+
 /** După remap, pot exista două rânduri cu același slug — păstrăm cel mai recent (>= ca să câștige ultima salvare la același timestamp). */
 function dedupeDynamicProductsBySlug(products: DynamicProduct[]): DynamicProduct[] {
     const bySlug = new Map<string, DynamicProduct>();
@@ -382,7 +446,7 @@ export async function getProducts(): Promise<DynamicProduct[]> {
     const suppressed = await getSuppressedSlugs();
     return Array.from(bySlug.values())
         .filter((p) => !suppressed.has(normalizeLegacyProductSlug(p.slug)))
-        .map((p) => resolveProductVideoUrls(ensureProductSpecsPreview(p)));
+        .map((p) => applyMultisemGreenPlainsRenaming(resolveProductVideoUrls(ensureProductSpecsPreview(p))));
 }
 
 export async function getProductBySlug(slug: string): Promise<DynamicProduct | null> {
@@ -395,7 +459,7 @@ export async function saveProduct(
     product: DynamicProduct,
     options?: { siteCatalogOnly?: boolean }
 ): Promise<void> {
-    product = normalizeDynamicProductRow(product);
+    product = applyMultisemGreenPlainsRenaming(normalizeDynamicProductRow(product));
     const rawCurrent = await readBlob<unknown>(PRODUCTS_BLOB_KEY, []);
     const current = parseDynamicProductsFromStorage(rawCurrent);
     const idx = current.findIndex(
@@ -461,7 +525,18 @@ export async function getBrochureProfilesMap(): Promise<Record<string, ProductBr
     for (const [key, prof] of Object.entries(raw)) {
         const ns = normalizeLegacyProductSlug(key);
         const prev = out[ns];
-        const next = { ...prof, slug: ns };
+        let next: ProductBrochureProfile = { ...prof, slug: ns };
+        if (ns === 'multisem-ads') {
+            const re = renameGreenPlainsToMultisemText;
+            next = {
+                ...next,
+                brochureDescription: next.brochureDescription ? re(next.brochureDescription) : next.brochureDescription,
+                referenceLinks: next.referenceLinks?.map((l) => ({
+                    ...l,
+                    label: re(l.label),
+                })),
+            };
+        }
         if (!prev || (prev.updatedAt || '') < (next.updatedAt || '')) out[ns] = next;
     }
     return out;
@@ -472,6 +547,16 @@ export async function saveBrochureProfile(
     patch: Partial<Omit<ProductBrochureProfile, 'slug' | 'updatedAt'>>
 ): Promise<void> {
     slug = normalizeLegacyProductSlug(slug);
+    const re = renameGreenPlainsToMultisemText;
+    if (slug === 'multisem-ads') {
+        if (patch.brochureDescription) patch = { ...patch, brochureDescription: re(patch.brochureDescription) };
+        if (patch.referenceLinks) {
+            patch = {
+                ...patch,
+                referenceLinks: patch.referenceLinks.map((l) => ({ ...l, label: re(l.label) })),
+            };
+        }
+    }
     const rawMap = await readBlob<unknown>(BROCHURE_PROFILES_BLOB_KEY, {});
     const map = parseBrochureProfileMapFromStorage(rawMap);
     for (const k of Object.keys(map)) {
@@ -530,10 +615,7 @@ export function mergeProductForPdf(
     const pdfOnly = { ...merged };
     delete (pdfOnly as Partial<DynamicProduct>).manufacturerUrl;
     delete (pdfOnly as Partial<DynamicProduct>).referenceLinks;
-    if (pdfOnly.slug === 'multisem-ads' && /green\s*plains/i.test(pdfOnly.name || '')) {
-        return { ...pdfOnly, name: 'Avers-Agro Multisem ADS' };
-    }
-    return pdfOnly;
+    return applyMultisemGreenPlainsRenaming(pdfOnly);
 }
 
 // ── CATEGORIES ────────────────────────────────────────────
