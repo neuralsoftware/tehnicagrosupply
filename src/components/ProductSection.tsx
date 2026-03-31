@@ -17,12 +17,6 @@ import {
     getBrochureIntroBullets,
 } from '@/lib/product-brochure-detail';
 
-export interface ProductFeatureBlockInput {
-    image: string;
-    title: string;
-    description: string;
-}
-
 interface ProductProps {
     title: string;
     description: string;
@@ -40,12 +34,9 @@ interface ProductProps {
     /** Pentru parsare nume / model ca în broșură */
     slug?: string;
     /**
-     * Galeria „curată” (ca în PDF catalog): primele imagini pentru coloana stângă pag. 2.
-     * Diferă de imaginile din blocurile detaliu — acelea apar mai jos dacă sunt completate.
+     * Galeria produsului pe site (pag. detaliu). Blocurile broșură dedicată din admin există doar în PDF.
      */
     gallery?: string[];
-    /** Opțional: secțiuni suplimentare (imagine + text) sub layout-ul principal tip broșură. */
-    featureBlocks?: ProductFeatureBlockInput[];
 }
 
 const sectionContainer = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
@@ -142,13 +133,11 @@ export function ProductSection({
     secondaryImages = [],
     slug,
     gallery: galleryProp,
-    featureBlocks,
 }: ProductProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [heroOk, setHeroOk] = useState(true);
     const [moodImgOk, setMoodImgOk] = useState<Record<number, boolean>>({});
     const [overflowImgOk, setOverflowImgOk] = useState<Record<number, boolean>>({});
-    const [featureImgOk, setFeatureImgOk] = useState<Record<number, boolean>>({});
 
     const { principle } = useMemo(
         () => splitPrincipleAndPresentation(description, longDescription),
@@ -187,18 +176,6 @@ export function ProductSection({
     const overflowGalleryUrls = useMemo(
         () => secondaryDeduped.filter((u) => u && !moodboardSet.has(u)),
         [secondaryDeduped, moodboardSet]
-    );
-
-    const detailFeatureRows = useMemo(
-        () =>
-            (featureBlocks || [])
-                .map((b) => ({
-                    image: String(b?.image || '').trim(),
-                    title: String(b?.title || '').trim(),
-                    body: String(b?.description || '').trim(),
-                }))
-                .filter((b) => b.image && (b.title || b.body)),
-        [featureBlocks]
     );
 
     const brochurePairImages = useMemo(() => {
@@ -409,51 +386,6 @@ export function ProductSection({
                                     );
                                 })}
                             </div>
-                        </div>
-                    ) : null}
-
-                    {detailFeatureRows.length > 0 ? (
-                        <div className={`space-y-16 md:space-y-24 pt-16 md:pt-24 border-t border-slate-200 mt-16 md:mt-24`}>
-                            {detailFeatureRows.map((row, i) => {
-                                const isEven = i % 2 === 0;
-                                const ok = featureImgOk[i] !== false;
-                                return (
-                                    <div
-                                        key={`feat-${row.image}-${i}`}
-                                        className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center"
-                                    >
-                                        <div className={`${isEven ? 'order-1' : 'order-1 lg:order-2'} relative w-full aspect-[4/3] rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-lg`}>
-                                            {ok ? (
-                                                <Image
-                                                    src={row.image}
-                                                    alt={`${title} — ${row.title || 'detaliu'}`}
-                                                    fill
-                                                    className="object-cover"
-                                                    sizes="(max-width: 1024px) 100vw, 50vw"
-                                                    onError={() =>
-                                                        setFeatureImgOk((prev) => ({
-                                                            ...prev,
-                                                            [i]: false,
-                                                        }))
-                                                    }
-                                                />
-                                            ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center text-zinc-500 text-xs p-4 text-center">
-                                                    Imagine indisponibilă
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className={`${isEven ? 'order-2' : 'order-2 lg:order-1'} flex flex-col justify-center`}>
-                                            <h2 className="text-xs font-black uppercase tracking-[0.28em] text-[#1B4332] mb-4 border-l-4 border-[#2d6a4f] pl-4">
-                                                {row.title || 'În detaliu'}
-                                            </h2>
-                                            <div className="text-zinc-700 text-base sm:text-[17px] leading-relaxed whitespace-pre-line text-pretty">
-                                                {row.body}
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
                         </div>
                     ) : null}
                 </div>

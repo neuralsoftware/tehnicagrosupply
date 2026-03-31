@@ -91,15 +91,11 @@ export default async function ProductPage({ params }: PageProps) {
     );
 
     const mainImage = (product.imageSrc || '').trim();
+    /** Doar galeria produsului — imaginile din „blocuri broșură dedicată” sunt exclusiv pentru PDF, nu apar pe site. */
     const fromGallery = (product.gallery || []).filter(
         (u) => u && String(u).trim() && String(u).trim() !== mainImage
     );
-    const fromFeatureBlocks = (product.featureBlocks || [])
-        .map((b) => String(b?.image || '').trim())
-        .filter((u) => u.length > 0 && u !== mainImage);
-    const secondaryImages = [...fromGallery, ...fromFeatureBlocks].filter(
-        (u, i, arr) => arr.indexOf(u) === i
-    );
+    const secondaryImages = [...fromGallery].filter((u, i, arr) => arr.indexOf(u) === i);
 
     const breadcrumbItems = [
         { label: 'Acasă', href: '/' },
@@ -135,7 +131,6 @@ export default async function ProductPage({ params }: PageProps) {
                 expertVerdict={product.expertVerdict}
                 gallery={product.gallery}
                 secondaryImages={secondaryImages}
-                featureBlocks={product.featureBlocks}
                 ctaLabel="Solicită Ofertă Tehnică"
             />
 

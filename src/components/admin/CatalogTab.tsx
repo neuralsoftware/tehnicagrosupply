@@ -219,8 +219,8 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                             Catalog site. Text lung + galerie extra: tab „Date broșură”.
                         </p>
                         <p className="text-[10px] text-sky-400/95 font-bold uppercase tracking-widest mt-2 max-w-xl leading-relaxed">
-                            Broșură PDF dedicată (deep dive): secțiunea albastră „Blocuri broșură dedicată” este mai jos, imediat după
-                            imaginea principală.
+                            Secțiunea albastră „Blocuri broșură dedicată”: <strong className="text-sky-300">doar în PDF</strong>
+                            (broșuri din Catalog sau Materiale), <strong className="text-sky-300">nu pe site</strong>.
                         </p>
                     </div>
                     <button
@@ -350,11 +350,11 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                 <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 border-l-4 border-l-sky-500 space-y-4 ring-1 ring-sky-900/30">
                     <div>
                         <label className="block text-[11px] text-sky-300 uppercase font-black tracking-widest">
-                            Blocuri broșură dedicată (PDF deep dive)
+                            Blocuri broșură dedicată (exclusiv PDF)
                         </label>
                         <p className="text-[11px] text-zinc-400 mt-2 leading-relaxed font-medium normal-case">
-                            Aici adaugi secțiunile pentru broșura pe un singur produs (titlu, text, poză). Se văd în PDF zig-zag, câte 2
-                            pe pagină. Nu apare pe site public — doar în PDF generat din Catalog sau din Materiale.
+                            Secțiuni imagine + titlu + text pentru broșura PDF pe un singur produs (layout zig-zag, câte 2 pe pagină).
+                            Nu sunt afișate pe pagina publică de produs — doar în documentele PDF generate.
                         </p>
                     </div>
                     {(editing.featureBlocks || []).map((block, idx) => (
