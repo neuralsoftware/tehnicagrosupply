@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { saveProduct, deleteProduct, DynamicProduct } from '@/lib/products-store';
+import { saveProduct, deleteProduct, getProducts, DynamicProduct } from '@/lib/products-store';
 
 export async function PUT(request: Request, { params }: { params: Promise<{ slug: string }> }) {
     try {
@@ -22,7 +22,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ slug
         await saveProduct({ ...updates, slug } as DynamicProduct, {
             siteCatalogOnly: Boolean(siteCatalogOnly),
         });
-        return NextResponse.json({ success: true });
+        const products = await getProducts();
+        return NextResponse.json({ success: true, products });
     } catch {
         return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
     }
@@ -47,7 +48,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
         }
 
         await deleteProduct(slug);
-        return NextResponse.json({ success: true });
+        const products = await getProducts();
+        return NextResponse.json({ success: true, products });
     } catch {
         return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
     }

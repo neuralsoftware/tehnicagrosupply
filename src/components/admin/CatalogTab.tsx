@@ -140,11 +140,15 @@ export function CatalogTab({ adminAuth, categories }: Props) {
             }
             setEditing(null);
             setImageUrl('');
+            const fresh = (data as { products?: DynamicProduct[] }).products;
+            if (Array.isArray(fresh)) {
+                setProducts(fresh);
+            } else {
+                await load();
+                await new Promise((r) => setTimeout(r, 400));
+                await load();
+            }
             router.refresh();
-            await load();
-            /* ultimă încercare după scriere în Storage (evită lista învechită la CDN) */
-            await new Promise((r) => setTimeout(r, 400));
-            await load();
         } finally {
             setSaving(false);
         }
@@ -190,13 +194,20 @@ export function CatalogTab({ adminAuth, categories }: Props) {
 
     const del = async (slug: string) => {
         if (!confirm('Ștergi produsul?')) return;
-        await fetch(`/api/products/${slug}`, {
+        const res = await fetch(`/api/products/${slug}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ adminAuth: (adminAuth || '').trim() }),
         });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            alert((data as { error?: string }).error || 'Ștergerea a eșuat.');
+            return;
+        }
+        const fresh = (data as { products?: DynamicProduct[] }).products;
+        if (Array.isArray(fresh)) setProducts(fresh);
+        else await load();
         router.refresh();
-        await load();
     };
 
     if (!loaded)

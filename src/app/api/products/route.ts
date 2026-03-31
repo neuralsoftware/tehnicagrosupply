@@ -38,7 +38,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Slug, name, and category are required' }, { status: 400 });
         }
         await saveProduct(product as DynamicProduct, { siteCatalogOnly: Boolean(siteCatalogOnly) });
-        return NextResponse.json({ success: true, product });
+        const products = await getProducts();
+        return NextResponse.json({ success: true, product, products });
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Eroare la salvare';
         console.error('[api/products POST]', error);
