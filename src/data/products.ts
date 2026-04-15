@@ -4,8 +4,6 @@
 
 import multisemAds from './products/semanat-fertilizat/multisem-ads.json';
 import chainDiscKse680 from './products/pregatire-sol/chain-disc-kse-680.json';
-import powerbank from './products/recoltare-logistica/powerbank.json';
-import booster from './products/recoltare-logistica/booster.json';
 
 export interface Product {
     id: string;
@@ -39,8 +37,6 @@ export interface Product {
 export const PRODUCTS: Product[] = [
     multisemAds as Product,
     chainDiscKse680 as Product,
-    powerbank as Product,
-    booster as Product,
 ];
 
 // Base categories (static) — new categories can be added from Admin UI
