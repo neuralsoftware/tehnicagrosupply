@@ -49,7 +49,7 @@ export async function FeaturedMachinery() {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8 items-stretch">
-                    {showcaseProducts.map((product, index) => (
+                    {showcaseProducts.map((product) => (
                         <div
                             key={product.id}
                             className="group relative flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-zinc-200 hover:border-ea-green-500/50 hover:shadow-lg transition-all"
