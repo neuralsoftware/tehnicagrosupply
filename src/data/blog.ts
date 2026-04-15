@@ -122,7 +122,7 @@ export const BLOG_POSTS: BlogPost[] = [
       <ul>
         <li><strong><a href="/utilaje/semanat-fertilizat/multisem-ads">Semănătoarea Avers-Agro Multisem ADS</a></strong> — eligibilă categoria „Semănători"</li>
         <li><strong><a href="/utilaje/pregatire-sol/chain-disc-kse-680">Fliegl Chain Disc KSE 680</a></strong> — eligibilă categoria „Utilaje pregătire sol"</li>
-        <li><strong><a href="/utilaje/recoltare-logistica/powerbank">K-Factor Powerbank</a></strong> — eligibilă categoria „Remorci agricole"</li>
+        <li><strong><a href="/utilaje/recoltare-logistica">Remorci Fliegl ULW &amp; DK</a></strong> — eligibile categoria „Remorci agricole"</li>
       </ul>
 
       <h3>Procesul de aplicare în 5 pași</h3>
@@ -341,7 +341,7 @@ export const BLOG_POSTS: BlogPost[] = [
       <ul>
         <li><strong>Avers-Agro Multisem ADS:</strong> Semănătoare No-Till eligibilă PD-04 și DR-12</li>
         <li><strong>Fliegl Chain Disc KSE 680:</strong> Soluție GAEC 6 eligibilă DR-12</li>
-        <li><strong>K-Factor Powerbank & Booster:</strong> Remorci de transbordare pentru eficientizarea recoltării</li>
+        <li><strong>Remorci Fliegl ULW & DK/DDK:</strong> Remorci de transport cereale pentru eficientizarea recoltării</li>
       </ul>
 
       <p>Contactează-ne pentru a primi un <strong>raport personalizat</strong> cu calculul subvențiilor și economiilor pentru ferma ta.</p>

@@ -165,13 +165,6 @@ export function Contact({
                                         className="h-8 w-auto object-contain opacity-80 transition-opacity hover:opacity-100 md:h-9"
                                     />
                                     <Image
-                                        src="/logos/brands/k-factor.webp"
-                                        alt="K-Factor"
-                                        width={160}
-                                        height={40}
-                                        className="h-8 w-auto object-contain brightness-0 opacity-70 transition-opacity hover:opacity-100 md:h-9"
-                                    />
-                                    <Image
                                         src="/logos/brands/provitis.svg"
                                         alt="Provitis"
                                         width={180}

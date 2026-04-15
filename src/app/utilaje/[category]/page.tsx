@@ -59,9 +59,9 @@ const CATEGORY_SEO: Record<string, { title: string; description: string; keyword
         keywords: ['utilaje protectia plantelor', 'masini aplicat pesticide', 'sprayer agricol romania', 'atomizor agricol pret'],
     },
     'recoltare-logistica': {
-        title: 'Remorci & Utilaje Logistică Agricolă | K-Factor | TehnicAgro Supply',
-        description: 'Remorci de transbordare cereale K-Factor Powerbank & Booster. Eficientizează recoltarea, reduce pierderile și costurile de transport. Eligibile DR-12.',
-        keywords: ['remorca transbordare cereale', 'k-factor powerbank', 'remorca agricola cereale', 'logistica recoltare romania', 'remorca cereale pret'],
+        title: 'Remorci Agricole Fliegl ULW & DK | Logistică Recoltare | TehnicAgro Supply',
+        description: 'Remorci de transport cereale Fliegl seria ULW și DK/DDK — capacitate mare, construcție robustă, soluții complete de logistică agricolă. Eligibile DR-12. Solicită ofertă.',
+        keywords: ['remorci agricole fliegl', 'remorca ulw fliegl', 'remorca dk fliegl', 'remorca cereale pret', 'logistica recoltare romania', 'remorci transport cereale'],
     },
 };
 

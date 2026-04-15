@@ -129,7 +129,7 @@ export default async function PieseSchimbPage() {
                 "name": "Furnizați piese și pentru alte mărci de utilaje agricole?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Da. Pe lângă piesele pentru utilajele din portofoliu (Avers-Agro, Fliegl, K-Factor, Kurt ALP, Bargam), oferim piese la comandă pentru Amazone, Lemken, Väderstad, Pöttinger, Gaspardo, Horsch, John Deere și alte branduri. Trimiteți-ne modelul utilajului și piesa necesară."
+                    "text": "Da. Pe lângă piesele pentru utilajele din portofoliu (Avers-Agro, Fliegl, Provitis, Kurt ALP, Bargam), oferim piese la comandă pentru Amazone, Lemken, Väderstad, Pöttinger, Gaspardo, Horsch, John Deere și alte branduri. Trimiteți-ne modelul utilajului și piesa necesară."
                 }
             },
             {

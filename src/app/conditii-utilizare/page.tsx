@@ -31,7 +31,7 @@ export default function TermsOfUse() {
                     <div className="space-y-4">
                         <h2 className="text-2xl font-bold text-white uppercase tracking-tight">2. Proprietate Intelectuală</h2>
                         <p>
-                            Conținutul prezentat pe acest site (texte, specificații tehnice ale utilajelor, articole de blog, imagini și elemente grafice) este proprietatea TehnicAgro Supply sau a partenerilor noștri (Avers-Agro, Fliegl, K-Factor) și este protejat de legile dreptului de autor. Este interzisă copierea sau redistribuirea acestui conținut fără acordul scris prealabil.
+                            Conținutul prezentat pe acest site (texte, specificații tehnice ale utilajelor, articole de blog, imagini și elemente grafice) este proprietatea TehnicAgro Supply sau a partenerilor noștri (Avers-Agro, Fliegl, Provitis) și este protejat de legile dreptului de autor. Este interzisă copierea sau redistribuirea acestui conținut fără acordul scris prealabil.
                         </p>
                     </div>
 
