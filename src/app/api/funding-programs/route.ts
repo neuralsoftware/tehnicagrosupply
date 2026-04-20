@@ -1,12 +1,22 @@
 import { NextResponse } from 'next/server';
 import { FUNDING_PROGRAMS, FundingProgram } from '@/data/funding-programs';
 import { readJsonFromSupabase, uploadToSupabase } from '@/lib/supabase';
+import { timingSafeEqual } from 'crypto';
 
 const PROGRAMS_BLOB_KEY = 'catalog/funding-programs.json';
 
 function isAuthenticated(request: Request): boolean {
-    const auth = request.headers.get('x-admin-auth');
-    return auth === process.env.ADMIN_PASSWORD;
+    const auth = (request.headers.get('x-admin-auth') || '').trim();
+    const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+    if (!auth || !serverPass) return false;
+    try {
+        const a = Buffer.from(auth, 'utf8');
+        const b = Buffer.from(serverPass, 'utf8');
+        if (a.length !== b.length) return false;
+        return timingSafeEqual(a, b);
+    } catch {
+        return false;
+    }
 }
 
 async function getOverrides(): Promise<Record<string, Partial<FundingProgram>>> {

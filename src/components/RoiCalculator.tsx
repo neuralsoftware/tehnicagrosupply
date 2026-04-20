@@ -157,7 +157,7 @@ export function RoiCalculator({
                 const reportRes = await fetch('/api/send-report', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(leadData),
+                    body: JSON.stringify({ ...leadData, clientId: data.lead?.id }),
                 });
                 if (!reportRes.ok) {
                     console.warn('[ROI] send-report', reportRes.status);

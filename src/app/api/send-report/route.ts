@@ -1,12 +1,30 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { simpleRateLimit } from '@/lib/leads';
+import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
+
+/** Fără emoji — CRM-ul poate afișa greșit caracterele speciale în titluri sarcini */
+function crmSafePlainText(text: string): string {
+    return text
+        .replace(/\p{Extended_Pictographic}/gu, '')
+        .replace(/\uFE0F/g, '')
+        .replace(/[\u200D\u200C]/g, '')
+        .replace(/[ \t]+$/gm, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+}
+
+/** Dată scadentă în ora României (Europe/Bucharest) — fără suffix Z, ca sarcinile create din CRM. */
+function crmTaskDueDateIso(daysFromNow: number): string {
+    const date = new Date(Date.now() + daysFromNow * 24 * 60 * 60 * 1000);
+    return date.toLocaleString('sv', { timeZone: 'Europe/Bucharest' }).replace(' ', 'T');
+}
 
 export async function POST(request: Request) {
     try {
-        // Rate limiting for email sending (3 reports per hour per IP)
+        // Rate limiting — 3 rapoarte pe oră per IP
         const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-        const allowed = simpleRateLimit(`send-report:${ip}`, 3, 3600000); // 3 per hour
+        const allowed = simpleRateLimit(`send-report:${ip}`, 3, 3600000);
 
         if (!allowed) {
             return NextResponse.json(
@@ -21,6 +39,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'No email provided' }, { status: 400 });
         }
 
+        // ── 1. TRIMITE EMAILUL ────────────────────────────────────────────────
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -55,7 +74,7 @@ export async function POST(request: Request) {
                         .benefit-card h3 { margin: 0 0 10px 0; color: #065f46; font-size: 18px; }
                         .detail-list { margin: 0; padding: 0; list-style: none; font-size: 14px; }
                         .detail-list li { margin-bottom: 8px; padding-left: 20px; position: relative; }
-                        .detail-list li:before { content: "✓"; position: absolute; left: 0; color: #059669; font-weight: bold; }
+                        .detail-list li:before { content: "v"; position: absolute; left: 0; color: #059669; font-weight: bold; }
                         .verdict { background: #fffbeb; border: 1px solid #fde68a; padding: 20px; border-radius: 8px; margin-top: 30px; }
                         .verdict h4 { margin: 0 0 10px 0; color: #92400e; text-transform: uppercase; font-size: 14px; }
                         .footer { background: #f3f4f6; color: #9ca3af; padding: 20px; text-align: center; font-size: 11px; }
@@ -68,13 +87,13 @@ export async function POST(request: Request) {
                             <h1>Raport Audit Tehnicagro</h1>
                             <p style="margin-top: 10px; opacity: 0.9;">Pregătit special pentru ${lead.name}</p>
                         </div>
-                        
+
                         <div class="content">
                             <p>Bună ziua,</p>
                             <p>Vă mulțumim pentru interesul acordat tehnologiilor de precizie TehnicAgro. În urma datelor furnizate, specialiștii noștri au elaborat o diagnoză preliminară a eficienței pentru ferma dvs. din județul <strong>${lead.county}</strong>.</p>
 
                             <div class="section-title">Parametri Analiză: ${lead.hectares} HA</div>
-                            
+
                             <div class="lead-info">
                                 <ul style="list-style: none; padding: 0; font-size: 14px;">
                                     <li><strong>Culturi vizate:</strong> ${lead.crops?.join(', ') || 'Nespecificat'}</li>
@@ -84,7 +103,7 @@ export async function POST(request: Request) {
                             </div>
 
                             <div class="section-title">Impact Financiar Detaliat (Anual)</div>
-                            
+
                             <div class="stat-grid">
                                 <div class="stat-item">
                                     <div class="stat-label">Subvenție Securizată (PD-04)</div>
@@ -133,7 +152,47 @@ export async function POST(request: Request) {
 
         await transporter.sendMail(mailOptions);
 
+        // ── 2. SARCINĂ ÎN CRM ────────────────────────────────────────────────
+        // Rulează async după email — o eroare CRM nu blochează confirmarea
+        try {
+            const crm = getSupabaseCrmAdmin();
+            const clientId = lead.clientId ?? null;
+
+            if (crm && clientId != null) {
+                const beneficiu = Number(lead.totalBenefit ?? 0);
+                const hectare = Number(lead.hectares ?? 0);
+                const culturi = Array.isArray(lead.crops) && lead.crops.length > 0
+                    ? lead.crops.join(', ')
+                    : '-';
+
+                const descriere = crmSafePlainText([
+                    `Sursa: Calculator ROI Website`,
+                    `Suprafata: ${hectare} ha | Judet: ${lead.county || '-'}`,
+                    `Culturi: ${culturi}`,
+                    `Orizont investitie: ${lead.urgency || '-'}`,
+                    `Beneficiu total estimat: ${beneficiu.toLocaleString('ro-RO')} RON/an`,
+                    `  - Subventie PD-04: ${Number(lead.subsidyIncome ?? 0).toLocaleString('ro-RO')} RON`,
+                    `  - Economie motorina: ${Number(lead.fuelSavings ?? 0).toLocaleString('ro-RO')} RON`,
+                    `Raport audit trimis pe email: ${String(lead.email ?? '')}`,
+                ].join('\n'));
+
+                await crm.from('client_tasks').insert([{
+                    client_id: clientId,
+                    title: 'CALC ROI: Raport audit trimis pe email',
+                    description: descriere,
+                    due_date: crmTaskDueDateIso(2),
+                    status: 'De facut',
+                    resolution: '',
+                    is_completed: 0,
+                }]);
+            }
+        } catch (crmErr) {
+            // Nu blocăm răspunsul dacă CRM-ul are o eroare
+            console.error('[send-report] CRM task insert error:', crmErr);
+        }
+
         return NextResponse.json({ success: true });
+
     } catch (error) {
         console.error('Email error:', error);
         return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });

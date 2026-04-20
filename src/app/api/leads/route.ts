@@ -94,10 +94,11 @@ async function resolveDefaultClientRepresentative(crm: SupabaseClient): Promise<
 /** Tabel sarcini/mesaje în proiectul CRM (mesajul site → task). Supabase: public.<nume>. */
 const CRM_TASKS_TABLE = process.env.CRM_TASKS_TABLE?.trim() || 'client_tasks';
 
-/** Aceeași formă ca sarcinile create din CRM: fără sufix `Z` (ex. `2026-03-26T15:23:33.794`). */
+/** Dată scadentă în ora României (Europe/Bucharest) — fără suffix Z, ca sarcinile create din CRM. */
 function crmTaskDueDateIso(daysFromNow: number): string {
-    const ms = Date.now() + daysFromNow * 24 * 60 * 60 * 1000;
-    return new Date(ms).toISOString().replace(/Z$/, '');
+    const date = new Date(Date.now() + daysFromNow * 24 * 60 * 60 * 1000);
+    // 'sv' locale returnează YYYY-MM-DD HH:MM:SS în timezone-ul cerut
+    return date.toLocaleString('sv', { timeZone: 'Europe/Bucharest' }).replace(' ', 'T');
 }
 
 /** Inserare în `client_tasks` — coloane obligatorii din API acolo unde DB nu are default. */
@@ -196,7 +197,10 @@ export async function POST(request: Request) {
             phone: leadData.phone || '',
             email: leadData.email || '',
             county: leadData.county || '',
-            source: leadData.source?.trim() || 'Website Form',
+            // CRM-ul verifică source === 'website' (lowercase exact) ca să afișeze
+            // bannerul "Lead nou" și să reîmprospăteze lista de clienți în timp real.
+            // Sursa originală (ROI Calculator / Website Form) se păstrează în tabelul leads și în sarcină.
+            source: 'website',
         };
         if (defaultRepresentative) {
             clientPayload.representative = defaultRepresentative;

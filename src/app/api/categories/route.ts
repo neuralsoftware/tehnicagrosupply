@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server';
 import { getCategories, saveCategory, Category } from '@/lib/products-store';
+import { timingSafeEqual } from 'crypto';
 
 function isAuthenticated(request: Request): boolean {
     const headerAuth = (request.headers.get('x-admin-auth') || '').trim();
     const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
-    return headerAuth !== '' && headerAuth === serverPass;
+    if (!headerAuth || !serverPass) return false;
+    try {
+        const a = Buffer.from(headerAuth, 'utf8');
+        const b = Buffer.from(serverPass, 'utf8');
+        if (a.length !== b.length) return false;
+        return timingSafeEqual(a, b);
+    } catch {
+        return false;
+    }
 }
 
 export async function GET() {
