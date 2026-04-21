@@ -97,12 +97,13 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             title: 'Investiții în procesare și comercializare produse agricole',
             agency: 'AFIR',
             sector: 'Procesare și logistică produse vegetale',
-            maxGrant: '2M EUR',
-            deadline: 'TBD — estimat 2026',
-            status: 'upcoming',
-            lastVerified: '2026-03-24',
-            sourceUrl: 'https://www.afir.ro/dr-23',
-            details: 'Include echipamente de transport, stocare și procesare primară a produselor agricole. Relevant pentru remorcile de transbordare cu capacitate mare.'
+            maxGrant: '10M EUR per beneficiar',
+            deadline: 'Sesiunea 01/2026 ÎNCHISĂ — 16 Feb 2026',
+            status: 'suspended',
+            lastVerified: '2026-04-21',
+            sourceUrl: 'https://www.afir.ro/domenii-de-interventie/detalii-si-anexe-dr-23/',
+            details: 'Include echipamente de transport, stocare și procesare primară a produselor agricole. Relevant pentru remorcile de transbordare cu capacitate mare. Alocare totală: 164.9M EUR (82.4M înființare + 82.4M modernizare).',
+            notes: 'Sesiunea 01/2026 s-a ÎNCHIS pe 16 feb 2026. Monitorizează afir.ro pentru sesiune nouă.'
         }
     ],
 
@@ -134,16 +135,16 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
         },
         {
             code: 'DR-17',
-            title: 'Investiții în sectorul struguri de masă',
+            title: 'Investiții în sectorul hamei și/sau struguri de masă',
             agency: 'AFIR',
-            sector: 'Viticultură — struguri de masă',
+            sector: 'Viticultură — struguri de masă, hamei',
             maxGrant: '1.5M EUR per proiect',
-            deadline: 'Estimat Martie 2026',
+            deadline: 'Estimat lansare sesiune 2026 — TBD',
             status: 'upcoming',
-            lastVerified: '2026-03-24',
-            sourceUrl: 'https://www.afir.ro/dr-17',
-            details: 'Alocare 40M EUR. Include înființare și modernizare plantații, utilaje specifice pentru struguri de masă, sisteme de irigare, echipamente de sortare și ambalare. Fermieri individuali și forme asociative.',
-            notes: 'Estimat deschidere sesiune Febr-Martie 2026 — urmărește afir.ro'
+            lastVerified: '2026-04-21',
+            sourceUrl: 'https://www.afir.ro/comunicate/consultare-publica-lansata-de-afir-pentru-investitiile-in-struguri-de-masa/',
+            details: 'Alocare 45M EUR. Include înființare și modernizare plantații, utilaje specifice pentru struguri de masă și hamei, sisteme de irigare, echipamente de sortare și ambalare. Beneficiari eligibili: fermieri (nu persoane fizice), cooperative agricole, grupuri de producători.',
+            notes: 'Consultare publică ghid publicată ian 2026. Sesiunea de depunere nu a fost deschisă încă — urmărește afir.ro.'
         }
     ],
 
@@ -153,13 +154,13 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             title: 'Investiții în sectorul legume și/sau cartofi',
             agency: 'AFIR',
             sector: 'Legumicultură, cartofi, spații protejate',
-            maxGrant: '2M EUR (complex) / 300.000 EUR (simplu, față de cartofi: 700.000 EUR)',
-            deadline: 'Estimat T4 2025 — T1 2026',
-            status: 'upcoming',
-            lastVerified: '2026-03-24',
-            sourceUrl: 'https://www.afir.ro/dr-16',
-            details: 'Alocare 151M EUR. Investiții în: înființare și modernizare ferme legumicole, spații protejate (sere, solarii), echipamente de irigare, utilaje de lucrul solului în legumicultură, sisteme de avertizare. Intensitate ajutor: 50-65%.',
-            notes: 'Așteptată lansare — monitorizează afir.ro'
+            maxGrant: '2M EUR (complex) / 300.000 EUR (simplu) / 700.000 EUR (cartofi)',
+            deadline: 'Sesiunea 01/2026 ÎNCHISĂ — 20 Mar 2026',
+            status: 'suspended',
+            lastVerified: '2026-04-21',
+            sourceUrl: 'https://www.afir.ro/domenii-de-interventie/detalii-si-anexe-dr-16/',
+            details: 'Alocare 151.3M EUR (70.4M legume ferme individuale + 51M cartofi + 30M forme asociative). Investiții în: înființare și modernizare ferme legumicole, spații protejate (sere, solarii), echipamente de irigare, utilaje de lucrul solului în legumicultură, sisteme de avertizare. Intensitate ajutor: 50-65%.',
+            notes: 'Sesiunea 01/2026 s-a ÎNCHIS pe 20 mar 2026 (deschisă 19 ian 2026). Urmărește afir.ro pentru sesiune nouă.'
         }
     ],
 
@@ -170,11 +171,12 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             agency: 'AFIR',
             sector: 'Agricultură ecologică, managementul pesticidelor',
             maxGrant: '200.000 EUR',
-            deadline: 'TBD — 2026',
-            status: 'upcoming',
-            lastVerified: '2026-03-24',
-            sourceUrl: 'https://www.afir.ro/dr-19',
-            details: 'Include echipamente de protecție a plantelor care reduc utilizarea pesticidelor: sprayer-e cu precizie, sisteme GPS pentru aplicare variabilă. Intensitate: 100% (non-productiv).'
+            deadline: '30 Apr 2026 (sesiune activă)',
+            status: 'active',
+            lastVerified: '2026-04-21',
+            sourceUrl: 'https://www.afir.ro/domenii-de-interventie/detalii-si-anexe-dr-19',
+            details: 'Include echipamente de protecție a plantelor care reduc utilizarea pesticidelor: sprayer-e cu precizie, sisteme GPS pentru aplicare variabilă. Intensitate: 100% (non-productiv). Alocare: 11.76M EUR.',
+            notes: 'ACTIV — sesiune deschisă 9 mar 2026, deadline 30 apr 2026. Depunere online pe afir.ro.'
         }
     ],
 };

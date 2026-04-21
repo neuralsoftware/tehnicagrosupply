@@ -23,6 +23,7 @@ export function ProgrameTab({ adminAuth }: Props) {
     const [programs, setPrograms] = useState<Record<string, FundingProgram[]>>({});
     const [loaded, setLoaded] = useState(false);
     const [saving, setSaving] = useState<string | null>(null);
+    const [saveError, setSaveError] = useState<string | null>(null);
     const [notes, setNotes] = useState<Record<string, string>>({});
 
     const load = async () => {
@@ -52,13 +53,23 @@ export function ProgrameTab({ adminAuth }: Props) {
 
     const update = async (code: string, updates: Partial<FundingProgram>) => {
         setSaving(code);
-        await fetch('/api/funding-programs', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'x-admin-auth': adminAuth },
-            body: JSON.stringify({ code, updates }),
-        });
-        setSaving(null);
-        load();
+        setSaveError(null);
+        try {
+            const res = await fetch('/api/funding-programs', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'x-admin-auth': adminAuth },
+                body: JSON.stringify({ code, updates }),
+            });
+            if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                setSaveError(`Eroare ${res.status}: ${body?.error || 'Server error'}`);
+            }
+        } catch (e) {
+            setSaveError(`Eroare conexiune: ${e instanceof Error ? e.message : 'unknown'}`);
+        } finally {
+            setSaving(null);
+            load();
+        }
     };
 
     const markVerified = (p: FundingProgram) => update(p.code, { lastVerified: new Date().toISOString().split('T')[0] });
@@ -83,6 +94,9 @@ export function ProgrameTab({ adminAuth }: Props) {
                 <div>
                     <p className="text-zinc-500 text-sm">{allPrograms.length} programe — {allPrograms.filter(p => p.status === 'active').length} active</p>
                     <p className="text-[10px] text-zinc-600 mt-1">Actualizează statusul manual după verificarea pe afir.ro / apia.org.ro</p>
+                    {saveError && (
+                        <p className="text-red-400 text-[10px] font-bold mt-1">⚠ {saveError}</p>
+                    )}
                 </div>
                 <button onClick={load} className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-zinc-400 hover:text-white text-xs font-bold uppercase">
                     <RefreshCcw className="w-3.5 h-3.5" />Reîncarcă
@@ -117,8 +131,8 @@ export function ProgrameTab({ adminAuth }: Props) {
                                     <button onClick={() => markVerified(p)} disabled={saving === p.code} className="px-3 py-1.5 bg-zinc-800 hover:bg-ea-green-900/40 rounded-lg text-zinc-400 hover:text-ea-green-400 text-[10px] font-bold uppercase">
                                         {saving === p.code ? '...' : '✓ Verificat Azi'}
                                     </button>
-                                    <button onClick={() => cycleStatus(p)} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase border ${STATUS_STYLES[p.status]}`}>
-                                        Schimbă Status
+                                    <button onClick={() => cycleStatus(p)} disabled={saving === p.code} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase border disabled:opacity-40 ${STATUS_STYLES[p.status]}`}>
+                                        {saving === p.code ? '...' : 'Schimbă Status'}
                                     </button>
                                 </div>
                             </div>
