@@ -2,11 +2,13 @@ import CookieBanner from '@/components/CookieBanner';
 import type { Metadata } from 'next';
 import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
-import { ConsentGatedAnalytics } from '@/components/ConsentGatedAnalytics';
 import { ConsentGatedMarketing } from '@/components/ConsentGatedMarketing';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { SITE_CONTACT } from '@/lib/site-contact';
+import { GoogleAnalytics } from '@next/third-parties/google';
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-KR6928Z45R';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
@@ -104,12 +106,13 @@ export default function RootLayout({
                         __html: `
                             window.dataLayer = window.dataLayer || [];
                             function gtag(){dataLayer.push(arguments);}
+                            window.gtag = gtag;
                             gtag('consent', 'default', {
                                 'ad_storage': 'denied',
                                 'analytics_storage': 'denied',
                                 'ad_user_data': 'denied',
                                 'ad_personalization': 'denied',
-                                'wait_for_update': 500
+                                'wait_for_update': 2000
                             });
                         `,
                     }}
@@ -120,8 +123,8 @@ export default function RootLayout({
                 <Footer />
 
                 <CookieBanner />
-                <ConsentGatedAnalytics />
                 <ConsentGatedMarketing />
+                <GoogleAnalytics gaId={GA_ID} />
             </body>
         </html>
     );
