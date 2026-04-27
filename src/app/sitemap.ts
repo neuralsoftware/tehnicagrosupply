@@ -6,6 +6,9 @@ import { getSiteBaseUrl } from '@/lib/site-base-url';
 /** Regenerare periodică — aliniat la catalog / blog. */
 export const revalidate = 3600;
 
+// Data ultimei actualizări semnificative a site-ului
+const SITE_LAST_UPDATED = new Date('2026-04-27');
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = getSiteBaseUrl();
     const now = new Date();
@@ -23,8 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const staticEntries: MetadataRoute.Sitemap = staticPaths.map((path) => ({
         url: `${baseUrl}${path}`,
-        lastModified: now,
-        changeFrequency: path === '' ? 'daily' : 'weekly',
+        lastModified: SITE_LAST_UPDATED,
+        changeFrequency: path === '' ? 'weekly' : 'monthly',
         priority: path === '' ? 1 : 0.8,
     }));
 
@@ -36,8 +39,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
         categoryEntries = categories.map((c) => ({
             url: `${baseUrl}/utilaje/${c.slug}`,
-            lastModified: now,
-            changeFrequency: 'weekly' as const,
+            lastModified: SITE_LAST_UPDATED,
+            changeFrequency: 'monthly' as const,
             priority: 0.85,
         }));
 
