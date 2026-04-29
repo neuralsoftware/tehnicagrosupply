@@ -6,9 +6,8 @@ import { ConsentGatedMarketing } from '@/components/ConsentGatedMarketing';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { SITE_CONTACT } from '@/lib/site-contact';
-import { GoogleAnalytics } from '@next/third-parties/google';
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-KR6928Z45R';
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? 'G-KR6928Z45R';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
@@ -67,6 +66,26 @@ export default function RootLayout({
                 {/* Facebook Domain Verification */}
                 <meta name="facebook-domain-verification" content="6oeyh29v3v848nr6qv4bsvovm2irfd" />
 
+                {/* Google Analytics — consent defaults ÎNAINTE de scriptul GA (cerință Consent Mode v2) */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            window.gtag = gtag;
+                            gtag('consent', 'default', {
+                                'ad_storage': 'denied',
+                                'analytics_storage': 'denied',
+                                'ad_user_data': 'denied',
+                                'ad_personalization': 'denied',
+                                'wait_for_update': 2000
+                            });
+                            gtag('js', new Date());
+                            gtag('config', '${GA_ID}');
+                        `,
+                    }}
+                />
+                <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
             </head>
             <body className={inter.className}>
                 {/* Schema.org Organization Structured Data */}
@@ -101,30 +120,12 @@ export default function RootLayout({
                     }}
                 />
 
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                            window.dataLayer = window.dataLayer || [];
-                            function gtag(){dataLayer.push(arguments);}
-                            window.gtag = gtag;
-                            gtag('consent', 'default', {
-                                'ad_storage': 'denied',
-                                'analytics_storage': 'denied',
-                                'ad_user_data': 'denied',
-                                'ad_personalization': 'denied',
-                                'wait_for_update': 2000
-                            });
-                        `,
-                    }}
-                />
-
                 <Navbar />
                 {children}
                 <Footer />
 
                 <CookieBanner />
                 <ConsentGatedMarketing />
-                <GoogleAnalytics gaId={GA_ID} />
             </body>
         </html>
     );
