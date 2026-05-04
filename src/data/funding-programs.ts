@@ -32,7 +32,7 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             maxGrant: '50-80 EUR/ha/an',
             deadline: 'Cerere unică APIA — anual',
             status: 'active',
-            lastVerified: '2026-03-24',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.apia.org.ro/ro/campania-2026',
             details: 'Obligatoriu: acoperirea solului în perioada 15 iunie – 15 octombrie. Resturile vegetale trebuie menținute la suprafață, fără îngropare. Utilajele de tip Chain Disc / grape cu lanțuri sunt soluția ideală de conformitate. Nerespectarea GAEC 6 atrage penalități de -3% din plățile directe.',
             notes: 'Campania 2026 — cerere unică în curs de depunere'
@@ -45,7 +45,7 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             maxGrant: '300.000 EUR (simplu) / 2M EUR (complex)',
             deadline: 'Estimat T3 2026',
             status: 'upcoming',
-            lastVerified: '2026-03-24',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.afir.ro/dr-12',
             details: 'Finanțare utilaje și echipamente agricole pentru fermieri tineri (sub 40 ani) și exploatații nou-înființate. Intensitatea ajutorului: 50% (standard) sau 65% (zone defavorizate). Include utilaje pregătire sol, semănat, recoltare.',
         }
@@ -60,7 +60,7 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             maxGrant: '56 EUR/ha/an',
             deadline: 'Cerere unică APIA — anual',
             status: 'active',
-            lastVerified: '2026-03-24',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.apia.org.ro/ro/campania-2026/eco-scheme',
             details: 'Eligibil pentru fermieri care practică No-Till sau Mini-Till. Semănătoarea directă trebuie să nu inverseze solul. Semănătorile Avers-Agro Multisem ADS îndeplinesc toate cerințele tehnice. Plata este per hectar, indiferent de dimensiunea fermei.',
             notes: 'Activ — cerere 2026 în curs'
@@ -73,7 +73,7 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             maxGrant: '300.000 EUR (simplu) / 2M EUR (complex)',
             deadline: 'Estimat T3 2026',
             status: 'upcoming',
-            lastVerified: '2026-03-24',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.afir.ro/dr-12',
             details: 'Include utilaje de semănat și fertilizat ca investiții eligibile. Intensitatea ajutorului: 50-65%.'
         }
@@ -88,7 +88,7 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             maxGrant: '300.000 EUR (simplu) / 2M EUR (complex)',
             deadline: 'Estimat T3 2026',
             status: 'upcoming',
-            lastVerified: '2026-03-24',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.afir.ro/dr-12',
             details: 'Remorcile de transbordare cereale, echipamente de logistică agricolă sunt eligibile ca investiții în utilaje. Fermieri sub 40 ani, exploatații noi.'
         },
@@ -98,11 +98,12 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             agency: 'AFIR',
             sector: 'Procesare și logistică produse vegetale',
             maxGrant: '2M EUR',
-            deadline: 'TBD — estimat 2026',
-            status: 'upcoming',
-            lastVerified: '2026-03-24',
+            deadline: 'Sesiunea 01/2026 închisă',
+            status: 'suspended',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.afir.ro/dr-23',
-            details: 'Include echipamente de transport, stocare și procesare primară a produselor agricole. Relevant pentru remorcile de transbordare cu capacitate mare.'
+            details: 'Include echipamente de transport, stocare și procesare primară a produselor agricole. Relevant pentru remorcile de transbordare cu capacitate mare.',
+            notes: 'Sesiunea 01/2026 s-a desfășurat 15 dec 2025 – 16 feb 2026. Nu există sesiune 02/2026 anunțată.'
         }
     ],
 
@@ -115,7 +116,7 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             maxGrant: '1.5M EUR (complex) / 400.000 EUR (simplu)',
             deadline: 'Sesiuni anuale APIA',
             status: 'active',
-            lastVerified: '2026-03-24',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.apia.org.ro/ro/interventii-sectoriale/sectorul-vitivinicol',
             details: 'Finanțare pentru utilaje specifice viticulturii: tratoare viticole, echipamente de lucrul solului în vie, sisteme de irigare, utilaje de recoltare. Intensitate ajutor: 40-50%.',
             notes: 'Program activ — verifică pe APIA sesiunea curentă'
@@ -128,7 +129,7 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             maxGrant: '650.000 EUR (complex) / 250.000 EUR (simplu)',
             deadline: 'Sesiuni anuale APIA',
             status: 'active',
-            lastVerified: '2026-03-24',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.apia.org.ro/ro/interventii-sectoriale/sectorul-vitivinicol',
             details: 'Specific pentru investiții care reduc amprenta de carbon: utilaje electrice sau hibride în vie, sisteme de precizie, senzori, echipamente pentru reducerea pesticidelor.'
         },
@@ -138,12 +139,12 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             agency: 'AFIR',
             sector: 'Viticultură — struguri de masă',
             maxGrant: '1.5M EUR per proiect',
-            deadline: 'Estimat Martie 2026',
+            deadline: 'TBD — sesiunea nu s-a deschis',
             status: 'upcoming',
-            lastVerified: '2026-03-24',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.afir.ro/dr-17',
             details: 'Alocare 40M EUR. Include înființare și modernizare plantații, utilaje specifice pentru struguri de masă, sisteme de irigare, echipamente de sortare și ambalare. Fermieri individuali și forme asociative.',
-            notes: 'Estimat deschidere sesiune Febr-Martie 2026 — urmărește afir.ro'
+            notes: 'Ghid consultativ publicat ian 2026. Sesiunea de depunere nu s-a deschis încă — urmărește afir.ro'
         }
     ],
 
@@ -154,12 +155,12 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             agency: 'AFIR',
             sector: 'Legumicultură, cartofi, spații protejate',
             maxGrant: '2M EUR (complex) / 300.000 EUR (simplu, față de cartofi: 700.000 EUR)',
-            deadline: 'Estimat T4 2025 — T1 2026',
-            status: 'upcoming',
-            lastVerified: '2026-03-24',
+            deadline: 'Sesiunea 01/2026 închisă',
+            status: 'suspended',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.afir.ro/dr-16',
             details: 'Alocare 151M EUR. Investiții în: înființare și modernizare ferme legumicole, spații protejate (sere, solarii), echipamente de irigare, utilaje de lucrul solului în legumicultură, sisteme de avertizare. Intensitate ajutor: 50-65%.',
-            notes: 'Așteptată lansare — monitorizează afir.ro'
+            notes: 'Sesiunea 01/2026 s-a desfășurat 19 ian – 20 mar 2026. Fonduri epuizate din 2 feb 2026. Nu există sesiune 02/2026 anunțată.'
         }
     ],
 
@@ -170,11 +171,12 @@ export const FUNDING_PROGRAMS: Record<string, FundingProgram[]> = {
             agency: 'AFIR',
             sector: 'Agricultură ecologică, managementul pesticidelor',
             maxGrant: '200.000 EUR',
-            deadline: 'TBD — 2026',
-            status: 'upcoming',
-            lastVerified: '2026-03-24',
+            deadline: '30 Iun 2026',
+            status: 'active',
+            lastVerified: '2026-05-04',
             sourceUrl: 'https://www.afir.ro/dr-19',
-            details: 'Include echipamente de protecție a plantelor care reduc utilizarea pesticidelor: sprayer-e cu precizie, sisteme GPS pentru aplicare variabilă. Intensitate: 100% (non-productiv).'
+            details: 'Include echipamente de protecție a plantelor care reduc utilizarea pesticidelor: sprayer-e cu precizie, sisteme GPS pentru aplicare variabilă. Intensitate: 100% (non-productiv).',
+            notes: 'Sesiunea 01/2026 deschisă 3 mar – 30 iun 2026. Fonduri disponibile ~17.5M EUR. Intensitate 100% nerambursabil.'
         }
     ],
 };
