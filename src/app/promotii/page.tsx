@@ -25,9 +25,9 @@ function getFramedPdfUrl(pdfUrl: string): string {
     return `${cleanUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&page=1`;
 }
 
-function getGoogleViewerUrl(pdfUrl: string): string {
+function getProxyPdfUrl(pdfUrl: string): string {
     const cleanUrl = pdfUrl.trim().split('#')[0] || pdfUrl.trim();
-    return `https://docs.google.com/viewer?url=${encodeURIComponent(cleanUrl)}&embedded=true`;
+    return `/api/promotions/pdf-proxy?url=${encodeURIComponent(cleanUrl)}`;
 }
 
 export default async function PromotionsPage() {
@@ -86,10 +86,10 @@ export default async function PromotionsPage() {
                                                 scrolling="no"
                                             />
                                         </div>
-                                        {/* Mobile: Google Docs Viewer — redă PDF-ul pe orice browser mobil */}
+                                        {/* Mobile: proxy intern → Content-Disposition: inline, funcționează pe iOS/Android */}
                                         <div className="relative aspect-[210/297] w-full overflow-hidden rounded-2xl bg-white md:hidden">
                                             <iframe
-                                                src={getGoogleViewerUrl(mainPromotion.pdfUrl)}
+                                                src={getProxyPdfUrl(mainPromotion.pdfUrl)}
                                                 title={`Afiș promoție ${mainPromotion.title}`}
                                                 className="absolute inset-0 h-full w-full border-0 bg-white"
                                             />
