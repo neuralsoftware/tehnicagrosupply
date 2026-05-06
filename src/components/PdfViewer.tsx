@@ -18,8 +18,7 @@ export default function PdfViewer({ url, title }: PdfViewerProps) {
         async function render() {
             try {
                 const pdfjsLib = await import('pdfjs-dist');
-                pdfjsLib.GlobalWorkerOptions.workerSrc =
-                    `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+                pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
                 const pdf = await pdfjsLib.getDocument(url).promise;
                 const page = await pdf.getPage(1);
