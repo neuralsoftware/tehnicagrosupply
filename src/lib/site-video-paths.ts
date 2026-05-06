@@ -1,12 +1,12 @@
 /**
  * Căi centralizate în bucket `tehnicagro` (Storage site, nu CRM).
  *
- * - Categorii: `video/{slug}/banner-*.mp4` → vezi `getCategoryBannerMp4PublicUrl`.
+ * - Categorii: `video/{slug}/banner-*.mp4|mov` → vezi `getCategoryBannerMp4PublicUrl`.
  * - Piese: slug-ul folderului = ruta site (`/piese-schimb`), nu apare în admin categorii.
  * - Home (VideoGallery): `video/home-showcase/` — clipuri demonstrative MP4.
  */
 
-/** Slug folder Storage pentru pagina /piese-schimb (banner opțional `banner-*.mp4`). */
+/** Slug folder Storage pentru pagina /piese-schimb (banner opțional `banner-*.mp4|mov`). */
 export const PIESE_SCHIMB_BANNER_SLUG = 'piese-schimb';
 
 /** Foldere suplimentare pentru `npm run sync-site-folders` (în afara categoriilor din catalog). */
