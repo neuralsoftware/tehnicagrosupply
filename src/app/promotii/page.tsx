@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import loadDynamic from 'next/dynamic';
 import { ArrowRight, Download, FileText, Tag } from 'lucide-react';
 import { getPromotions } from '@/lib/promotions-store';
 import { getProducts } from '@/lib/products-store';
-
-const PdfViewer = loadDynamic(() => import('@/components/PdfViewer'), { ssr: false });
+import PdfViewerWrapper from '@/components/PdfViewerWrapper';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,7 +85,7 @@ export default async function PromotionsPage() {
                                         </div>
                                         {/* Mobile: PDF.js redă pagina 1 ca imagine canvas — funcționează pe orice browser */}
                                         <div className="w-full md:hidden">
-                                            <PdfViewer
+                                            <PdfViewerWrapper
                                                 url={mainPromotion.pdfUrl}
                                                 title={`Afiș promoție ${mainPromotion.title}`}
                                             />
