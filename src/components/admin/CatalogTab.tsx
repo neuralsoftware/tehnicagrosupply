@@ -252,7 +252,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
                             ['Nume Produs *', 'name'],
                             ['Brand *', 'brand'],
                             ['Badge', 'badge'],
-                            ['URL Video (YouTube)', 'videoUrl'],
+                            ['URL Video demo (YouTube sau MP4 Supabase)', 'videoUrl'],
                             ['URL Video Hero (MP4, full-bleed)', 'heroVideoUrl'],
                         ] as const
                     ).map(([label, key]) => (

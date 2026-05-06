@@ -18,6 +18,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, BadgeCheck, ExternalLink } from 'lucide-react';
 import { getActiveProgramsForCategory } from '@/data/funding-programs';
+import { resolveProductDemoVideo } from '@/lib/product-demo-video';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,6 +97,7 @@ export default async function ProductPage({ params }: PageProps) {
         (u) => u && String(u).trim() && String(u).trim() !== mainImage
     );
     const secondaryImages = [...fromGallery].filter((u, i, arr) => arr.indexOf(u) === i);
+    const demoVideo = resolveProductDemoVideo(product.videoUrl);
 
     const breadcrumbItems = [
         { label: 'Acasă', href: '/' },
@@ -134,16 +136,30 @@ export default async function ProductPage({ params }: PageProps) {
                 ctaLabel="Solicită Ofertă Tehnică"
             />
 
-            {product.videoUrl && (
+            {demoVideo && (
                 <section className="max-w-4xl mx-auto px-4 pb-12">
                     <h2 className="text-2xl font-black uppercase tracking-tight text-zinc-900 mb-6">Demo Video</h2>
                     <div className="aspect-video rounded-2xl overflow-hidden shadow-xl">
-                        <iframe
-                            src={product.videoUrl.replace('watch?v=', 'embed/')}
-                            className="w-full h-full"
-                            allowFullScreen
-                            title={`Demo ${product.name}`}
-                        />
+                        {demoVideo.kind === 'video' ? (
+                            <video
+                                className="h-full w-full bg-zinc-950 object-contain"
+                                controls
+                                playsInline
+                                preload="metadata"
+                                title={`Demo ${product.name}`}
+                            >
+                                <source src={demoVideo.src} type={demoVideo.mimeType} />
+                            </video>
+                        ) : (
+                            <iframe
+                                src={demoVideo.src}
+                                className="w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                title={`Demo ${product.name}`}
+                            />
+                        )}
                     </div>
                 </section>
             )}

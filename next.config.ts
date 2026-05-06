@@ -29,8 +29,8 @@ const securityHeaders = [
             "img-src 'self' data: blob: https://*.supabase.co https://wsrv.nl https://*.public.blob.vercel-storage.com https://www.google.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.facebook.com https://px.ads.linkedin.com https:",
             // Conexiuni: permite Google Analytics, supabase, wsrv
             "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://wsrv.nl https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://region1.google-analytics.com https://www.googletagmanager.com",
-            // Frame-uri: Google recaptcha, DoubleClick
-            "frame-src https://bid.g.doubleclick.net https://www.google.com",
+            // Frame-uri: Google recaptcha, DoubleClick, demo-uri video produs
+            "frame-src https://bid.g.doubleclick.net https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
             "media-src 'self' https://*.supabase.co",
             "frame-ancestors 'self'",
             "base-uri 'self'",

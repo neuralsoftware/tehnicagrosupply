@@ -476,6 +476,7 @@ export async function saveProduct(
     if (!merged.createdAt) merged.createdAt = idx >= 0 ? (base as DynamicProduct).createdAt || now : now;
     const st = coerceActiveDraftStatus(product.status);
     if (st !== undefined) merged.status = st;
+    delete (merged as DynamicProduct & { adminAuth?: string }).adminAuth;
     if (options?.siteCatalogOnly) {
         delete (merged as Partial<DynamicProduct>).gallery;
         delete (merged as Partial<DynamicProduct>).manufacturerUrl;
