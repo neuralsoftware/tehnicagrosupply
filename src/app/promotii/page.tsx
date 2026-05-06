@@ -72,13 +72,28 @@ export default async function PromotionsPage() {
                             <div className="bg-zinc-100 p-3 md:p-6">
                                 {mainPromotion.pdfUrl ? (
                                     <div className="mx-auto max-w-3xl rounded-[1.35rem] bg-white p-2 shadow-2xl ring-1 ring-zinc-200 md:p-4">
-                                        <div className="relative aspect-[210/297] w-full overflow-hidden rounded-2xl bg-white">
+                                        {/* Desktop: iframe embed */}
+                                        <div className="relative hidden aspect-[210/297] w-full overflow-hidden rounded-2xl bg-white md:block">
                                             <iframe
                                                 src={getFramedPdfUrl(mainPromotion.pdfUrl)}
                                                 title={`Afiș promoție ${mainPromotion.title}`}
                                                 className="pointer-events-none absolute inset-0 h-full w-full border-0 bg-white"
                                                 scrolling="no"
                                             />
+                                        </div>
+                                        {/* Mobile: PDF nu se poate afișa inline — link direct */}
+                                        <div className="flex flex-col items-center justify-center gap-4 rounded-2xl bg-zinc-50 p-8 text-center md:hidden">
+                                            <FileText className="h-12 w-12 text-ea-green-600" aria-hidden />
+                                            <p className="text-sm font-semibold text-zinc-700">Apasă pentru a vedea PDF-ul promoției</p>
+                                            <a
+                                                href={mainPromotion.pdfUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-2 rounded-xl bg-ea-green-600 px-6 py-3 text-sm font-bold text-white"
+                                            >
+                                                <FileText className="h-4 w-4" aria-hidden />
+                                                Deschide PDF
+                                            </a>
                                         </div>
                                     </div>
                                 ) : (
