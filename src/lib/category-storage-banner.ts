@@ -4,16 +4,22 @@ import { normalizeCategorySlugParam } from '@/lib/products-store';
 const BUCKET = 'tehnicagro';
 const VIDEO_ROOT = 'video';
 
-function isBannerMp4FileName(name: string): boolean {
+function isBannerVideoFileName(name: string): boolean {
     const n = name.trim();
     if (!n || n.startsWith('.')) return false;
     const lower = n.toLowerCase();
-    return lower.startsWith('banner-') && lower.endsWith('.mp4');
+    return lower.startsWith('banner-') && (lower.endsWith('.mp4') || lower.endsWith('.mov'));
+}
+
+function bannerVideoSortKey(fileName: string): string {
+    const lower = fileName.toLowerCase();
+    const extensionRank = lower.endsWith('.mp4') ? '0' : '1';
+    return `${extensionRank}:${lower}`;
 }
 
 /**
  * Publică URL pentru clipul hero al categoriei din Storage (bucket site, nu CRM).
- * Cale: `tehnicagro` / `video/{slug-categorie}/banner-*.mp4` (primul fișier după nume, dacă sunt mai multe).
+ * Cale: `tehnicagro` / `video/{slug-categorie}/banner-*.mp4|mov` (preferă MP4, apoi primul fișier după nume).
  */
 export async function getCategoryBannerMp4PublicUrl(categorySlug: string): Promise<string | null> {
     const folder = normalizeCategorySlugParam(categorySlug);
@@ -33,8 +39,8 @@ export async function getCategoryBannerMp4PublicUrl(categorySlug: string): Promi
 
     const candidates = (data ?? [])
         .map((row) => row.name)
-        .filter((name): name is string => Boolean(name) && isBannerMp4FileName(name))
-        .sort((a, b) => a.localeCompare(b, 'en'));
+        .filter((name): name is string => Boolean(name) && isBannerVideoFileName(name))
+        .sort((a, b) => bannerVideoSortKey(a).localeCompare(bannerVideoSortKey(b), 'en'));
 
     const fileName = candidates[0];
     if (!fileName) return null;

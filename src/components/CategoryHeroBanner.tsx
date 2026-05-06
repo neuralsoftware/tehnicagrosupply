@@ -10,6 +10,13 @@ export interface CategoryHeroBannerProps {
     videoUrls: string[];
 }
 
+function getVideoMimeType(src: string): string {
+    const cleanSrc = src.split(/[?#]/)[0]?.toLowerCase() ?? '';
+    if (cleanSrc.endsWith('.mov')) return 'video/quicktime';
+    if (cleanSrc.endsWith('.webm')) return 'video/webm';
+    return 'video/mp4';
+}
+
 function CategoryHeroBannerVideos({
     categoryTitle,
     subtitle,
@@ -64,7 +71,7 @@ function CategoryHeroBannerVideos({
                             setActiveIndex((a) => (a + 1) % videoUrls.length);
                         }}
                     >
-                        <source src={src} type="video/mp4" />
+                        <source src={src} type={getVideoMimeType(src)} />
                     </video>
                 ))}
             </div>
