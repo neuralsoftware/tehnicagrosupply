@@ -25,6 +25,11 @@ function getFramedPdfUrl(pdfUrl: string): string {
     return `${cleanUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&page=1`;
 }
 
+function getGoogleViewerUrl(pdfUrl: string): string {
+    const cleanUrl = pdfUrl.trim().split('#')[0] || pdfUrl.trim();
+    return `https://docs.google.com/viewer?url=${encodeURIComponent(cleanUrl)}&embedded=true`;
+}
+
 export default async function PromotionsPage() {
     const [promotions, products] = await Promise.all([getPromotions(), getProducts()]);
     const productBySlug = new Map(products.map((product) => [product.slug, product]));
@@ -81,19 +86,13 @@ export default async function PromotionsPage() {
                                                 scrolling="no"
                                             />
                                         </div>
-                                        {/* Mobile: PDF nu se poate afișa inline — link direct */}
-                                        <div className="flex flex-col items-center justify-center gap-4 rounded-2xl bg-zinc-50 p-8 text-center md:hidden">
-                                            <FileText className="h-12 w-12 text-ea-green-600" aria-hidden />
-                                            <p className="text-sm font-semibold text-zinc-700">Apasă pentru a vedea PDF-ul promoției</p>
-                                            <a
-                                                href={mainPromotion.pdfUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 rounded-xl bg-ea-green-600 px-6 py-3 text-sm font-bold text-white"
-                                            >
-                                                <FileText className="h-4 w-4" aria-hidden />
-                                                Deschide PDF
-                                            </a>
+                                        {/* Mobile: Google Docs Viewer — redă PDF-ul pe orice browser mobil */}
+                                        <div className="relative aspect-[210/297] w-full overflow-hidden rounded-2xl bg-white md:hidden">
+                                            <iframe
+                                                src={getGoogleViewerUrl(mainPromotion.pdfUrl)}
+                                                title={`Afiș promoție ${mainPromotion.title}`}
+                                                className="absolute inset-0 h-full w-full border-0 bg-white"
+                                            />
                                         </div>
                                     </div>
                                 ) : (
