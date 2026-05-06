@@ -28,6 +28,8 @@ const leadSchema = z.object({
     message: z.string().max(10000, 'Mesaj prea lung').optional().default(''),
     source: z.string().optional().default('Website Form'),
     productName: z.string().max(200).optional(),
+    cif: z.string().max(32, 'CUI/CIF prea lung').optional().default(''),
+    attribution: z.record(z.string(), z.string().optional()).optional().default({}),
 });
 
 /** Răspuns JSON cu câmpurile erorii PostgREST/Postgres așa cum vin de la Supabase (`error` = alias la message pentru formulare). */
@@ -131,6 +133,26 @@ type CrmLeadInsert = {
     notes?: string;
 };
 
+function formatAttributionLines(attribution: Record<string, string | undefined>): string[] {
+    const labels: Record<string, string> = {
+        currentUrl: 'URL curent',
+        pagePath: 'Pagină',
+        pageTitle: 'Titlu pagină',
+        referrer: 'Referrer',
+        gclid: 'Google Click ID',
+        gbraid: 'GBRAID',
+        wbraid: 'WBRAID',
+        utm_source: 'UTM source',
+        utm_medium: 'UTM medium',
+        utm_campaign: 'UTM campaign',
+        utm_term: 'UTM term',
+        utm_content: 'UTM content',
+    };
+    return Object.entries(attribution)
+        .filter(([, value]) => typeof value === 'string' && value.trim().length > 0)
+        .map(([key, value]) => `${labels[key] ?? key}: ${String(value).trim()}`);
+}
+
 function toClientIntegerId(id: string | number): number {
     if (typeof id === 'number' && Number.isFinite(id)) return Math.trunc(id);
     const n = parseInt(String(id), 10);
@@ -155,16 +177,19 @@ export async function POST(request: Request) {
         const leadData = {
             ...validatedData,
             email: validatedData.email || '',
+            cif: validatedData.cif?.trim() || '',
             subsidyIncome: validatedData.subsidyIncome || 0,
             fuelSavings: validatedData.fuelSavings || 0,
             totalBenefit: validatedData.totalBenefit || 0,
             notes: validatedData.message || '',
             source: validatedData.source || 'Website Form',
         };
+        const attributionLines = formatAttributionLines(validatedData.attribution);
 
         const messageBody = [
             `Sursă: ${leadData.source}`,
             `Produs interesat: ${validatedData.productName || '-'}`,
+            `CUI/CIF: ${leadData.cif || '-'}`,
             `Mesaj: ${leadData.notes || '-'}`,
             `Hectare: ${leadData.hectares ?? 0}`,
             `Culturi: ${(leadData.crops || []).join(', ') || '-'}`,
@@ -172,6 +197,7 @@ export async function POST(request: Request) {
             `Subvenție estimată (RON): ${leadData.subsidyIncome ?? 0}`,
             `Economie combustibil estimată (RON): ${leadData.fuelSavings ?? 0}`,
             `Beneficiu total estimat (RON): ${leadData.totalBenefit ?? 0}`,
+            ...(attributionLines.length > 0 ? ['', 'Atribuire campanie:', ...attributionLines] : []),
         ].join('\n');
 
         const crm = getSupabaseCrmAdmin();
@@ -202,6 +228,9 @@ export async function POST(request: Request) {
             // Sursa originală (ROI Calculator / Website Form) se păstrează în tabelul leads și în sarcină.
             source: 'website',
         };
+        if (leadData.cif) {
+            clientPayload.cif = leadData.cif;
+        }
         if (defaultRepresentative) {
             clientPayload.representative = defaultRepresentative;
         }
@@ -235,21 +264,23 @@ export async function POST(request: Request) {
                 }
                 insertedRow = { id: existingId };
 
-                if (defaultRepresentative) {
-                    const { data: existingClient } = await crm
-                        .from('clients')
-                        .select('representative')
-                        .eq('id', existingId)
-                        .maybeSingle();
-                    const rep = existingClient?.representative;
-                    if (rep == null || String(rep).trim() === '') {
-                        const patchRes = await crm
-                            .from('clients')
-                            .update({ representative: defaultRepresentative })
-                            .eq('id', existingId);
-                        if (patchRes.error) {
-                            console.error('CRM clients update representative:', patchRes.error);
-                        }
+                const { data: existingClient } = await crm
+                    .from('clients')
+                    .select('representative,cif')
+                    .eq('id', existingId)
+                    .maybeSingle();
+                const rep = existingClient?.representative;
+                const patch: Record<string, string> = {};
+                if (defaultRepresentative && (rep == null || String(rep).trim() === '')) {
+                    patch.representative = defaultRepresentative;
+                }
+                if (leadData.cif && (!existingClient?.cif || String(existingClient.cif).trim() === '')) {
+                    patch.cif = leadData.cif;
+                }
+                if (Object.keys(patch).length > 0) {
+                    const patchRes = await crm.from('clients').update(patch).eq('id', existingId);
+                    if (patchRes.error) {
+                        console.error('CRM clients update from website lead:', patchRes.error);
                     }
                 }
             } else {
@@ -280,7 +311,7 @@ export async function POST(request: Request) {
         const clientId: string | number = rawId;
 
         const leadNotes =
-            crmSafePlainText(leadData.notes || '').slice(0, 4000) ||
+            crmSafePlainText(messageBody || leadData.notes || '').slice(0, 4000) ||
             'Lead trimis de pe tehnicagrosupply.ro';
 
         const crmLeadPayload: CrmLeadInsert = {

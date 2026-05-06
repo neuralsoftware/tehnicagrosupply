@@ -1,10 +1,11 @@
 import CookieBanner from '@/components/CookieBanner';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
 import { ConsentGatedMarketing } from '@/components/ConsentGatedMarketing';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
+import { MobileStickyCTA } from '@/components/MobileStickyCTA';
 import { SITE_CONTACT } from '@/lib/site-contact';
 import { GoogleAnalytics } from '@next/third-parties/google';
 
@@ -12,6 +13,11 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-KR6928Z45R';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1,
+};
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://tehnicagrosupply.ro'),
@@ -122,6 +128,7 @@ export default function RootLayout({
                 {children}
                 <Footer />
 
+                <MobileStickyCTA />
                 <CookieBanner />
                 <ConsentGatedMarketing />
                 <GoogleAnalytics gaId={GA_ID} />

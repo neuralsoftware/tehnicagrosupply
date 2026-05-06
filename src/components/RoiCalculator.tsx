@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calculator, Banknote, Droplets, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone, Scale } from 'lucide-react';
+import { collectLeadAttribution } from '@/lib/lead-attribution';
 
 const COUNTIES = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila', 'București',
@@ -56,6 +57,7 @@ export function RoiCalculator({
     const [contact, setContact] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [cif, setCif] = useState('');
     const [county, setCounty] = useState('');
     const [selectedCrops, setSelectedCrops] = useState<string[]>([]);
     const [urgency, setUrgency] = useState('');
@@ -103,6 +105,8 @@ export function RoiCalculator({
             totalBenefit,
             message: `Hectare: ${hectares}, Culturi: ${selectedCrops.join(', ')}, Urgență: ${urgency}, Beneficiu Total: ${totalBenefit} RON`,
             source: 'ROI Calculator',
+            cif: cif.trim(),
+            attribution: collectLeadAttribution(),
         };
 
         try {
@@ -183,6 +187,7 @@ export function RoiCalculator({
         setContact('');
         setPhone('');
         setEmail('');
+        setCif('');
         setCounty('');
         setSelectedCrops([]);
         setUrgency('');
@@ -420,6 +425,18 @@ export function RoiCalculator({
                                                             placeholder="07xx xxx xxx"
                                                         />
                                                     </div>
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">CUI / CIF (Opțional)</label>
+                                                        <input
+                                                            type="text"
+                                                            value={cif}
+                                                            onChange={(e) => setCif(e.target.value)}
+                                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-zinc-900 focus:ring-2 focus:ring-ea-green-500/50 outline-none transition-all"
+                                                            placeholder="Ex: RO12345678"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="grid md:grid-cols-2 gap-6">
                                                     <div>
                                                         <label className="block text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2">Județ *</label>
                                                         <select

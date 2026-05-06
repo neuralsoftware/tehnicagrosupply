@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { Suspense } from 'react';
 import { CONTACT_SECTION_ID, onHashLinkClickSmooth } from '@/lib/scroll-to-anchor';
 
@@ -70,46 +70,29 @@ function HeroContent() {
     }
 
     return (
-        <section className="relative min-h-[min(100dvh,900px)] flex items-center justify-center overflow-hidden pt-20 pb-12">
-            <div
-                className="absolute inset-0 z-0 bg-gradient-to-br from-slate-900 via-green-950 to-slate-900"
+        <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden pt-14 pb-20 md:min-h-[680px] md:pb-12">
+            <Image
+                src="/images/hero-wheat-field.jpg"
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                className="absolute inset-0 z-0 object-cover object-center"
                 aria-hidden
             />
-            {/* Accente subtile „agricultură de precizie” peste gradient */}
-            <div
-                className="absolute inset-0 z-[1] opacity-40 pointer-events-none"
-                style={{
-                    backgroundImage:
-                        'radial-gradient(circle at 75% 25%, rgba(34,197,94,0.12), transparent 42%), radial-gradient(circle at 25% 75%, rgba(15,118,110,0.1), transparent 45%)',
-                }}
-                aria-hidden
-            />
+            <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/25 via-emerald-950/35 to-slate-950/70" aria-hidden />
+            <div className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_50%_42%,rgba(0,0,0,0.05),rgba(0,0,0,0.38)_72%)]" aria-hidden />
 
-            <div className="relative z-10 max-w-4xl mx-auto px-6 text-center space-y-6 sm:space-y-7">
-                <motion.h1
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7 }}
-                    className="text-3xl sm:text-4xl md:text-[2.4rem] lg:text-[2.65rem] font-semibold leading-snug px-2 normal-case text-white"
-                >
+            <div className="relative z-10 mx-auto max-w-3xl px-6 text-center space-y-5 sm:space-y-6">
+                <h1 className="mx-auto max-w-[22rem] px-2 text-2xl font-semibold leading-tight text-white normal-case text-balance drop-shadow-lg sm:max-w-2xl sm:text-4xl md:text-[2.7rem]">
                     {headline}
-                </motion.h1>
+                </h1>
 
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.25, duration: 0.7 }}
-                    className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto font-light leading-relaxed px-2"
-                >
+                <p className="mx-auto max-w-2xl px-2 text-sm font-medium leading-relaxed text-white/85 drop-shadow sm:text-base">
                     Utilaje și consultanță pentru ferme care cer fiabilitate, randament și respectarea standardelor în câmp.
-                </motion.p>
+                </p>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.45, duration: 0.5 }}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2"
-                >
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1">
                     <Link
                         href="#audit"
                         className="w-full sm:w-auto px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white text-sm sm:text-base font-medium rounded-lg transition-colors shadow-lg shadow-black/25 text-center"
@@ -123,7 +106,7 @@ function HeroContent() {
                     >
                         Solicită expertiză tehnică
                     </a>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

@@ -210,6 +210,13 @@ export function ProductSection({
                                 </span>
                             ) : null}
                             <HeroTitleColumn parts={heroTitles} brandLine={brandLine} />
+                            <button
+                                type="button"
+                                onClick={() => scrollToIdSmooth(CONTACT_SECTION_ID)}
+                                className="inline-flex w-full items-center justify-center rounded-xl bg-ea-green-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-ea-green-900/15 transition-colors hover:bg-ea-green-500 sm:w-auto"
+                            >
+                                {ctaLabel}
+                            </button>
                         </motion.div>
 
                         <motion.div

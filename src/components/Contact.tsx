@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useState, useRef } from 'react';
+import { collectLeadAttribution } from '@/lib/lead-attribution';
 
 const JUDETE = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brăila',
@@ -33,6 +34,10 @@ export function Contact({
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [county, setCounty] = useState('');
+    const [cif, setCif] = useState('');
+    const [farmSize, setFarmSize] = useState('');
+    const [interest, setInterest] = useState('');
+    const [urgency, setUrgency] = useState('');
     const [message, setMessage] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,28 +59,12 @@ export function Contact({
         isFetchingRef.current = true;
         setIsSubmitting(true);
 
-        if (typeof window !== 'undefined') {
-            if (typeof window.gtag === 'function') {
-                window.gtag('event', 'generate_lead', {
-                    event_category: 'Contact',
-                    event_label: 'General Inquiry',
-                    transport_type: 'beacon',
-                });
-            }
-
-            if (typeof window.fbq === 'function') {
-                window.fbq('track', 'Lead', {
-                    content_name: 'General Contact Form',
-                    content_category: 'Lead Generation',
-                });
-            }
-        }
-
         try {
             const pageTitle = typeof document !== 'undefined' ? document.title : 'Pagină Necunoscută';
             const pagePath = typeof window !== 'undefined' ? window.location.pathname : '';
-            const contextString = `\n\n--- \n📍 Context Lead: Trimis de pe pagina "${pageTitle}" (${pagePath})`;
+            const contextString = `\n\n--- \nContext Lead: Trimis de pe pagina "${pageTitle}" (${pagePath})`;
             const enrichedMessage = (message || 'Fără mesaj adăugat de client.') + contextString;
+            const hectares = Number.parseFloat(farmSize.replace(',', '.'));
 
             const res = await fetch('/api/leads', {
                 method: 'POST',
@@ -85,14 +74,34 @@ export function Contact({
                     phone: phone,
                     email: email,
                     county: county,
+                    cif: cif,
+                    hectares: Number.isFinite(hectares) ? hectares : 0,
+                    urgency: urgency,
                     message: enrichedMessage,
                     source: `Formular Contact (Pagina: ${pageTitle})`,
-                    productName: productName || undefined,
+                    productName: productName || interest || undefined,
+                    attribution: collectLeadAttribution(),
                 })
             });
             const data = await res.json();
 
             if (data.success) {
+                if (typeof window !== 'undefined') {
+                    if (typeof window.gtag === 'function') {
+                        window.gtag('event', 'generate_lead', {
+                            event_category: 'Contact',
+                            event_label: productName || interest || 'General Inquiry',
+                            transport_type: 'beacon',
+                        });
+                    }
+
+                    if (typeof window.fbq === 'function') {
+                        window.fbq('track', 'Lead', {
+                            content_name: productName || interest || 'General Contact Form',
+                            content_category: 'Lead Generation',
+                        });
+                    }
+                }
 
                 setIsSubmitted(true);
                 setStatusMessage("Mesajul a fost trimis cu succes! Vă vom contacta în curând.");
@@ -105,6 +114,10 @@ export function Contact({
                 setPhone('');
                 setEmail('');
                 setCounty('');
+                setCif('');
+                setFarmSize('');
+                setInterest('');
+                setUrgency('');
                 setMessage('');
                 
                 if (typeof window !== 'undefined') {
@@ -227,7 +240,7 @@ export function Contact({
                                                 required
                                             />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                             <div>
                                                 <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                                                     Telefon
@@ -282,6 +295,69 @@ export function Contact({
                                                     Selectează județul.
                                                 </p>
                                             ) : null}
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                    CUI / CIF (opțional)
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={cif}
+                                                    onChange={(e) => setCif(e.target.value)}
+                                                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:ring-1 focus:ring-ea-green-500"
+                                                    placeholder="Ex: RO12345678"
+                                                    inputMode="text"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                    Suprafață lucrată (ha)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    value={farmSize}
+                                                    onChange={(e) => setFarmSize(e.target.value)}
+                                                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:ring-1 focus:ring-ea-green-500"
+                                                    placeholder="Ex: 250"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                    Interes principal
+                                                </label>
+                                                <select
+                                                    value={interest}
+                                                    onChange={(e) => setInterest(e.target.value)}
+                                                    className="w-full appearance-none rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all focus:ring-1 focus:ring-ea-green-500"
+                                                >
+                                                    <option value="">Alege categoria</option>
+                                                    <option value="Pregătire sol">Pregătire sol</option>
+                                                    <option value="Semănat & fertilizat">Semănat & fertilizat</option>
+                                                    <option value="Recoltare & logistică">Recoltare & logistică</option>
+                                                    <option value="Viticultură">Viticultură</option>
+                                                    <option value="Piese de schimb">Piese de schimb</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                    Orizont achiziție
+                                                </label>
+                                                <select
+                                                    value={urgency}
+                                                    onChange={(e) => setUrgency(e.target.value)}
+                                                    className="w-full appearance-none rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all focus:ring-1 focus:ring-ea-green-500"
+                                                >
+                                                    <option value="">Alege perioada</option>
+                                                    <option value="0-30 zile">0-30 zile</option>
+                                                    <option value="1-3 luni">1-3 luni</option>
+                                                    <option value="3-6 luni">3-6 luni</option>
+                                                    <option value="Informare">Informare</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div>
                                             <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
@@ -422,7 +498,7 @@ export function Contact({
                             </div>
 
                             {/* Telefon + Email */}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
                                     <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Telefon</label>
                                     <input
@@ -469,6 +545,62 @@ export function Contact({
                                         Selectează județul.
                                     </p>
                                 ) : null}
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">CUI / CIF (opțional)</label>
+                                    <input
+                                        type="text"
+                                        value={cif}
+                                        onChange={(e) => setCif(e.target.value)}
+                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-400 text-sm"
+                                        placeholder="Ex: RO12345678"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Suprafață lucrată (ha)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={farmSize}
+                                        onChange={(e) => setFarmSize(e.target.value)}
+                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-400 text-sm"
+                                        placeholder="Ex: 250"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Interes principal</label>
+                                    <select
+                                        value={interest}
+                                        onChange={(e) => setInterest(e.target.value)}
+                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all text-sm appearance-none"
+                                    >
+                                        <option value="">Alege categoria</option>
+                                        <option value="Pregătire sol">Pregătire sol</option>
+                                        <option value="Semănat & fertilizat">Semănat & fertilizat</option>
+                                        <option value="Recoltare & logistică">Recoltare & logistică</option>
+                                        <option value="Viticultură">Viticultură</option>
+                                        <option value="Piese de schimb">Piese de schimb</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Orizont achiziție</label>
+                                    <select
+                                        value={urgency}
+                                        onChange={(e) => setUrgency(e.target.value)}
+                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all text-sm appearance-none"
+                                    >
+                                        <option value="">Alege perioada</option>
+                                        <option value="0-30 zile">0-30 zile</option>
+                                        <option value="1-3 luni">1-3 luni</option>
+                                        <option value="3-6 luni">3-6 luni</option>
+                                        <option value="Informare">Informare</option>
+                                    </select>
+                                </div>
                             </div>
 
                             {/* Mesaj */}

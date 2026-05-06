@@ -51,24 +51,29 @@ export default function CookieBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-slate-900 text-white p-4 md:p-6 z-[99999] border-t border-slate-700 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
-      <div className="text-sm text-slate-300 flex-1">
-        Folosim cookie-uri pentru a vă asigura cea mai bună experiență pe site, pentru analiza traficului (Google Analytics) și marketing. 
-        Detalii în <Link href="/politica-cookie" className="text-emerald-400 underline hover:text-emerald-300">Politica de Cookie-uri</Link> și <Link href="/privacy-policy" className="text-emerald-400 underline hover:text-emerald-300">Confidențialitate</Link>.
+    <div className="fixed inset-x-3 bottom-3 z-[99999] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 p-3 text-white shadow-2xl md:left-0 md:right-0 md:bottom-0 md:max-w-none md:rounded-none md:p-5">
+      <div className="mx-auto flex max-w-7xl flex-col items-stretch gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="min-w-0 flex-1 break-words text-xs leading-snug text-slate-300 md:text-sm">
+        Folosim cookie-uri pentru analiză și marketing.{' '}
+        <span className="hidden sm:inline">Detalii în </span>
+        <Link href="/politica-cookie" className="text-emerald-400 underline hover:text-emerald-300">Cookie-uri</Link>
+        {' '}și{' '}
+        <Link href="/privacy-policy" className="text-emerald-400 underline hover:text-emerald-300">Confidențialitate</Link>.
       </div>
-      <div className="flex gap-3 w-full md:w-auto shrink-0">
+      <div className="flex w-full min-w-0 shrink-0 gap-2 md:w-auto md:gap-3">
         <button 
           onClick={handleDecline}
-          className="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-slate-300 bg-slate-800 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors"
+          className="min-h-11 min-w-0 basis-0 grow rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-300 transition-colors hover:bg-slate-700 md:basis-auto md:grow-0 md:px-4"
         >
           Refuz
         </button>
         <button 
           onClick={handleAccept}
-          className="flex-1 md:flex-none px-4 py-2 text-sm font-semibold text-slate-900 bg-emerald-500 rounded-lg hover:bg-emerald-400 transition-colors"
+          className="min-h-11 min-w-0 basis-0 grow rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-emerald-400 md:basis-auto md:grow-0 md:px-4"
         >
           Acceptă
         </button>
+      </div>
       </div>
     </div>
   );

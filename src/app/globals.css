@@ -20,4 +20,9 @@ body {
 html {
   scroll-behavior: auto;
   scroll-padding-top: 5rem;
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
 }
