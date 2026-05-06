@@ -63,6 +63,7 @@ export function Navbar() {
             href: '/utilaje',
             children: utilajeLinks,
         },
+        { name: 'Promoții', href: '/promotii' },
         { name: 'Blog Subvenții', href: '/blog' },
         { name: 'Contact', href: '/contact' },
     ];

@@ -17,6 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         '',
         '/contact',
         '/utilaje',
+        '/promotii',
         '/blog',
         '/piese-schimb',
         '/conditii-utilizare',

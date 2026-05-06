@@ -7,19 +7,13 @@ import { getTehnicagroStoragePublicUrl } from '@/lib/storage-video-public';
 import { WhatsAppButton } from '@/components/WhatsAppButton';
 import { ExitIntentPopup } from '@/components/ExitIntentPopup';
 import { HomeViticultureSeason } from '@/components/HomeViticultureSeason';
-import { HomeViticultureProducts } from '@/components/HomeViticultureProducts';
 import { HomeBlogTeaser } from '@/components/HomeBlogTeaser';
 import { HomeAuditContextBand } from '@/components/HomeAuditContextBand';
 import { HomePromiseBand } from '@/components/HomePromiseBand';
 import { getPublishedPosts } from '@/data/blog';
-import {
-    getProducts,
-    getViticultureCategoryCatalogPath,
-    productMatchesCategorySlug,
-    isProductVisibleOnSite,
-} from '@/lib/products-store';
+import { getProducts, productMatchesCategorySlug, isProductVisibleOnSite } from '@/lib/products-store';
 
-/** Catalog viticol de pe home trebuie citit la fiecare request (altfel rămâne gol sau vechi de la build static). */
+/** Home citește catalogul la fiecare request pentru secțiunile dependente de produse din Supabase. */
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
@@ -27,18 +21,13 @@ export default async function Home() {
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 3);
 
-    const [catalogProducts, viticultureCatalogHref] = await Promise.all([
-        getProducts(),
-        getViticultureCategoryCatalogPath(),
-    ]);
+    const catalogProducts = await getProducts();
     const videoSrcAds = getTehnicagroStoragePublicUrl(HOME_SHOWCASE_STORAGE.aversAds);
     const videoSrcKse = getTehnicagroStoragePublicUrl(HOME_SHOWCASE_STORAGE.flieglKseTeren);
-    const viticolHomePreview = catalogProducts
-        .filter(
-            (p) =>
-                isProductVisibleOnSite(p.status) && productMatchesCategorySlug(p.category, 'viticol')
-        )
-        .slice(0, 2);
+    const hasHarvestProducts = catalogProducts.some(
+        (p) => isProductVisibleOnSite(p.status) && productMatchesCategorySlug(p.category, 'recoltare-logistica')
+    );
+    const harvestCatalogHref = hasHarvestProducts ? '/utilaje/recoltare-logistica' : '/utilaje';
     const faqSchema = {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
@@ -76,9 +65,7 @@ export default async function Home() {
 
             <Hero />
 
-            <HomeViticultureSeason catalogHref={viticultureCatalogHref} />
-
-            <HomeViticultureProducts products={viticolHomePreview} catalogHref={viticultureCatalogHref} />
+            <HomeViticultureSeason catalogHref={harvestCatalogHref} />
 
             <HomeAuditContextBand />
 

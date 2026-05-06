@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { Category, DynamicProduct } from '@/lib/products-store';
-import { Package, FolderOpen, FileText, Landmark, BookOpen } from 'lucide-react';
+import { Package, FolderOpen, FileText, Landmark, BookOpen, Tag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { CatalogTab } from '@/components/admin/CatalogTab';
 import { CategoriiTab } from '@/components/admin/CategoriiTab';
 import { ProgrameTab } from '@/components/admin/ProgrameTab';
 import { MaterialeTab } from '@/components/admin/MaterialeTab';
 import { BrochuraTab } from '@/components/admin/BrochuraTab';
+import { PromotiiTab } from '@/components/admin/PromotiiTab';
 
-type Tab = 'catalog' | 'brochura' | 'categorii' | 'programe' | 'materiale';
+type Tab = 'catalog' | 'brochura' | 'categorii' | 'programe' | 'materiale' | 'promotii';
 
 const DEFAULT_CATEGORIES: Category[] = [
     { slug: 'pregatire-sol', name: 'Pregătire Sol', status: 'active', createdAt: '' },
@@ -135,6 +136,7 @@ export default function AdminPage() {
         { id: 'categorii', label: 'Categorii', icon: <FolderOpen className="w-4 h-4" /> },
         { id: 'programe', label: 'Programe APIA/AFIR', icon: <Landmark className="w-4 h-4" /> },
         { id: 'materiale', label: 'Materiale Publicitare', icon: <FileText className="w-4 h-4" /> },
+        { id: 'promotii', label: 'Promoții', icon: <Tag className="w-4 h-4" /> },
     ] as const;
 
     return (
@@ -189,6 +191,13 @@ export default function AdminPage() {
                         adminAuth={adminAuth}
                         allProducts={allProducts}
                         tabVisible={activeTab === 'materiale'}
+                    />
+                </div>
+                <div className={activeTab === 'promotii' ? 'block' : 'hidden'}>
+                    <PromotiiTab
+                        adminAuth={adminAuth}
+                        allProducts={allProducts}
+                        tabVisible={activeTab === 'promotii'}
                     />
                 </div>
             </div>
