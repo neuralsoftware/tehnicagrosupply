@@ -30,7 +30,7 @@ const securityHeaders = [
             // Conexiuni: permite Google Analytics, supabase, wsrv
             "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://wsrv.nl https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://region1.google-analytics.com https://www.googletagmanager.com",
             // Frame-uri: Google recaptcha, DoubleClick, demo-uri video produs
-            "frame-src https://bid.g.doubleclick.net https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+            "frame-src https://bid.g.doubleclick.net https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://*.supabase.co",
             "media-src 'self' https://*.supabase.co",
             "frame-ancestors 'self'",
             "base-uri 'self'",

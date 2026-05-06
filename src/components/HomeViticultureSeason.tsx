@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
-const SEASON_BG = '/images/hero-wheat-field.jpg';
+const SEASON_VIDEO =
+    'https://unetpytdkdaryvnfnpei.supabase.co/storage/v1/object/public/tehnicagro/video/recoltare-logistica/edit.corn.ziegler.mp4';
 
 /** Card categorie premium — echipamente de sezon (imagine + overlay), nu alertă de sistem */
 export function HomeViticultureSeason({ catalogHref }: { catalogHref: string }) {
@@ -9,11 +10,15 @@ export function HomeViticultureSeason({ catalogHref }: { catalogHref: string }) 
         <section className="border-y border-zinc-100 bg-white py-8 md:py-10" aria-labelledby="season-equipment-heading">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="relative min-h-[260px] md:min-h-[300px] rounded-2xl overflow-hidden shadow-md border border-zinc-200/80">
-                    <div
-                        className="absolute inset-0 bg-cover bg-center scale-[1.02]"
-                        style={{ backgroundImage: `url(${SEASON_BG})` }}
-                        role="img"
-                        aria-label="Câmp de cereale pentru campania de recoltare"
+                    <video
+                        className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
+                        src={SEASON_VIDEO}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="metadata"
+                        aria-label="Culegător porumb Ziegler în campania de recoltare"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/35" aria-hidden />
                     <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-12 md:py-14 max-w-2xl mx-auto">
