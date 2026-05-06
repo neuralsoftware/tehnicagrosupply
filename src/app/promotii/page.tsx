@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import loadDynamic from 'next/dynamic';
 import { ArrowRight, Download, FileText, Tag } from 'lucide-react';
 import { getPromotions } from '@/lib/promotions-store';
 import { getProducts } from '@/lib/products-store';
+
+const PdfViewer = loadDynamic(() => import('@/components/PdfViewer'), { ssr: false });
 
 export const dynamic = 'force-dynamic';
 
@@ -25,10 +28,6 @@ function getFramedPdfUrl(pdfUrl: string): string {
     return `${cleanUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&page=1`;
 }
 
-function getProxyPdfUrl(pdfUrl: string): string {
-    const cleanUrl = pdfUrl.trim().split('#')[0] || pdfUrl.trim();
-    return `/api/promotions/pdf-proxy?url=${encodeURIComponent(cleanUrl)}`;
-}
 
 export default async function PromotionsPage() {
     const [promotions, products] = await Promise.all([getPromotions(), getProducts()]);
@@ -86,12 +85,11 @@ export default async function PromotionsPage() {
                                                 scrolling="no"
                                             />
                                         </div>
-                                        {/* Mobile: proxy intern → Content-Disposition: inline, funcționează pe iOS/Android */}
-                                        <div className="relative aspect-[210/297] w-full overflow-hidden rounded-2xl bg-white md:hidden">
-                                            <iframe
-                                                src={getProxyPdfUrl(mainPromotion.pdfUrl)}
+                                        {/* Mobile: PDF.js redă pagina 1 ca imagine canvas — funcționează pe orice browser */}
+                                        <div className="w-full md:hidden">
+                                            <PdfViewer
+                                                url={mainPromotion.pdfUrl}
                                                 title={`Afiș promoție ${mainPromotion.title}`}
-                                                className="absolute inset-0 h-full w-full border-0 bg-white"
                                             />
                                         </div>
                                     </div>
