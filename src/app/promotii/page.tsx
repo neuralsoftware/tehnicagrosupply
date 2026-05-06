@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, Download, FileText, Tag } from 'lucide-react';
 import { getPromotions } from '@/lib/promotions-store';
 import { getProducts } from '@/lib/products-store';
+import PdfViewerWrapper from '@/components/PdfViewerWrapper';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,7 @@ function getFramedPdfUrl(pdfUrl: string): string {
     const cleanUrl = pdfUrl.trim().split('#')[0] || pdfUrl.trim();
     return `${cleanUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&page=1`;
 }
+
 
 export default async function PromotionsPage() {
     const [promotions, products] = await Promise.all([getPromotions(), getProducts()]);
@@ -72,12 +74,20 @@ export default async function PromotionsPage() {
                             <div className="bg-zinc-100 p-3 md:p-6">
                                 {mainPromotion.pdfUrl ? (
                                     <div className="mx-auto max-w-3xl rounded-[1.35rem] bg-white p-2 shadow-2xl ring-1 ring-zinc-200 md:p-4">
-                                        <div className="relative aspect-[210/297] w-full overflow-hidden rounded-2xl bg-white">
+                                        {/* Desktop: iframe embed */}
+                                        <div className="relative hidden aspect-[210/297] w-full overflow-hidden rounded-2xl bg-white md:block">
                                             <iframe
                                                 src={getFramedPdfUrl(mainPromotion.pdfUrl)}
                                                 title={`Afiș promoție ${mainPromotion.title}`}
                                                 className="pointer-events-none absolute inset-0 h-full w-full border-0 bg-white"
                                                 scrolling="no"
+                                            />
+                                        </div>
+                                        {/* Mobile: PDF.js redă pagina 1 ca imagine canvas — funcționează pe orice browser */}
+                                        <div className="w-full md:hidden">
+                                            <PdfViewerWrapper
+                                                url={mainPromotion.pdfUrl}
+                                                title={`Afiș promoție ${mainPromotion.title}`}
                                             />
                                         </div>
                                     </div>
