@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { CONTACT_SECTION_ID, onHashLinkClickSmooth } from '@/lib/scroll-to-anchor';
+
+const HERO_VIDEO =
+    'https://unetpytdkdaryvnfnpei.supabase.co/storage/v1/object/public/tehnicagro/video/home-showcase/camp%20de%20grau%20.mp4';
 
 function HeroContent() {
     const searchParams = useSearchParams();
@@ -71,14 +73,15 @@ function HeroContent() {
 
     return (
         <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden pt-14 pb-20 md:min-h-[680px] md:pb-12">
-            <Image
-                src="/images/hero-wheat-field.jpg"
-                alt=""
-                fill
-                priority
-                sizes="100vw"
-                className="absolute inset-0 z-0 object-cover object-center"
-                aria-hidden
+            <video
+                className="absolute inset-0 z-0 h-full w-full object-cover object-center"
+                src={HERO_VIDEO}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-hidden="true"
             />
             <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/25 via-emerald-950/35 to-slate-950/70" aria-hidden />
             <div className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_50%_42%,rgba(0,0,0,0.05),rgba(0,0,0,0.38)_72%)]" aria-hidden />
