@@ -20,6 +20,11 @@ function formatDate(date: string | undefined): string | null {
     return new Intl.DateTimeFormat('ro-RO', { day: '2-digit', month: 'long', year: 'numeric' }).format(parsed);
 }
 
+function getFramedPdfUrl(pdfUrl: string): string {
+    const cleanUrl = pdfUrl.trim().split('#')[0] || pdfUrl.trim();
+    return `${cleanUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&page=1`;
+}
+
 export default async function PromotionsPage() {
     const [promotions, products] = await Promise.all([getPromotions(), getProducts()]);
     const productBySlug = new Map(products.map((product) => [product.slug, product]));
@@ -66,11 +71,16 @@ export default async function PromotionsPage() {
 
                             <div className="bg-zinc-100 p-3 md:p-6">
                                 {mainPromotion.pdfUrl ? (
-                                    <iframe
-                                        src={mainPromotion.pdfUrl}
-                                        title={`PDF promoție ${mainPromotion.title}`}
-                                        className="mx-auto h-[72vh] min-h-[520px] w-full max-w-5xl rounded-2xl border border-zinc-300 bg-white shadow-inner"
-                                    />
+                                    <div className="mx-auto max-w-3xl rounded-[1.35rem] bg-white p-2 shadow-2xl ring-1 ring-zinc-200 md:p-4">
+                                        <div className="relative aspect-[210/297] w-full overflow-hidden rounded-2xl bg-white">
+                                            <iframe
+                                                src={getFramedPdfUrl(mainPromotion.pdfUrl)}
+                                                title={`Afiș promoție ${mainPromotion.title}`}
+                                                className="pointer-events-none absolute inset-0 h-full w-full border-0 bg-white"
+                                                scrolling="no"
+                                            />
+                                        </div>
+                                    </div>
                                 ) : (
                                     <div className="mx-auto flex min-h-[420px] max-w-4xl items-center justify-center rounded-2xl border border-dashed border-zinc-300 bg-white p-10 text-center">
                                         <div>
