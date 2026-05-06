@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Claude Code worktrees (generate fisiere auto in .claude/)
     ".claude/**",
+    // Fisiere statice third-party in public/
+    "public/**",
   ]),
 ]);
 
