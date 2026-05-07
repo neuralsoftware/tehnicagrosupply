@@ -46,6 +46,7 @@ export function VideoGallery({ videoSrcAds, videoSrcKse }: VideoGalleryProps) {
                         badge="Semănătoare No-Till"
                         ctaText="Solicită Ofertă ADS"
                         ctaHref="#contact"
+                        autoPlay
                     />
                     <VideoShowcase
                         title="Fliegl Chain Disc KSE 680"
@@ -53,6 +54,7 @@ export function VideoGallery({ videoSrcAds, videoSrcKse }: VideoGalleryProps) {
                         badge="Grapă cu Lanțuri"
                         ctaText="Solicită Ofertă KSE"
                         ctaHref="#contact"
+                        autoPlay
                     />
                 </div>
 

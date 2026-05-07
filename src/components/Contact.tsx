@@ -184,6 +184,13 @@ export function Contact({
                                         height={48}
                                         className="h-9 w-auto object-contain object-left opacity-80 transition-opacity hover:opacity-100 md:h-10"
                                     />
+                                    <Image
+                                        src="/logos/brands/ziegler-logo2x.png"
+                                        alt="Ziegler"
+                                        width={188}
+                                        height={85}
+                                        className="h-9 w-auto object-contain opacity-80 transition-opacity hover:opacity-100 md:h-10"
+                                    />
                                 </div>
                             </div>
                             <p className="text-sm leading-relaxed text-zinc-600">

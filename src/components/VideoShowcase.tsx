@@ -15,6 +15,7 @@ interface VideoShowcaseProps {
     badge?: string;
     ctaText?: string;
     ctaHref?: string;
+    autoPlay?: boolean;
 }
 
 export function VideoShowcase({
@@ -24,8 +25,9 @@ export function VideoShowcase({
     badge,
     ctaText,
     ctaHref,
+    autoPlay = false,
 }: VideoShowcaseProps) {
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(autoPlay);
 
     const handlePlay = () => {
         const video = document.getElementById(`video-${title.replace(/\s/g, '')}`) as HTMLVideoElement;
@@ -78,8 +80,11 @@ export function VideoShowcase({
                     muted
                     loop
                     playsInline
+                    autoPlay={autoPlay}
                     preload="metadata"
                     className="w-full h-full object-cover"
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
                     onEnded={() => setIsPlaying(false)}
                 />
 
