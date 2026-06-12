@@ -5,6 +5,7 @@ import { RefreshCcw, ExternalLink, CheckCircle, Clock, XCircle } from 'lucide-re
 
 interface Props {
     adminAuth: string;
+    onUnauthorized?: () => void;
 }
 
 const STATUS_STYLES: Record<string, string> = {

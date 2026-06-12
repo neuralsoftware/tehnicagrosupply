@@ -42,6 +42,14 @@ export default function AdminPage() {
         }
     };
 
+    const handleUnauthorized = () => {
+        localStorage.removeItem('admin_auth');
+        localStorage.removeItem('admin_pass');
+        setIsAuthenticated(false);
+        setAdminAuth('');
+        alert('Sesiunea a expirat sau parola s-a schimbat. Te rugăm să te reconectezi.');
+    };
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setAuthError('');
@@ -69,10 +77,14 @@ export default function AdminPage() {
         const bootstrap = () => {
             const auth = localStorage.getItem('admin_auth');
             const pass = localStorage.getItem('admin_pass') || '';
-            if (auth === 'true') {
+            if (auth === 'true' && pass !== '') {
                 setIsAuthenticated(true);
                 setAdminAuth(pass);
                 fetchProducts();
+            } else {
+                // Clear stale/incomplete auth — force fresh login
+                localStorage.removeItem('admin_auth');
+                localStorage.removeItem('admin_pass');
             }
             setCheckingAuth(false);
         };
@@ -175,22 +187,23 @@ export default function AdminPage() {
             <div className="max-w-[1400px] mx-auto px-6 py-8">
                 {/* Tab-urile rămân montate (hidden) ca să nu se piardă textul la schimbarea tab-ului sau la revenirea din alt tab browser */}
                 <div className={activeTab === 'catalog' ? 'block' : 'hidden'}>
-                    <CatalogTab adminAuth={adminAuth} categories={categories} />
+                    <CatalogTab adminAuth={adminAuth} categories={categories} onUnauthorized={handleUnauthorized} />
                 </div>
                 <div className={activeTab === 'brochura' ? 'block' : 'hidden'}>
-                    <BrochuraTab adminAuth={adminAuth} allProducts={allProducts} />
+                    <BrochuraTab adminAuth={adminAuth} allProducts={allProducts} onUnauthorized={handleUnauthorized} />
                 </div>
                 <div className={activeTab === 'categorii' ? 'block' : 'hidden'}>
-                    <CategoriiTab adminAuth={adminAuth} onCategoriesChange={setCategories} />
+                    <CategoriiTab adminAuth={adminAuth} onCategoriesChange={setCategories} onUnauthorized={handleUnauthorized} />
                 </div>
                 <div className={activeTab === 'programe' ? 'block' : 'hidden'}>
-                    <ProgrameTab adminAuth={adminAuth} />
+                    <ProgrameTab adminAuth={adminAuth} onUnauthorized={handleUnauthorized} />
                 </div>
                 <div className={activeTab === 'materiale' ? 'block' : 'hidden'}>
                     <MaterialeTab
                         adminAuth={adminAuth}
                         allProducts={allProducts}
                         tabVisible={activeTab === 'materiale'}
+                        onUnauthorized={handleUnauthorized}
                     />
                 </div>
                 <div className={activeTab === 'promotii' ? 'block' : 'hidden'}>
@@ -198,6 +211,7 @@ export default function AdminPage() {
                         adminAuth={adminAuth}
                         allProducts={allProducts}
                         tabVisible={activeTab === 'promotii'}
+                        onUnauthorized={handleUnauthorized}
                     />
                 </div>
             </div>

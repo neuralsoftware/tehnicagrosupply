@@ -26,10 +26,12 @@ export function PromotiiTab({
     adminAuth,
     allProducts,
     tabVisible,
+    onUnauthorized: _onUnauthorized,
 }: {
     adminAuth: string;
     allProducts: DynamicProduct[];
     tabVisible: boolean;
+    onUnauthorized?: () => void;
 }) {
     const [promotions, setPromotions] = useState<Promotion[]>([]);
     const [draft, setDraft] = useState<Partial<Promotion>>(EMPTY_PROMOTION);

@@ -19,9 +19,10 @@ function slugify(str: string) {
 interface Props {
     adminAuth: string;
     categories: { slug: string; name: string }[];
+    onUnauthorized?: () => void;
 }
 
-export function CatalogTab({ adminAuth, categories }: Props) {
+export function CatalogTab({ adminAuth, categories, onUnauthorized }: Props) {
     const router = useRouter();
     const [products, setProducts] = useState<DynamicProduct[]>([]);
     const [loaded, setLoaded] = useState(false);
@@ -135,6 +136,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
+                if (res.status === 401) { onUnauthorized?.(); return; }
                 alert((data as { error?: string }).error || `Eroare server (${res.status}). Produsul nu a fost salvat.`);
                 return;
             }
@@ -201,6 +203,7 @@ export function CatalogTab({ adminAuth, categories }: Props) {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
+            if (res.status === 401) { onUnauthorized?.(); return; }
             alert((data as { error?: string }).error || 'Ștergerea a eșuat.');
             return;
         }

@@ -9,6 +9,7 @@ interface Props {
     allProducts: DynamicProduct[];
     /** Când ești pe acest tab, se reîncarcă profilurile „Date broșură”. Dacă lipsește, se consideră mereu vizibil. */
     tabVisible?: boolean;
+    onUnauthorized?: () => void;
 }
 
 const MIN_PDF_TEXT_HINT = 40;

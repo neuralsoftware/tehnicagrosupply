@@ -10,9 +10,10 @@ function slugify(str: string) {
 interface Props {
     adminAuth: string;
     onCategoriesChange: (cats: Category[]) => void;
+    onUnauthorized?: () => void;
 }
 
-export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
+export function CategoriiTab({ adminAuth, onCategoriesChange, onUnauthorized }: Props) {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loaded, setLoaded] = useState(false);
     const [editing, setEditing] = useState<Partial<Category> | null>(null);
@@ -67,6 +68,7 @@ export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
             body: JSON.stringify(payload),
         });
         if (!res.ok) {
+            if (res.status === 401) { onUnauthorized?.(); setSaving(false); return; }
             const data = await res.json().catch(() => ({}));
             alert((data as { error?: string }).error || `Eroare la salvare (${res.status}).`);
             setSaving(false);
@@ -85,6 +87,7 @@ export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
             body: JSON.stringify(updated),
         });
         if (!res.ok) {
+            if (res.status === 401) { onUnauthorized?.(); return; }
             const data = await res.json().catch(() => ({}));
             alert((data as { error?: string }).error || 'Nu s-a putut schimba statusul.');
             return;
@@ -94,8 +97,12 @@ export function CategoriiTab({ adminAuth, onCategoriesChange }: Props) {
 
     const del = async (slug: string) => {
         const res = await fetch(`/api/categories/${slug}`, { method: 'DELETE', headers: { 'x-admin-auth': adminAuth } });
-        const data = await res.json();
-        if (!res.ok) { alert(data.error); return; }
+        if (!res.ok) {
+            if (res.status === 401) { onUnauthorized?.(); return; }
+            const data = await res.json().catch(() => ({}));
+            alert((data as { error?: string }).error || 'Ștergerea a eșuat.');
+            return;
+        }
         load();
     };
 
