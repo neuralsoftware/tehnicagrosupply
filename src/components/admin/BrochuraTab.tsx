@@ -40,7 +40,7 @@ function emptyDraft(slug: string, existing?: ProductBrochureProfile): ProductBro
     };
 }
 
-export function BrochuraTab({ adminAuth, allProducts, onUnauthorized }: { adminAuth: string; allProducts: DynamicProduct[]; onUnauthorized?: () => void }) {
+export function BrochuraTab({ adminAuth, allProducts }: { adminAuth: string; allProducts: DynamicProduct[]; onUnauthorized?: () => void }) {
     const [profiles, setProfiles] = useState<Record<string, ProductBrochureProfile>>({});
     const [loaded, setLoaded] = useState(false);
     const [selectedSlug, setSelectedSlug] = useState<string | null>(null);

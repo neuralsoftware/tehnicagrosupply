@@ -26,7 +26,6 @@ export function PromotiiTab({
     adminAuth,
     allProducts,
     tabVisible,
-    onUnauthorized: _onUnauthorized,
 }: {
     adminAuth: string;
     allProducts: DynamicProduct[];
