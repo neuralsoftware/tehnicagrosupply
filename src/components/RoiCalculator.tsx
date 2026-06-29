@@ -556,7 +556,7 @@ export function RoiCalculator({
                                                         <h4 className="text-zinc-400 text-[10px] font-black uppercase mb-4 tracking-widest border-b border-zinc-200 pb-2">Analiză Randament Financiar</h4>
                                                         <div className="space-y-4">
                                                             <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-zinc-100">
-                                                                <span className="text-sm font-bold text-zinc-600 uppercase">Subvenție APIA PD-04</span>
+                                                                <span className="text-sm font-bold text-zinc-600 uppercase">Subvenție APIA PD-04 <span className="text-[10px] font-medium text-amber-600 normal-case">(Campania 2027)</span></span>
                                                                 <span className="font-black text-xl text-ea-green-600">+{subsidyIncome.toLocaleString('ro-RO')} <span className="text-xs">RON</span></span>
                                                             </div>
                                                             <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-zinc-100">
@@ -586,9 +586,9 @@ export function RoiCalculator({
                                                                     <CheckCircle2 className="w-6 h-6 text-ea-green-600" />
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-xs font-black uppercase text-zinc-400 mb-1">Eco-Schema PD-04 / GAEC 6</p>
+                                                                    <p className="text-xs font-black uppercase text-zinc-400 mb-1">GAEC 6 (obligatoriu acum) · PD-04 (Campania 2027)</p>
                                                                     <p className="text-sm font-bold text-zinc-700 leading-snug">
-                                                                        Configurația propusă respectă cerința de tehnologie conservativă pe min. 50% din suprafață și asigură acoperirea solului (15 iunie - 15 oct), eliminând riscul penalizărilor.
+                                                                        Configurația propusă respectă cerința de tehnologie conservativă pe min. 50% din suprafață și asigură acoperirea solului (15 iun – 15 oct), eliminând riscul penalizărilor GAEC 6. Subvenția PD-04 se poate accesa din campania 2027 (Mar–Iun 2027).
                                                                     </p>
                                                                 </div>
                                                             </li>

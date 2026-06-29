@@ -16,7 +16,15 @@ import { getProducts, productMatchesCategorySlug, isProductVisibleOnSite } from 
 /** Home citește catalogul la fiecare request pentru secțiunile dependente de produse din Supabase. */
 export const dynamic = 'force-dynamic';
 
-export default async function Home() {
+export default async function Home({
+    searchParams,
+}: {
+    searchParams?: Promise<{ ref?: string | string[] }>;
+}) {
+    const resolvedSearchParams = await searchParams;
+    const refSource = Array.isArray(resolvedSearchParams?.ref)
+        ? resolvedSearchParams?.ref[0]
+        : resolvedSearchParams?.ref;
     const recentBlogPosts = [...getPublishedPosts()]
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
         .slice(0, 3);
@@ -34,10 +42,10 @@ export default async function Home() {
         mainEntity: [
             {
                 '@type': 'Question',
-                name: 'Ce este subvenția APIA PD-04 și cum o pot accesa?',
+                name: 'Ce este subvenția APIA PD-04 și cum o pot accesa în 2027?',
                 acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'Eco-schema PD-04 oferă 56 EUR/ha pentru agricultura conservativă (No-Till, Mini-Till). Pentru a fi eligibil, trebuie să folosești utilaje care nu inversează solul și să menții resturile vegetale la suprafață. Semănătoarea Avers-Agro Multisem ADS îndeplinește toate cerințele.',
+                    text: 'Eco-schema PD-04 oferă 56 EUR/ha pentru agricultura conservativă (No-Till, Mini-Till). Campania 2026 s-a închis pe 5 Iunie 2026. Fermierii care achiziționează utilaje acum se pot înscrie la cererea unică APIA din campania 2027 (depunere Mar–Iun 2027). Semănătoarea Avers-Agro Multisem ADS îndeplinește toate cerințele tehnice de eligibilitate.',
                 },
             },
             {
@@ -53,7 +61,7 @@ export default async function Home() {
                 name: 'Cât economisesc cu tehnologia No-Till?',
                 acceptedAnswer: {
                     '@type': 'Answer',
-                    text: 'În medie, fermierii economisesc 320 RON/ha la motorină prin reducerea numărului de treceri. La 100 hectare, aceasta înseamnă 32.000 RON/an economie, plus subvenția de 28.140 RON (56 EUR x 100 ha x 5 RON/EUR).',
+                    text: 'În medie, fermierii economisesc 320 RON/ha la motorină prin reducerea numărului de treceri. La 100 hectare, aceasta înseamnă 32.000 RON/an economie. Adăugând subvenția PD-04 din campania 2027 (56 EUR x 100 ha x 5 RON/EUR = 28.000 RON), beneficiul total depășește 60.000 RON/an.',
                 },
             },
         ],
@@ -63,7 +71,7 @@ export default async function Home() {
         <main className="min-h-screen bg-white pt-16 font-sans text-zinc-900 selection:bg-ea-green-500 selection:text-white">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-            <Hero />
+            <Hero refSource={refSource} />
 
             <HomeViticultureSeason catalogHref={harvestCatalogHref} />
 
@@ -71,7 +79,7 @@ export default async function Home() {
 
             <HomePromiseBand />
 
-            <FeaturedMachinery />
+            <FeaturedMachinery products={catalogProducts} />
 
             <VideoGallery videoSrcAds={videoSrcAds} videoSrcKse={videoSrcKse} />
 

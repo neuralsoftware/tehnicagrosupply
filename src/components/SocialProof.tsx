@@ -29,7 +29,7 @@ export function SocialProof() {
                         <Users className="mx-auto mb-3 h-8 w-8 text-ea-green-600" />
                         <span className="text-4xl font-semibold tabular-nums text-ea-green-600">56</span>
                         <span className="text-xl font-semibold text-ea-green-700"> EUR/ha</span>
-                        <p className="mt-2 text-sm font-medium text-zinc-500">Subvenție APIA PD-04</p>
+                        <p className="mt-2 text-sm font-medium text-zinc-500">Subvenție APIA PD-04 (Campania 2027)</p>
                     </motion.div>
 
                     <motion.div

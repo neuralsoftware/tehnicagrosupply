@@ -23,11 +23,14 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     id: 'dosar-apia-pd04-pas-cu-pas',
     slug: 'cum-depui-dosarul-apia-pd04-2026',
-    title: 'Cum Depui Dosarul APIA PD-04 în 2026: Ghid Pas cu Pas pentru Fermieri',
-    excerpt: 'Sesiunea APIA se deschide pe 16 Martie 2026. Află exact ce documente îți trebuie, ce erori te pot costa subvenția și cum utilajele No-Till te scutesc de birocrație inutilă.',
+    title: 'Cum Depui Dosarul APIA PD-04: Ghid Pas cu Pas pentru Fermieri (Campania 2027)',
+    excerpt: 'Campania 2026 s-a încheiat pe 5 Iunie. Pregătește-te pentru campania 2027 (Mar–Iun 2027): documente necesare, greșeli de evitat și cum utilajele No-Till te scutesc de birocrație.',
     content: `
-      <h2>Sesiunea APIA PD-04 2026 — Ce trebuie să știi înainte de 16 Martie</h2>
-      <p>Eco-schema PD-04, dedicată agriculturii conservative, este disponibilă între <strong>16 Martie și 5 Iunie 2026</strong>. Cu 56 EUR/ha disponibili, un fermier cu 200 ha poate încasa peste <strong>56.000 RON</strong> suplimentar față de subvenția de bază.</p>
+      <div style="background:#fef3c7;border-left:4px solid #d97706;padding:12px 16px;margin-bottom:24px;border-radius:4px;">
+        <strong>⚠️ Actualizare 2026:</strong> Sesiunea APIA PD-04 din 2026 s-a încheiat pe 5 Iunie 2026. Ghidul de mai jos rămâne complet valabil pentru <strong>campania 2027</strong> (depunere estimat Mar–Iun 2027). Achiziția utilajelor acum te pregătește direct pentru accesarea subvenției la campania viitoare.
+      </div>
+      <h2>Sesiunea APIA PD-04 — Ghid pentru Campania 2027</h2>
+      <p>Eco-schema PD-04, dedicată agriculturii conservative, oferă <strong>56 EUR/ha</strong> anual pentru fermierii care practică No-Till sau Mini-Till. Un fermier cu 200 ha poate încasa peste <strong>56.000 RON</strong> suplimentar față de subvenția de bază.</p>
 
       <h3>Documente necesare pentru dosarul PD-04</h3>
       <ul>

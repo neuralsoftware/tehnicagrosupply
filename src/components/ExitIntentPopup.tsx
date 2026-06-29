@@ -114,7 +114,7 @@ export function ExitIntentPopup() {
                                 <Calculator className="w-8 h-8 text-ea-green-500 shrink-0" />
                                 <div>
                                     <p className="text-white font-bold text-sm">Calculator ROI Personalizat</p>
-                                    <p className="text-zinc-400 text-xs">Află cât poți câștiga cu subvenția APIA PD-04</p>
+                                    <p className="text-zinc-400 text-xs">Calculează subvenția APIA PD-04 pentru campania 2027</p>
                                 </div>
                             </div>
 
