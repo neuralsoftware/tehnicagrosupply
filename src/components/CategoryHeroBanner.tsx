@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 const HERO_VIDEO_POSTER = '/images/category-hero-video-poster.jpg';
@@ -8,6 +9,7 @@ export interface CategoryHeroBannerProps {
     categoryTitle: string;
     subtitle: string;
     videoUrls: string[];
+    imageUrl?: string | null;
 }
 
 function getVideoMimeType(src: string): string {
@@ -28,9 +30,11 @@ function CategoryHeroBannerVideos({
 }) {
     const multi = videoUrls.length > 1;
     const [activeIndex, setActiveIndex] = useState(0);
+    const [failedVideos, setFailedVideos] = useState<Set<string>>(() => new Set());
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
     useEffect(() => {
+        if (!window.matchMedia('(min-width: 768px)').matches) return;
         const refs = videoRefs.current;
         videoUrls.forEach((_, i) => {
             const el = refs[i];
@@ -51,6 +55,11 @@ function CategoryHeroBannerVideos({
 
     return (
         <div className="relative mb-12 h-[250px] w-full overflow-hidden md:h-[350px]">
+            <div
+                className="absolute inset-0 z-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${HERO_VIDEO_POSTER})` }}
+                aria-hidden
+            />
             <div className="absolute inset-0 z-0">
                 {videoUrls.map((src, i) => (
                     <video
@@ -65,6 +74,9 @@ function CategoryHeroBannerVideos({
                         muted
                         playsInline
                         preload="metadata"
+                        onError={() => {
+                            setFailedVideos((prev) => new Set(prev).add(src));
+                        }}
                         onEnded={() => {
                             if (!multi) return;
                             if (i !== activeIndex) return;
@@ -75,6 +87,9 @@ function CategoryHeroBannerVideos({
                     </video>
                 ))}
             </div>
+            {failedVideos.size >= videoUrls.length && (
+                <div className="absolute inset-0 z-[1] bg-black/20" aria-hidden />
+            )}
             <div className="pointer-events-none absolute inset-0 z-[5] bg-black/40" aria-hidden />
             <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center">
                 <h1 className="normal-case text-3xl font-semibold tracking-tight text-white drop-shadow-lg md:text-4xl">
@@ -86,9 +101,70 @@ function CategoryHeroBannerVideos({
     );
 }
 
-export function CategoryHeroBanner({ categoryTitle, subtitle, videoUrls }: CategoryHeroBannerProps) {
+function CategoryHeroBannerImage({
+    categoryTitle,
+    subtitle,
+    imageUrl,
+}: {
+    categoryTitle: string;
+    subtitle: string;
+    imageUrl: string;
+}) {
+    const [imageOk, setImageOk] = useState(true);
+
+    if (!imageOk) {
+        return (
+            <div className="relative mb-12 h-[250px] w-full overflow-hidden md:h-[350px]">
+                <div
+                    className="absolute inset-0 z-0 bg-gradient-to-br from-slate-900 via-green-950 to-slate-900"
+                    aria-hidden
+                />
+                <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center">
+                    <h1 className="normal-case text-3xl font-semibold tracking-tight text-white drop-shadow-lg md:text-4xl">
+                        {categoryTitle}
+                    </h1>
+                    <p className="mt-3 max-w-3xl text-sm text-gray-100 drop-shadow-md md:text-base">{subtitle}</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="relative mb-12 h-[250px] w-full overflow-hidden md:h-[350px]">
+            <Image
+                src={imageUrl}
+                alt={`${categoryTitle} — TehnicAgro Supply`}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover object-center"
+                onError={() => setImageOk(false)}
+            />
+            <div className="pointer-events-none absolute inset-0 z-[5] bg-black/45" aria-hidden />
+            <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center">
+                <h1 className="normal-case text-3xl font-semibold tracking-tight text-white drop-shadow-lg md:text-4xl">
+                    {categoryTitle}
+                </h1>
+                <p className="mt-3 max-w-3xl text-sm text-gray-100 drop-shadow-md md:text-base">{subtitle}</p>
+            </div>
+        </div>
+    );
+}
+
+export function CategoryHeroBanner({ categoryTitle, subtitle, videoUrls, imageUrl }: CategoryHeroBannerProps) {
     const hasVideo = videoUrls.length > 0;
+    const hasImage = Boolean(imageUrl?.trim());
     const urlsKey = videoUrls.join('\0');
+
+    if (!hasVideo && hasImage) {
+        return (
+            <CategoryHeroBannerImage
+                categoryTitle={categoryTitle}
+                subtitle={subtitle}
+                imageUrl={imageUrl as string}
+            />
+        );
+    }
 
     if (!hasVideo) {
         return (

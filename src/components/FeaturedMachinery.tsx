@@ -2,14 +2,15 @@ import { getProducts, isProductVisibleOnSite, productMatchesCategorySlug } from 
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Check } from 'lucide-react';
+import type { DynamicProduct } from '@/lib/products-store';
 
 /**
  * Server Component — afișează 4 produse pe homepage:
  * 1-2: Multisem ADS (Avers-Agro) + Chain Disc KSE 680 (Fliegl) — utilaje principale
  * 3-4: Produse Fliegl recoltare-logistica (ULW, DK/DDK) — înlocuiesc K-Factor
  */
-export async function FeaturedMachinery() {
-    const allProducts = await getProducts();
+export async function FeaturedMachinery({ products }: { products?: DynamicProduct[] }) {
+    const allProducts = products ?? (await getProducts());
     const active = allProducts.filter((p) => isProductVisibleOnSite(p.status));
 
     // Produsele principale (Pregătire Sol + Semănat) — ordine fixă pentru brand consistency

@@ -81,7 +81,7 @@ export default function ContactPage() {
                     </div>
 
                     <div className="lg:col-span-3 w-full min-w-0">
-                        <Contact hideSectionAnchor hideMarketingCopy />
+                        <Contact hideMarketingCopy />
                     </div>
                 </div>
             </div>

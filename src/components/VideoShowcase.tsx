@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Play, Maximize2 } from 'lucide-react';
 import { onHashLinkClickSmooth } from '@/lib/scroll-to-anchor';
@@ -27,29 +28,52 @@ export function VideoShowcase({
     ctaHref,
     autoPlay = false,
 }: VideoShowcaseProps) {
+    const videoRef = useRef<HTMLVideoElement | null>(null);
     const [isPlaying, setIsPlaying] = useState(autoPlay);
+    const [hasLoadedVideo, setHasLoadedVideo] = useState(autoPlay);
+    const [pendingPlay, setPendingPlay] = useState(autoPlay);
+    const [videoFailed, setVideoFailed] = useState(false);
+
+    useEffect(() => {
+        if (!pendingPlay || !hasLoadedVideo || !videoRef.current) return;
+
+        videoRef.current
+            .play()
+            .catch(() => {
+                setIsPlaying(false);
+                setPendingPlay(false);
+            });
+    }, [hasLoadedVideo, pendingPlay]);
 
     const handlePlay = () => {
-        const video = document.getElementById(`video-${title.replace(/\s/g, '')}`) as HTMLVideoElement;
+        if (!hasLoadedVideo) {
+            setHasLoadedVideo(true);
+            setPendingPlay(true);
+            return;
+        }
+
+        const video = videoRef.current;
         if (video) {
             if (isPlaying) {
                 video.pause();
             } else {
-                video.play();
-                // Track Video Play
-                if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
-                    window.fbq('trackCustom', 'VideoPlay', {
-                        content_name: title,
-                        video_title: title,
-                    });
-                }
+                setPendingPlay(true);
+                video.play().catch(() => {
+                    setIsPlaying(false);
+                    setPendingPlay(false);
+                });
             }
             setIsPlaying(!isPlaying);
         }
     };
 
     const handleFullscreen = () => {
-        const video = document.getElementById(`video-${title.replace(/\s/g, '')}`) as HTMLVideoElement;
+        if (!hasLoadedVideo) {
+            setHasLoadedVideo(true);
+            return;
+        }
+
+        const video = videoRef.current;
         if (video) {
             if (video.requestFullscreen) {
                 video.requestFullscreen();
@@ -71,22 +95,46 @@ export function VideoShowcase({
             )}
 
             <div className="relative aspect-video" role="region" aria-label={`Demonstrație video: ${title}`}>
-                <video
-                    id={`video-${title.replace(/\s/g, '')}`}
-                    src={videoSrc}
-                    poster={posterSrc}
-                    title={`Demonstrație video: ${title}`}
-                    aria-label={`Film demonstrativ ${title}. Folosește controalele pentru redare sau pauză.`}
-                    muted
-                    loop
-                    playsInline
-                    autoPlay={autoPlay}
-                    preload="metadata"
-                    className="w-full h-full object-cover"
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    onEnded={() => setIsPlaying(false)}
-                />
+                {videoFailed ? (
+                    <Image src={posterSrc} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" aria-hidden="true" />
+                ) : !hasLoadedVideo ? (
+                    <Image src={posterSrc} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" aria-hidden="true" />
+                ) : (
+                    <video
+                        ref={videoRef}
+                        id={`video-${title.replace(/\s/g, '')}`}
+                        src={videoSrc}
+                        poster={posterSrc}
+                        title={`Demonstrație video: ${title}`}
+                        aria-label={`Film demonstrativ ${title}. Folosește controalele pentru redare sau pauză.`}
+                        muted
+                        loop
+                        playsInline
+                        autoPlay={autoPlay}
+                        preload="none"
+                        className="w-full h-full object-cover"
+                        onPlay={() => {
+                            setIsPlaying(true);
+                            setPendingPlay(false);
+                            if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+                                window.fbq('trackCustom', 'VideoPlay', {
+                                    content_name: title,
+                                    video_title: title,
+                                });
+                            }
+                        }}
+                        onPause={() => {
+                            setIsPlaying(false);
+                            setPendingPlay(false);
+                        }}
+                        onEnded={() => setIsPlaying(false)}
+                        onError={() => {
+                            setVideoFailed(true);
+                            setIsPlaying(false);
+                            setPendingPlay(false);
+                        }}
+                    />
+                )}
 
                 {/* Overlay Controls */}
                 <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>

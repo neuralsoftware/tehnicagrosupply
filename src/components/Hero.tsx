@@ -1,17 +1,13 @@
-'use client';
-
+import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
-import { CONTACT_SECTION_ID, onHashLinkClickSmooth } from '@/lib/scroll-to-anchor';
+import { CONTACT_SECTION_ID } from '@/lib/scroll-to-anchor';
+import { SafeBackgroundVideo } from '@/components/SafeBackgroundVideo';
+import { getTehnicagroStoragePublicUrl } from '@/lib/storage-video-public';
 
-const HERO_VIDEO =
-    'https://unetpytdkdaryvnfnpei.supabase.co/storage/v1/object/public/tehnicagro/video/home-showcase/camp%20de%20grau%20.mp4';
+const HERO_VIDEO = getTehnicagroStoragePublicUrl('video/home-showcase/camp de grau .mp4');
+const HERO_POSTER = '/images/hero-wheat-field.jpg';
 
-function HeroContent() {
-    const searchParams = useSearchParams();
-    const ref = searchParams.get('ref');
-
+export function Hero({ refSource }: { refSource?: string }) {
     const defaultHeadline = (
         <>
             <span className="block text-white tracking-tight drop-shadow-sm">
@@ -25,7 +21,7 @@ function HeroContent() {
 
     let headline = defaultHeadline;
 
-    if (ref === 'subventie') {
+    if (refSource === 'subventie') {
         headline = (
             <>
                 <span className="block text-white tracking-tight drop-shadow-sm">
@@ -36,7 +32,7 @@ function HeroContent() {
                 </span>
             </>
         );
-    } else if (ref === 'roi') {
+    } else if (refSource === 'roi') {
         headline = (
             <>
                 <span className="block text-white tracking-tight drop-shadow-sm">
@@ -47,7 +43,7 @@ function HeroContent() {
                 </span>
             </>
         );
-    } else if (ref === 'avers') {
+    } else if (refSource === 'avers') {
         headline = (
             <>
                 <span className="block text-white tracking-tight drop-shadow-sm">
@@ -58,7 +54,7 @@ function HeroContent() {
                 </span>
             </>
         );
-    } else if (ref === 'dr12') {
+    } else if (refSource === 'dr12') {
         headline = (
             <>
                 <span className="block text-white tracking-tight drop-shadow-sm">
@@ -73,58 +69,49 @@ function HeroContent() {
 
     return (
         <section className="relative flex min-h-[640px] items-center justify-center overflow-hidden pt-14 pb-20 md:min-h-[680px] md:pb-12">
-            <video
+            <Image
+                src={HERO_POSTER}
+                alt=""
+                fill
+                priority
+                sizes="100vw"
                 className="absolute inset-0 z-0 h-full w-full object-cover object-center"
-                src={HERO_VIDEO}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
                 aria-hidden="true"
+            />
+            <SafeBackgroundVideo
+                className="absolute inset-0 z-0 hidden h-full w-full md:block"
+                src={HERO_VIDEO}
+                poster={HERO_POSTER}
+                minViewportWidth={768}
+                preload="metadata"
             />
             <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/25 via-emerald-950/35 to-slate-950/70" aria-hidden />
             <div className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_50%_42%,rgba(0,0,0,0.05),rgba(0,0,0,0.38)_72%)]" aria-hidden />
 
-            <div className="relative z-10 mx-auto max-w-3xl px-6 text-center space-y-5 sm:space-y-6">
-                <h1 className="mx-auto max-w-[22rem] px-2 text-2xl font-semibold leading-tight text-white normal-case text-balance drop-shadow-lg sm:max-w-2xl sm:text-4xl md:text-[2.7rem]">
+            <div className="relative z-10 mx-auto w-full max-w-3xl px-6 text-center space-y-5 sm:space-y-6">
+                <h1 className="mx-auto max-w-[19rem] text-2xl font-semibold leading-tight text-white normal-case text-balance drop-shadow-lg sm:max-w-2xl sm:text-4xl md:text-[2.7rem]">
                     {headline}
                 </h1>
 
-                <p className="mx-auto max-w-2xl px-2 text-sm font-medium leading-relaxed text-white/85 drop-shadow sm:text-base">
+                <p className="mx-auto max-w-[19rem] text-sm font-medium leading-relaxed text-white/85 drop-shadow sm:max-w-2xl sm:text-base">
                     Utilaje și consultanță pentru ferme care cer fiabilitate, randament și respectarea standardelor în câmp.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-1">
                     <Link
                         href="#audit"
-                        className="w-full sm:w-auto px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white text-sm sm:text-base font-medium rounded-lg transition-colors shadow-lg shadow-black/25 text-center"
+                        className="w-full max-w-[21rem] sm:w-auto sm:max-w-none px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white text-sm sm:text-base font-medium rounded-lg transition-colors shadow-lg shadow-black/25 text-center"
                     >
                         Calculează beneficiul fermei tale
                     </Link>
                     <a
                         href={`#${CONTACT_SECTION_ID}`}
-                        onClick={(e) => onHashLinkClickSmooth(e, `#${CONTACT_SECTION_ID}`)}
-                        className="w-full sm:w-auto px-6 py-3 rounded-lg font-medium text-sm sm:text-base border border-white/35 bg-white/10 text-white hover:bg-white/15 backdrop-blur-sm transition-colors text-center"
+                        className="w-full max-w-[21rem] sm:w-auto sm:max-w-none px-6 py-3 rounded-lg font-medium text-sm sm:text-base border border-white/35 bg-white/10 text-white hover:bg-white/15 backdrop-blur-sm transition-colors text-center"
                     >
                         Solicită expertiză tehnică
                     </a>
                 </div>
             </div>
         </section>
-    );
-}
-
-export function Hero() {
-    return (
-        <Suspense
-            fallback={
-                <div className="min-h-[60vh] bg-gradient-to-br from-slate-900 via-green-950 to-slate-900 flex items-center justify-center">
-                    <div className="h-8 w-8 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                </div>
-            }
-        >
-            <HeroContent />
-        </Suspense>
     );
 }

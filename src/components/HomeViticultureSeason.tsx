@@ -1,8 +1,11 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { SafeBackgroundVideo } from '@/components/SafeBackgroundVideo';
+import { getTehnicagroStoragePublicUrl } from '@/lib/storage-video-public';
 
-const SEASON_VIDEO =
-    'https://unetpytdkdaryvnfnpei.supabase.co/storage/v1/object/public/tehnicagro/video/recoltare-logistica/edit.corn.ziegler.mp4';
+const SEASON_VIDEO = getTehnicagroStoragePublicUrl('video/recoltare-logistica/edit.corn.ziegler.mp4');
+const SEASON_POSTER = '/images/viticulture-season-bg.jpg';
 
 /** Card categorie premium — echipamente de sezon (imagine + overlay), nu alertă de sistem */
 export function HomeViticultureSeason({ catalogHref }: { catalogHref: string }) {
@@ -10,15 +13,21 @@ export function HomeViticultureSeason({ catalogHref }: { catalogHref: string }) 
         <section className="border-y border-zinc-100 bg-white py-8 md:py-10" aria-labelledby="season-equipment-heading">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="relative min-h-[260px] md:min-h-[300px] rounded-2xl overflow-hidden shadow-md border border-zinc-200/80">
-                    <video
-                        className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
+                    <Image
+                        src={SEASON_POSTER}
+                        alt=""
+                        fill
+                        sizes="(max-width: 768px) 100vw, 1200px"
+                        className="absolute inset-0 h-full w-full object-cover"
+                        aria-hidden="true"
+                    />
+                    <SafeBackgroundVideo
+                        className="absolute inset-0 hidden h-full w-full scale-[1.02] md:block"
                         src={SEASON_VIDEO}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
                         aria-label="Culegător porumb Ziegler în campania de recoltare"
+                        loading="lazy"
+                        minViewportWidth={768}
+                        preload="none"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/35" aria-hidden />
                     <div className="relative z-10 flex flex-col items-center justify-center text-center px-6 py-12 md:py-14 max-w-2xl mx-auto">

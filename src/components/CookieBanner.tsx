@@ -3,10 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-KR6928Z45R';
+
 export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
-  const updateConsent = useCallback((granted: boolean) => {
+  const updateConsent = useCallback((granted: boolean, sendPageView = false) => {
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
       window.gtag('consent', 'update', {
         analytics_storage: granted ? 'granted' : 'denied',
@@ -14,6 +16,15 @@ export default function CookieBanner() {
         ad_user_data: granted ? 'granted' : 'denied',
         ad_personalization: granted ? 'granted' : 'denied',
       });
+
+      if (granted && sendPageView) {
+        window.gtag('event', 'page_view', {
+          page_title: document.title,
+          page_location: window.location.href,
+          page_path: window.location.pathname,
+          send_to: GA_ID,
+        });
+      }
     }
   }, []);
 
@@ -36,7 +47,7 @@ export default function CookieBanner() {
 
   const handleAccept = () => {
     localStorage.setItem('cookie_consent', 'granted');
-    updateConsent(true);
+    updateConsent(true, true);
     setIsVisible(false);
     window.dispatchEvent(new Event('tehnicagro-cookie-consent'));
   };

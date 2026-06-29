@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Filmări secțiunea „în acțiune” pe home — URL-uri publice Supabase Storage (`video/home-showcase/…`).
+ * Filmări secțiunea „în acțiune” pe home — URL-uri publice R2 (`video/home-showcase/…`).
  */
 
 import { motion } from 'framer-motion';
@@ -46,7 +46,6 @@ export function VideoGallery({ videoSrcAds, videoSrcKse }: VideoGalleryProps) {
                         badge="Semănătoare No-Till"
                         ctaText="Solicită Ofertă ADS"
                         ctaHref="#contact"
-                        autoPlay
                     />
                     <VideoShowcase
                         title="Fliegl Chain Disc KSE 680"
@@ -54,7 +53,6 @@ export function VideoGallery({ videoSrcAds, videoSrcKse }: VideoGalleryProps) {
                         badge="Grapă cu Lanțuri"
                         ctaText="Solicită Ofertă KSE"
                         ctaHref="#contact"
-                        autoPlay
                     />
                 </div>
 

@@ -1,13 +1,10 @@
-import { supabase } from '@/lib/supabase';
+import { getR2VideoPublicUrl, supabaseVideoPublicUrlToR2Path } from '@/lib/r2-video-public';
 import { HOME_SHOWCASE_STORAGE } from '@/lib/site-video-paths';
-
-const BUCKET = 'tehnicagro';
 
 /** URL public pentru un obiect din `tehnicagro` (ex. `video/home-showcase/…`). */
 export function getTehnicagroStoragePublicUrl(storageObjectPath: string): string {
     const key = storageObjectPath.replace(/^\/+/, '');
-    const { data } = supabase.storage.from(BUCKET).getPublicUrl(key);
-    return data.publicUrl;
+    return getR2VideoPublicUrl(key);
 }
 
 /** Mapare veche `/downloads/…` → cale Storage (singura sursă pentru MP4 pe site). */
@@ -23,7 +20,10 @@ export function resolveSiteVideoRef(ref: string | undefined | null): string | un
     if (ref == null) return undefined;
     const t = String(ref).trim();
     if (!t) return undefined;
-    if (/^https?:\/\//i.test(t)) return t;
+    if (/^https?:\/\//i.test(t)) {
+        const r2Path = supabaseVideoPublicUrlToR2Path(t);
+        return r2Path ? getTehnicagroStoragePublicUrl(r2Path) : t;
+    }
     if (t.startsWith('video/')) return getTehnicagroStoragePublicUrl(t);
     const legacyKey = t.startsWith('/') ? t : `/${t}`;
     const mapped = LEGACY_DOWNLOADS_TO_STORAGE[legacyKey] ?? LEGACY_DOWNLOADS_TO_STORAGE[t];

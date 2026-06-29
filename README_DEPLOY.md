@@ -16,6 +16,7 @@ Pentru ca **Admin Panel** să funcționeze corect, este CRITIC să setezi variab
 | `NODEMAILER_USER` | Email trimitere rapoarte | Gmail |
 | `NODEMAILER_PASS` | Parolă aplicație Gmail | Gmail -> App Passwords |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics 4 ID | Google Analytics |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Token meta pentru Google Search Console | Search Console -> Ownership verification -> HTML tag |
 | `NEXT_PUBLIC_FACEBOOK_PIXEL_ID` | Facebook Pixel ID | Facebook Business Manager |
 
 ## ⚠️ Cum se adaugă manual SUPABASE_SERVICE_ROLE_KEY
@@ -37,3 +38,5 @@ Această cheie NU este în `.env.local` implicit din motive de securitate sau po
 - **Formular Lead:** Declansează `Lead` pe FB Pixel și `generate_lead` pe GA4.
 
 Aceste evenimente sunt active automat dacă `NEXT_PUBLIC_FACEBOOK_PIXEL_ID` și `NEXT_PUBLIC_GA_ID` sunt setate.
+
+Pentru Google Search Console, setează `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` doar cu valoarea din `content="..."` a meta tagului oferit de Google, apoi redeploy.

@@ -11,7 +11,7 @@ import {
     collectCategoryHeroMp4Urls,
     CATEGORY_HERO_PROVITIS_MP4,
 } from '@/lib/category-hero-videos';
-import { getCategoryBannerMp4PublicUrl } from '@/lib/category-storage-banner';
+import { getCategoryBannerImagePublicUrl, getCategoryBannerMp4PublicUrl } from '@/lib/category-storage-banner';
 import { CategoryHeroBanner } from '@/components/CategoryHeroBanner';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -132,6 +132,7 @@ export default async function CategoryPage({ params }: PageProps) {
     );
 
     const storageBannerUrl = await getCategoryBannerMp4PublicUrl(catMeta.slug);
+    const storageBannerImageUrl = await getCategoryBannerImagePublicUrl(catMeta.slug);
     let categoryHeroMp4s: string[];
     if (storageBannerUrl) {
         /** Admin: `tehnicagro/video/{slug}/banner-*.mp4` — înlocuiește fundalul verde și lista din produse pentru hero. */
@@ -161,6 +162,7 @@ export default async function CategoryPage({ params }: PageProps) {
                 categoryTitle={categoryTitle}
                 subtitle={heroSubtitle}
                 videoUrls={categoryHeroMp4s}
+                imageUrl={storageBannerImageUrl}
             />
 
             <div className="max-w-7xl mx-auto px-4">
