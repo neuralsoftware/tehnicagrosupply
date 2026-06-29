@@ -12,7 +12,7 @@ export function LegislativeContextStack() {
                 <h2 className="text-lg font-semibold tracking-tight md:text-xl">Fonduri & legislație 2026</h2>
             </div>
             <p className="mb-4 shrink-0 text-xs leading-snug text-zinc-500">
-                Context obligatorii: PD-04, GAEC 6, măsuri viticole.
+                GAEC 6 — obligatoriu acum. PD-04 — depunere campania 2027 (Mar–Iun 2027).
             </p>
 
             <div className="flex min-h-0 flex-1 flex-col gap-3">
@@ -25,15 +25,18 @@ export function LegislativeContextStack() {
                     <div className="flex items-start gap-2">
                         <FileText className="mt-0.5 h-4 w-4 shrink-0 text-ea-green-600" />
                         <div className="min-w-0 space-y-1.5 text-xs text-zinc-600">
-                            <h3 className="text-sm font-semibold text-zinc-900">Eco-schemă PD-04</h3>
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <h3 className="text-sm font-semibold text-zinc-900">Eco-schemă PD-04</h3>
+                                <span className="text-[9px] font-black uppercase tracking-wide bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">Campania 2027</span>
+                            </div>
                             <p>
                                 <span className="font-medium text-zinc-800">Beneficiu:</span>{' '}
                                 <span className="font-semibold text-zinc-900">~56,28 EUR/ha</span>
                             </p>
                             <p className="border-l-2 border-zinc-200 pl-2 text-[11px] italic leading-snug text-zinc-500">
-                                No-till / strip-till pe min. 50% din suprafața arabilă.
+                                No-till / strip-till pe min. 50% din suprafața arabilă. Depunere: Mar–Iun 2027.
                             </p>
-                            <p className="text-[10px] font-medium text-zinc-400">PNS 2023–2027</p>
+                            <p className="text-[10px] font-medium text-zinc-400">Campania 2026 închisă · PNS 2023–2027</p>
                         </div>
                     </div>
                 </motion.div>
