@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
+import { isAdminAuth } from '@/lib/admin-auth';
 import { uploadToSupabase } from '@/lib/supabase';
+
+/** Ruta e folosită doar de ImageOptimizer (admin) — acceptă exclusiv imagini. */
+const ALLOWED_IMAGE_TYPES = new Set(['image/webp', 'image/jpeg', 'image/png', 'image/avif', 'image/gif']);
+const MAX_UPLOAD_BYTES = 15 * 1024 * 1024; // 15 MB
 
 export async function POST(request: Request) {
     try {
-        const auth = request.headers.get('x-admin-auth');
-        if (auth !== process.env.ADMIN_PASSWORD) {
+        if (!isAdminAuth(request)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
@@ -14,6 +18,12 @@ export async function POST(request: Request) {
 
         if (!file) {
             return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+        }
+        if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+            return NextResponse.json({ error: 'Doar imagini (webp, jpeg, png, avif, gif)' }, { status: 400 });
+        }
+        if (file.size > MAX_UPLOAD_BYTES) {
+            return NextResponse.json({ error: 'Fișier prea mare (max 15 MB)' }, { status: 400 });
         }
 
         const safeBase = String(filename).replace(/[^a-zA-Z0-9._-]/g, '_');

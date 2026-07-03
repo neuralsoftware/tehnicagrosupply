@@ -1,5 +1,20 @@
+import { timingSafeEqual } from 'crypto';
 import { NextResponse } from 'next/server';
 import { simpleRateLimit } from '@/lib/leads';
+
+/** Comparație timing-safe; refuză accesul dacă ADMIN_PASSWORD lipsește de pe server. */
+function passwordMatches(candidate: unknown): boolean {
+    const input = typeof candidate === 'string' ? candidate.trim() : '';
+    const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
+    if (!input || !serverPass) return false;
+    const a = Buffer.from(input, 'utf8');
+    const b = Buffer.from(serverPass, 'utf8');
+    if (a.length !== b.length) {
+        timingSafeEqual(b, b);
+        return false;
+    }
+    return timingSafeEqual(a, b);
+}
 
 export async function POST(request: Request) {
     try {
@@ -15,9 +30,8 @@ export async function POST(request: Request) {
         }
 
         const { password } = await request.json();
-        const adminPassword = process.env.ADMIN_PASSWORD;
 
-        if (password === adminPassword) {
+        if (passwordMatches(password)) {
             return NextResponse.json({ success: true });
         } else {
             return NextResponse.json({ success: false, message: 'Parolă incorectă' }, { status: 401 });
