@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import { NextResponse } from 'next/server';
 import { simpleRateLimit } from '@/lib/leads';
+import { isAdminAuth } from '@/lib/admin-auth';
 import { z } from 'zod';
 import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
@@ -404,8 +405,12 @@ export async function POST(request: Request) {
     }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
+        if (!isAdminAuth(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const crm = getSupabaseCrmAdmin();
         if (!crm) {
             const missing =

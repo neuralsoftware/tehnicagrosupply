@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isAdminAuth } from '@/lib/admin-auth';
 import { uploadToSupabase } from '@/lib/supabase';
 import { renderToBuffer } from '@react-pdf/renderer';
 import {
@@ -18,17 +19,17 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
+        // AUTH: numai header (timing-safe, refuză accesul dacă ADMIN_PASSWORD lipsește);
+        // parola nu se mai acceptă în body, ca să nu ajungă în logs.
+        if (!isAdminAuth(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const bodyInput = await request.json();
-        const { productSlug, adminAuth, config: rawConfig } = bodyInput as {
+        const { productSlug, config: rawConfig } = bodyInput as {
             productSlug?: string;
-            adminAuth?: string;
             config?: { title?: string; subtitle?: string; phone?: string; email?: string };
         };
-
-        const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
-        const authOk =
-            (adminAuth || '').trim() === serverPass || (request.headers.get('x-admin-auth') || '').trim() === serverPass;
-        if (!authOk) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
         const slug = normalizeLegacyProductSlug(String(productSlug || '').trim());
         if (!slug) return NextResponse.json({ error: 'Lipsește productSlug' }, { status: 400 });

@@ -152,9 +152,8 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
             const cleanToken = (adminAuth || '').trim();
             const res = await fetch('/api/materiale/single', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'x-admin-auth': cleanToken },
                 body: JSON.stringify({
-                    adminAuth: cleanToken,
                     productSlug: slug,
                     config: {
                         phone: config.phone,
@@ -189,11 +188,10 @@ export function MaterialeTab({ adminAuth, allProducts, tabVisible = true }: Prop
             const cleanToken = (adminAuth || '').trim();
             const res = await fetch('/api/materiale', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }, // Header-ul x-admin-auth este mutat în BODY pentru fiabilitate maximă
+                headers: { 'Content-Type': 'application/json', 'x-admin-auth': cleanToken },
                 body: JSON.stringify({
                     config,
                     productSlugs: selectedSlugs,
-                    adminAuth: cleanToken // <--- AUTH ÎN BODY (Final Fix for 401)
                 }),
             });
             const data = await res.json();
