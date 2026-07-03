@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
+import { isAdminAuth } from '@/lib/admin-auth';
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -16,9 +17,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
         // Convert frontend camelCase fields to database snake_case columns
         const dbUpdates: Record<string, unknown> = {};
-        if (updates.status) dbUpdates.status = updates.status;
-        if (updates.notes) dbUpdates.notes = updates.notes;
-        if (updates.urgency) dbUpdates.urgency = updates.urgency;
+        if (isAdminAuth(request)) {
+            if (updates.status) dbUpdates.status = updates.status;
+            if (updates.notes) dbUpdates.notes = updates.notes;
+            if (updates.urgency) dbUpdates.urgency = updates.urgency;
+        } else if (updates.callRequested === true) {
+            // Singura acțiune publică: butonul „Solicită reapelare” din calculatorul ROI,
+            // imediat după trimiterea formularului. Textele sunt fixate pe server.
+            dbUpdates.notes = 'SOLICITARE REAPELARE RAPIDĂ (Urgent)';
+            dbUpdates.urgency = 'URGENT: APEL';
+        } else {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        if (Object.keys(dbUpdates).length === 0) {
+            return NextResponse.json({ error: 'Nimic de actualizat' }, { status: 400 });
+        }
 
         const { data, error } = await crm
             .from('clients')
@@ -41,6 +55,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        if (!isAdminAuth(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const crm = getSupabaseCrmAdmin();
         if (!crm) {
             return NextResponse.json(

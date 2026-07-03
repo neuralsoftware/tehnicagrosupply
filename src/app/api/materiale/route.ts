@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { NextResponse } from 'next/server';
+import { isAdminAuth } from '@/lib/admin-auth';
 import { uploadToSupabase } from '@/lib/supabase';
 import {
     getProducts,
@@ -1954,13 +1955,14 @@ function buildPDF(
 
 export async function POST(request: Request) {
     try {
-        const bodyInput = await request.json();
-        const { config, productSlugs, adminAuth } = bodyInput;
+        // AUTH: numai header (timing-safe, refuză accesul dacă ADMIN_PASSWORD lipsește);
+        // parola nu se mai acceptă în body, ca să nu ajungă în logs.
+        if (!isAdminAuth(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
-        // AUTH
-        const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
-        const authOk = (adminAuth || '').trim() === serverPass || (request.headers.get('x-admin-auth') || '').trim() === serverPass;
-        if (!authOk) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const bodyInput = await request.json();
+        const { config, productSlugs } = bodyInput;
 
         const slugList = Array.isArray(productSlugs) ? productSlugs : [];
         if (slugList.length > MAX_MULTI_BROCHURE_PRODUCTS) {
@@ -2038,9 +2040,7 @@ export async function GET() {
 
 export async function DELETE(request: Request) {
     try {
-        const serverPass = (process.env.ADMIN_PASSWORD || '').trim();
-        const authOk = (request.headers.get('x-admin-auth') || '').trim() === serverPass;
-        if (!authOk) {
+        if (!isAdminAuth(request)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
         const { searchParams } = new URL(request.url);

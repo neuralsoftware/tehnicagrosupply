@@ -203,10 +203,8 @@ export function RoiCalculator({
             await fetch(`/api/leads/${leadId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    notes: 'SOLICITARE REAPELARE RAPIDĂ (Urgent)',
-                    urgency: 'URGENT: APEL'
-                })
+                // Textele notiței/urgenței sunt fixate pe server (singura acțiune permisă fără admin)
+                body: JSON.stringify({ callRequested: true })
             });
             setCallRequested(true);
         } catch (err) {

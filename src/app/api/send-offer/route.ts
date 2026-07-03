@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { isAdminAuth } from '@/lib/admin-auth';
 
 export async function POST(request: Request) {
     try {
+        // Trimite email de pe contul companiei — strict pentru admin, altfel devine relay de spam
+        if (!isAdminAuth(request)) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const { email, name, message, leadData } = await request.json();
 
         if (!email) {

@@ -166,9 +166,8 @@ export function CatalogTab({ adminAuth, categories }: Props) {
         try {
             const res = await fetch('/api/materiale/single', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'x-admin-auth': (adminAuth || '').trim() },
                 body: JSON.stringify({
-                    adminAuth: (adminAuth || '').trim(),
                     productSlug: slug,
                     config: {
                         title: `Broșură dedicată: ${name}`,
