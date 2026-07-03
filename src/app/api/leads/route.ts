@@ -33,14 +33,18 @@ const leadSchema = z.object({
     attribution: z.record(z.string(), z.string().optional()).optional().default({}),
 });
 
-/** Răspuns JSON cu câmpurile erorii PostgREST/Postgres așa cum vin de la Supabase (`error` = alias la message pentru formulare). */
+/**
+ * Mesaj generic către browser — detaliile PostgREST (message/details/hint/code) rămân
+ * doar în logurile serverului, ca să nu expunem public schema bazei de date.
+ */
+const GENERIC_LEAD_ERROR =
+    'A apărut o eroare la trimitere. Te rugăm să încerci din nou sau să ne contactezi telefonic.';
+
 function jsonFromPostgrestError(err: PostgrestError) {
+    console.error('[api/leads] PostgREST:', err.code, err.message, err.details, err.hint);
     return {
-        error: err.message,
-        message: err.message,
-        details: err.details,
-        code: err.code,
-        hint: err.hint,
+        error: GENERIC_LEAD_ERROR,
+        message: GENERIC_LEAD_ERROR,
     };
 }
 
@@ -297,15 +301,9 @@ export async function POST(request: Request) {
             rawId == null ||
             (typeof rawId !== 'string' && typeof rawId !== 'number')
         ) {
-            const msg = 'Insert client fără id în răspuns.';
+            console.error('[api/leads] Insert client fără id în răspuns:', JSON.stringify(insertedRow));
             return NextResponse.json(
-                {
-                    error: msg,
-                    message: msg,
-                    details: JSON.stringify(insertedRow),
-                    code: null,
-                    hint: null,
-                },
+                { error: GENERIC_LEAD_ERROR, message: GENERIC_LEAD_ERROR },
                 { status: 500 }
             );
         }
@@ -387,19 +385,8 @@ export async function POST(request: Request) {
             );
         }
         console.error('Lead processing error:', error);
-        if (isPostgrestError(error)) {
-            return NextResponse.json(jsonFromPostgrestError(error), { status: 500 });
-        }
-        const err = error as Error & { details?: string; code?: string; hint?: string };
-        const msg = err?.message ?? String(error);
         return NextResponse.json(
-            {
-                error: msg,
-                message: msg,
-                details: err?.details ?? null,
-                code: err?.code ?? null,
-                hint: err?.hint ?? null,
-            },
+            { error: GENERIC_LEAD_ERROR, message: GENERIC_LEAD_ERROR },
             { status: 500 }
         );
     }
