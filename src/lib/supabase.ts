@@ -2,8 +2,14 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
+// Modulul rulează doar pe server (API routes / products-store). Scrierile în Storage
+// folosesc SERVICE_ROLE ca să funcționeze după închiderea politicilor publice de scriere
+// pe bucketul `tehnicagro`. Fallback pe anon doar dacă cheia de server lipsește.
+const supabaseStorageKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || supabaseAnonKey;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseStorageKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+});
 
 const BUCKET = 'tehnicagro';
 
