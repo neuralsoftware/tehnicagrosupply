@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { collectLeadAttribution } from '@/lib/lead-attribution';
+import { formatLeadApiError } from '@/lib/lead-api-error';
 
 const JUDETE = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brăila',
@@ -44,6 +45,8 @@ export function Contact({
     const isFetchingRef = useRef(false);
     const [gdprConsent, setGdprConsent] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
+    /** Eroare afișată inline în formular (înlocuiește alert-urile blocante). */
+    const [submitError, setSubmitError] = useState('');
     /** aria-invalid: false la încărcare; true doar după încercare submit sau onBlur pe câmp */
     const [submitAttempted, setSubmitAttempted] = useState(false);
     const [countyBlurred, setCountyBlurred] = useState(false);
@@ -58,6 +61,7 @@ export function Contact({
         if (isFetchingRef.current) return;
         isFetchingRef.current = true;
         setIsSubmitting(true);
+        setSubmitError('');
 
         try {
             const pageTitle = typeof document !== 'undefined' ? document.title : 'Pagină Necunoscută';
@@ -124,18 +128,11 @@ export function Contact({
                     localStorage.setItem('tehnicagro_lead_submitted', 'true');
                 }
             } else {
-                const detail =
-                    typeof data.details === 'string' && data.details.trim()
-                        ? `\n\n${data.details}`
-                        : '';
-                const msg = (data.error || 'A apărut o eroare la server.') + detail;
-                setStatusMessage(msg);
-                alert(msg);
+                setSubmitError(formatLeadApiError(data));
             }
         } catch (err) {
             console.error(err);
-            setStatusMessage("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
-            alert("A apărut o eroare. Vă rugăm să ne contactați telefonic.");
+            setSubmitError('A apărut o eroare de rețea. Te rugăm să încerci din nou sau să ne suni direct.');
         } finally {
             isFetchingRef.current = false;
             setIsSubmitting(false);
@@ -256,6 +253,9 @@ export function Contact({
                                                     type="tel"
                                                     value={phone}
                                                     onChange={(e) => setPhone(e.target.value)}
+                                                    inputMode="tel"
+                                                    pattern="[0-9+(). -]{8,}"
+                                                    title="Minim 8 cifre (ex: 0722 123 456)"
                                                     className="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:ring-1 focus:ring-ea-green-500"
                                                     placeholder="07xx xxx xxx"
                                                     required
@@ -263,7 +263,7 @@ export function Contact({
                                             </div>
                                             <div>
                                                 <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                                                    Email
+                                                    Email (opțional)
                                                 </label>
                                                 <input
                                                     type="email"
@@ -271,7 +271,6 @@ export function Contact({
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     className="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:ring-1 focus:ring-ea-green-500"
                                                     placeholder="nume@ferma.ro"
-                                                    required
                                                 />
                                             </div>
                                         </div>
@@ -403,6 +402,11 @@ export function Contact({
                                                 Bifează acordul GDPR pentru a trimite.
                                             </p>
                                         ) : null}
+                                        {submitError ? (
+                                            <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700" role="alert">
+                                                {submitError}
+                                            </p>
+                                        ) : null}
                                         <button
                                             type="submit"
                                             disabled={isSubmitting}
@@ -512,20 +516,22 @@ export function Contact({
                                         type="tel"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
+                                        inputMode="tel"
+                                        pattern="[0-9+(). -]{8,}"
+                                        title="Minim 8 cifre (ex: 0722 123 456)"
                                         className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-400 text-sm"
                                         placeholder="07xx xxx xxx"
                                         required
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Email</label>
+                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Email (opțional)</label>
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all placeholder:text-zinc-400 text-sm"
                                         placeholder="nume@ferma.ro"
-                                        required
                                     />
                                 </div>
                             </div>
@@ -645,6 +651,11 @@ export function Contact({
                             {gdprInvalid ? (
                                 <p id="err-gdpr-default" className="text-xs text-red-600" role="alert">
                                     Bifează acordul GDPR pentru a trimite.
+                                </p>
+                            ) : null}
+                            {submitError ? (
+                                <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700" role="alert">
+                                    {submitError}
                                 </p>
                             ) : null}
 
