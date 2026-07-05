@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calculator, Banknote, Droplets, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone, Scale } from 'lucide-react';
 import { collectLeadAttribution } from '@/lib/lead-attribution';
+import { formatLeadApiError } from '@/lib/lead-api-error';
 
 const COUNTIES = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila', 'București',
@@ -19,23 +20,6 @@ const URGENCY_OPTIONS = [
     { id: 'next_season', label: 'Campania Viitoare' },
     { id: 'info', label: 'Doar Informativ (Planificare)' }
 ];
-
-function formatLeadApiError(data: {
-    error?: string;
-    details?: unknown;
-}): string {
-    if (typeof data.details === 'string' && data.details.trim()) {
-        const base = data.error || 'Cererea nu a putut fi procesată';
-        return `${base} ${data.details}`;
-    }
-    if (Array.isArray(data.details) && data.details.length > 0) {
-        const parts = data.details
-            .map((d) => (d && typeof d === 'object' && 'message' in d ? String((d as { message?: string }).message || '') : ''))
-            .filter(Boolean);
-        if (parts.length) return parts.join(' ');
-    }
-    return data.error || 'Cererea nu a putut fi procesată.';
-}
 
 export function RoiCalculator({
     embedded = false,
@@ -200,15 +184,21 @@ export function RoiCalculator({
         if (!leadId) return; // Should not happen if flow is correct
 
         try {
-            await fetch(`/api/leads/${leadId}`, {
+            const res = await fetch(`/api/leads/${leadId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                // Textele notiței/urgenței sunt fixate pe server (singura acțiune permisă fără admin)
+                // Textele notiței sunt fixate pe server (singura acțiune permisă fără admin)
                 body: JSON.stringify({ callRequested: true })
             });
+            if (!res.ok) {
+                console.warn('[ROI] reapelare', res.status);
+                alert('Nu am putut înregistra solicitarea de reapelare. Sună-ne direct — numărul este în josul paginii.');
+                return;
+            }
             setCallRequested(true);
         } catch (err) {
             console.error(err);
+            alert('Nu am putut înregistra solicitarea de reapelare. Sună-ne direct — numărul este în josul paginii.');
         }
     };
 
