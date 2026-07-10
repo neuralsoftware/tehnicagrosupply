@@ -19,7 +19,13 @@ import { ArrowRight, Check } from 'lucide-react';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+/**
+ * ISR ca la paginile de produs (PR #20): servit din cache, regenerat la max. 5 minute.
+ * `force-static` e necesar pentru că citirile din Supabase Storage ar forța altfel
+ * randare la fiecare cerere. Modificările din admin apar în max. 5 minute.
+ */
+export const dynamic = 'force-static';
+export const revalidate = 300;
 
 interface PageProps {
     params: Promise<{
@@ -168,18 +174,22 @@ export default async function CategoryPage({ params }: PageProps) {
             <div className="max-w-7xl mx-auto px-4">
                 {filteredProducts.length > 0 ? (
                     <div className="grid lg:grid-cols-2 gap-12">
-                        {filteredProducts.map((product) => (
+                        {filteredProducts.map((product, index) => (
                             <div
                                 key={product.id}
                                 className="bg-white rounded-3xl overflow-hidden border border-zinc-200 flex flex-col md:flex-row group shadow-sm hover:shadow-lg transition-all"
                             >
                                 <div className="md:w-2/5 aspect-[4/5] md:aspect-auto relative overflow-hidden md:min-h-[280px]">
+                                    {/* Primele 2 carduri sunt vizibile la încărcare (elementul LCP pe mobil) — fără lazy */}
                                     <Image
                                         src={product.imageSrc}
                                         alt={product.name}
                                         fill
                                         sizes="(max-width: 768px) 100vw, 280px"
                                         className="object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
+                                        priority={index < 2}
+                                        fetchPriority={index === 0 ? 'high' : undefined}
+                                        quality={65}
                                     />
                                     {product.badge && (
                                         <div className="absolute top-4 left-4">
