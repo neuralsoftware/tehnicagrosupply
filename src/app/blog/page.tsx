@@ -41,19 +41,23 @@ export default async function BlogPage({ searchParams }: PageProps) {
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {posts.map((post) => (
+                    {posts.map((post, index) => (
                         <Link
                             key={post.id}
                             href={`/blog/${post.slug}`}
                             className="group bg-white rounded-3xl overflow-hidden border border-zinc-200 hover:border-ea-green-300 transition-all flex flex-col shadow-sm hover:shadow-lg"
                         >
                             <div className="aspect-[16/9] overflow-hidden relative">
+                                {/* Primul card e elementul LCP pe mobil — fără lazy */}
                                 <Image
                                     src={resolveBlogPostImage(post)}
                                     alt={post.title}
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                     className="object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                                    priority={index === 0}
+                                    fetchPriority={index === 0 ? 'high' : undefined}
+                                    quality={65}
                                 />
                                 <div className="absolute top-4 left-4">
                                     <span className="bg-ea-green-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
