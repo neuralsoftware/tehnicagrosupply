@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { FadeIn } from './FadeIn';
 import { Zap, ShieldCheck, Target, Rocket, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export function ExpertAuthority() {
@@ -40,12 +40,7 @@ export function ExpertAuthority() {
             <div className="max-w-7xl mx-auto px-4 relative z-10">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="space-y-4"
-                    >
+                    <FadeIn className="space-y-4">
                         <span className="inline-block px-4 py-1.5 rounded-full bg-white border border-slate-200/60 text-ea-green-700 text-xs font-medium shadow-sm">
                             De ce TehnicAgro?
                         </span>
@@ -58,18 +53,15 @@ export function ExpertAuthority() {
                             Combinăm <span className="text-zinc-900 font-semibold">utilaje de ultimă generație</span> cu
                             prețuri competitive și determinarea de a demonstra valoare din prima colaborare.
                         </p>
-                    </motion.div>
+                    </FadeIn>
                 </div>
 
                 {/* Advantages Grid */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                     {advantages.map((adv, index) => (
-                        <motion.div
+                        <FadeIn
                             key={index}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
+                            delay={index * 0.1}
                             className="group rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
                         >
                             <div className="w-12 h-12 bg-ea-green-50 rounded-xl flex items-center justify-center text-ea-green-600 mb-4 group-hover:bg-ea-green-100 transition-colors">
@@ -81,17 +73,12 @@ export function ExpertAuthority() {
                             <p className="text-zinc-500 text-sm leading-relaxed">
                                 {adv.description}
                             </p>
-                        </motion.div>
+                        </FadeIn>
                     ))}
                 </div>
 
                 {/* Main CTA Block */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    className="rounded-2xl border border-slate-200/60 bg-white p-8 shadow-sm md:p-12"
-                >
+                <FadeIn className="rounded-2xl border border-slate-200/60 bg-white p-8 shadow-sm md:p-12">
                     <div className="flex flex-col lg:flex-row items-center gap-12">
                         {/* Left - Promise */}
                         <div className="flex-1 space-y-6">
@@ -139,7 +126,7 @@ export function ExpertAuthority() {
                             </button>
                         </div>
                     </div>
-                </motion.div>
+                </FadeIn>
             </div>
         </section>
     );

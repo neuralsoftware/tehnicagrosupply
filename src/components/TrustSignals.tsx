@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { FadeIn } from './FadeIn';
 import { Truck, ShieldCheck, Headphones, GraduationCap } from 'lucide-react';
 
 const signals = [
@@ -32,12 +32,9 @@ export function TrustSignals() {
             <div className="mx-auto max-w-7xl px-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {signals.map((signal, index) => (
-                        <motion.div
+                        <FadeIn
                             key={index}
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.08 }}
+                            delay={index * 0.08}
                             className="flex items-start gap-4 rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
                         >
                             <div className="shrink-0 rounded-xl border border-slate-200/60 bg-slate-50/80 p-2.5">
@@ -51,7 +48,7 @@ export function TrustSignals() {
                                     {signal.description}
                                 </p>
                             </div>
-                        </motion.div>
+                        </FadeIn>
                     ))}
                 </div>
             </div>
