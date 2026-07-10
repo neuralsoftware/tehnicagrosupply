@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { FadeIn } from './FadeIn';
 import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { collectLeadAttribution } from '@/lib/lead-attribution';
@@ -151,12 +151,7 @@ export function Contact({
             <section id="contact" className="relative overflow-hidden bg-ea-green-50 py-12 md:py-16">
                 <div className="relative z-10 mx-auto max-w-7xl px-4">
                     <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-5 md:gap-12">
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            className="space-y-6 md:col-span-2"
-                        >
+                        <FadeIn className="space-y-6 md:col-span-2">
                             <div>
                                 <p className="text-xs font-medium text-zinc-500">Producători reprezentați</p>
                                 <div className="mt-4 flex flex-wrap items-center gap-6 md:gap-8">
@@ -194,31 +189,19 @@ export function Contact({
                                 Parteneri OEM și consultanță tehnică pentru conformitate APIA, eficiență în câmp și finanțare
                                 nerambursabilă — același interlocutor de la ofertă la livrare.
                             </p>
-                        </motion.div>
+                        </FadeIn>
 
                         <div className="md:col-span-3 md:min-w-0">
-                            <motion.div
-                                initial={{ opacity: 0, y: 12 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.05 }}
-                                className="mb-6 text-left"
-                            >
+                            <FadeIn delay={0.05} className="mb-6 text-left">
                                 <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 md:text-3xl">
                                     Nu mai pierde timp.
                                 </h2>
                                 <p className="mt-2 text-base text-zinc-600 md:text-lg">
                                     Utilajele se vând rapid. Asigură-ți tehnologia pentru campania de primăvară.
                                 </p>
-                            </motion.div>
+                            </FadeIn>
 
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.98 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.1 }}
-                                className={formCardClass}
-                            >
+                            <FadeIn delay={0.1} className={formCardClass}>
                                 <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-ea-green-500 opacity-5 blur-3xl" />
                                 {!isSubmitted ? (
                                     <form className="relative z-10 space-y-4 text-left" onSubmit={handleSubmit}>
@@ -445,7 +428,7 @@ export function Contact({
                                         </button>
                                     </div>
                                 )}
-                            </motion.div>
+                            </FadeIn>
                         </div>
                     </div>
                 </div>
@@ -461,27 +444,17 @@ export function Contact({
 
             <div className="relative z-10 mx-auto max-w-4xl space-y-8 px-4 text-center">
                 {!hideMarketingCopy && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                    >
+                    <FadeIn>
                         <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 md:text-4xl">
                             Nu mai pierde timp.
                         </h2>
                         <p className="mt-3 text-lg text-zinc-600 md:text-xl">
                             Utilajele se vând rapid. Asigură-ți tehnologia pentru campania de primăvară.
                         </p>
-                    </motion.div>
+                    </FadeIn>
                 )}
 
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 }}
-                    className={formCardClass}
-                >
+                <FadeIn delay={0.2} className={formCardClass}>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-ea-green-500 opacity-5 blur-3xl -mr-10 -mt-10"></div>
 
                     {!isSubmitted ? (
@@ -694,7 +667,7 @@ export function Contact({
                             </button>
                         </div>
                     )}
-                </motion.div>
+                </FadeIn>
             </div>
         </section>
     );

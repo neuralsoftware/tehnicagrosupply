@@ -1,6 +1,6 @@
 import CookieBanner from '@/components/CookieBanner';
 import type { Metadata, Viewport } from 'next';
-import { Inter, Oswald } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { ConsentGatedMarketing } from '@/components/ConsentGatedMarketing';
 import { Navbar } from '@/components/Navbar';
@@ -12,8 +12,8 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-KR6928Z45R';
 const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
 
+/* Oswald a fost eliminat: era descărcat la fiecare vizită dar neutilizat în niciun stil. */
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
-const oswald = Oswald({ subsets: ['latin'], variable: '--font-oswald' });
 
 export const viewport: Viewport = {
     width: 'device-width',
@@ -69,7 +69,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="ro" className={`${inter.variable} ${oswald.variable} scroll-smooth`}>
+        <html lang="ro" className={`${inter.variable} scroll-smooth`}>
             <head>
                 {/* Facebook Domain Verification */}
                 <meta name="facebook-domain-verification" content="6oeyh29v3v848nr6qv4bsvovm2irfd" />

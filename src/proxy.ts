@@ -7,6 +7,9 @@ import type { NextRequest } from 'next/server';
 const CANONICAL_DOMAIN = 'tehnicagrosupply.ro';
 
 function redirectToCanonical(request: NextRequest): NextResponse | null {
+    // Doar în producție: preview-urile (*.vercel.app) trebuie să rămână accesibile
+    // pentru teste (ex: PageSpeed Insights), altfel ar redirecționa spre site-ul live.
+    if (process.env.VERCEL_ENV !== 'production') return null;
     const hostname = request.headers.get('host') || '';
     if (hostname.includes('vercel.app') || hostname.includes('vercel-dns.com')) {
         const url = new URL(request.url);

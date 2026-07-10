@@ -1,10 +1,10 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { FileText } from 'lucide-react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useMemo, useState } from 'react';
-import { TechSpecsModal } from './TechSpecsModal';
+import { FadeIn } from './FadeIn';
 import { CONTACT_SECTION_ID, scrollToIdSmooth } from '@/lib/scroll-to-anchor';
 import {
     getWebHeroTitleParts,
@@ -38,6 +38,12 @@ interface ProductProps {
      */
     gallery?: string[];
 }
+
+/** Modalul (și framer-motion din el) se încarcă doar la primul click pe „Specificații detaliate”. */
+const TechSpecsModal = dynamic(
+    () => import('./TechSpecsModal').then((m) => m.TechSpecsModal),
+    { ssr: false }
+);
 
 const sectionContainer = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
 const sectionY = 'py-12 md:py-16';
@@ -135,6 +141,7 @@ export function ProductSection({
     gallery: galleryProp,
 }: ProductProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMounted, setModalMounted] = useState(false);
     const [heroOk, setHeroOk] = useState(true);
     const [moodImgOk, setMoodImgOk] = useState<Record<number, boolean>>({});
     const [overflowImgOk, setOverflowImgOk] = useState<Record<number, boolean>>({});
@@ -187,12 +194,8 @@ export function ProductSection({
             <div className="bg-white pt-10 pb-8 md:pt-14 md:pb-10">
                 <div className={sectionContainer}>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 lg:items-end mb-10 md:mb-12">
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, amount: 0.15 }}
-                            transition={{ duration: 0.45 }}
-                            onViewportEnter={() => {
+                        <FadeIn
+                            onEnter={() => {
                                 if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
                                     window.fbq('track', 'ViewContent', {
                                         content_name: title,
@@ -217,32 +220,20 @@ export function ProductSection({
                             >
                                 {ctaLabel}
                             </button>
-                        </motion.div>
+                        </FadeIn>
 
-                        <motion.div
-                            initial={{ opacity: 0, y: 12 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, amount: 0.15 }}
-                            transition={{ duration: 0.45, delay: 0.05 }}
-                            className="flex flex-col justify-end"
-                        >
+                        <FadeIn delay={0.05} className="flex flex-col justify-end">
                             <p className="text-[11px] font-black uppercase tracking-[0.28em] text-[#2d6a4f] mb-3">
                                 Principiu
                             </p>
                             <p className="text-base sm:text-lg text-zinc-700 leading-relaxed text-pretty font-medium">
                                 {principle}
                             </p>
-                        </motion.div>
+                        </FadeIn>
                     </div>
 
-                    {/* Imagine principală: container lat, centrat */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.1 }}
-                        transition={{ duration: 0.5, delay: 0.08 }}
-                        className="w-full max-w-6xl mx-auto"
-                    >
+                    {/* Imagine principală (element LCP): fără animație de intrare — trebuie să fie vizibilă din primul paint */}
+                    <div className="w-full max-w-6xl mx-auto">
                         <div className="relative w-full aspect-[16/10] sm:aspect-[2/1] rounded-2xl overflow-hidden border border-zinc-200/90 shadow-2xl bg-zinc-100">
                             {heroOk ? (
                                 <Image
@@ -253,6 +244,8 @@ export function ProductSection({
                                     className="object-cover object-center"
                                     sizes="(max-width: 1152px) 100vw, 1152px"
                                     priority
+                                    fetchPriority="high"
+                                    quality={65}
                                     onError={() => setHeroOk(false)}
                                 />
                             ) : (
@@ -261,7 +254,7 @@ export function ProductSection({
                                 </div>
                             )}
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
 
@@ -416,20 +409,14 @@ export function ProductSection({
             <div className={`bg-white ${sectionY} pb-16 md:pb-24`}>
                 <div className={`${sectionContainer} space-y-10`}>
                     {expertVerdict ? (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.4 }}
-                            className="border-l-4 border-orange-500 bg-orange-50 p-6 md:p-8 rounded-r-2xl border-y border-r border-orange-100/90 shadow-sm"
-                        >
+                        <FadeIn className="border-l-4 border-orange-500 bg-orange-50 p-6 md:p-8 rounded-r-2xl border-y border-r border-orange-100/90 shadow-sm">
                             <h3 className="text-orange-900/90 text-[11px] font-black uppercase tracking-[0.22em] mb-3">
                                 Verdictul expertului
                             </h3>
                             <p className="text-lg md:text-xl text-zinc-900 leading-relaxed font-medium text-pretty">
                                 {expertVerdict}
                             </p>
-                        </motion.div>
+                        </FadeIn>
                     ) : null}
 
                     <div className="flex flex-col sm:flex-row flex-wrap gap-3">
@@ -451,7 +438,10 @@ export function ProductSection({
                         {detailedSpecs && Object.keys(detailedSpecs).length > 0 ? (
                             <button
                                 type="button"
-                                onClick={() => setIsModalOpen(true)}
+                                onClick={() => {
+                                    setModalMounted(true);
+                                    setIsModalOpen(true);
+                                }}
                                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-zinc-50 text-zinc-900 font-bold rounded-xl border border-zinc-200 shadow-md uppercase tracking-wide text-sm transition-colors"
                             >
                                 <FileText className="w-4 h-4" />
@@ -462,12 +452,14 @@ export function ProductSection({
                 </div>
             </div>
 
-            <TechSpecsModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                productName={title}
-                specs={detailedSpecs || {}}
-            />
+            {modalMounted ? (
+                <TechSpecsModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    productName={title}
+                    specs={detailedSpecs || {}}
+                />
+            ) : null}
         </section>
     );
 }
