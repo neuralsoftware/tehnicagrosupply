@@ -20,7 +20,12 @@ import { ArrowRight, BookOpen, BadgeCheck, ExternalLink } from 'lucide-react';
 import { getActiveProgramsForCategory } from '@/data/funding-programs';
 import { resolveProductDemoVideo } from '@/lib/product-demo-video';
 
-export const dynamic = 'force-dynamic';
+/**
+ * ISR în loc de force-dynamic: pagina e servită din cache și regenerată la max. 5 minute.
+ * TTFB scade de la ~1s la ~0,1s (LCP mobil) și reduce citirile din Supabase.
+ * Compromis: modificările din admin apar pe pagină în cel mult 5 minute.
+ */
+export const revalidate = 300;
 
 interface PageProps {
     params: Promise<{ category: string; slug: string }>;
