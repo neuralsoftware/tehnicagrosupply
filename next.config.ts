@@ -5,6 +5,12 @@ import type { NextConfig } from 'next';
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const securityHeaders = [
+    /**
+     * Oprește injectarea toolbar-ului Vercel (vercel.live/feedback.js) în preview-uri:
+     * scriptul e blocat oricum de CSP și genera erori de consolă care stricau
+     * scorul Best Practices la testele PageSpeed pe preview. În producție nu există.
+     */
+    { key: 'x-vercel-skip-toolbar', value: '1' },
     { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
     { key: 'X-Content-Type-Options', value: 'nosniff' },
     { key: 'X-XSS-Protection', value: '1; mode=block' },
