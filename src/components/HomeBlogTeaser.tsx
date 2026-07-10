@@ -20,12 +20,12 @@ function formatPostDate(iso: string): string {
     }
 }
 
-function PostCoverImage({ imageSrc, href }: { imageSrc?: string | null; href: string }) {
+function PostCoverImage({ imageSrc, href, title }: { imageSrc?: string | null; href: string; title: string }) {
     const initial = imageSrc?.trim() ? imageSrc.trim() : BLOG_POST_IMAGE_FALLBACK;
     const [src, setSrc] = useState(initial);
 
     return (
-        <Link href={href} className="block aspect-[16/10] overflow-hidden bg-zinc-100 relative">
+        <Link href={href} aria-label={title} className="block aspect-[16/10] overflow-hidden bg-zinc-100 relative">
             <Image
                 src={src}
                 alt=""
@@ -71,7 +71,7 @@ export function HomeBlogTeaser({ posts }: { posts: BlogPost[] }) {
                     {posts.map((post) => (
                         <li key={post.id}>
                             <article className="h-full flex flex-col bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm hover:shadow-md hover:border-emerald-200/80 transition-all duration-300 group">
-                                <PostCoverImage imageSrc={post.imageSrc} href={`/blog/${post.slug}`} />
+                                <PostCoverImage imageSrc={post.imageSrc} href={`/blog/${post.slug}`} title={post.title} />
                                 <div className="p-5 flex flex-col flex-1">
                                     <span className="text-xs font-medium text-emerald-800 mb-2">
                                         {categoryLabel[post.category]}
@@ -80,7 +80,7 @@ export function HomeBlogTeaser({ posts }: { posts: BlogPost[] }) {
                                         <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                                     </h3>
                                     <p className="text-zinc-600 text-sm mt-2 line-clamp-3 flex-1 leading-relaxed">{post.excerpt}</p>
-                                    <time className="text-xs text-zinc-400 mt-4 font-medium" dateTime={post.date}>
+                                    <time className="text-xs text-zinc-500 mt-4 font-medium" dateTime={post.date}>
                                         {formatPostDate(post.date)}
                                     </time>
                                 </div>

@@ -258,10 +258,11 @@ export function Contact({
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                            <label htmlFor="contact-judet-split" className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                                                 Județ
                                             </label>
                                             <select
+                                                id="contact-judet-split"
                                                 value={county}
                                                 onChange={(e) => setCounty(e.target.value)}
                                                 onBlur={() => setCountyBlurred(true)}
@@ -315,10 +316,11 @@ export function Contact({
                                         </div>
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                             <div>
-                                                <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                <label htmlFor="contact-interes-split" className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                                                     Interes principal
                                                 </label>
                                                 <select
+                                                    id="contact-interes-split"
                                                     value={interest}
                                                     onChange={(e) => setInterest(e.target.value)}
                                                     className="w-full appearance-none rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all focus:ring-1 focus:ring-ea-green-500"
@@ -332,10 +334,11 @@ export function Contact({
                                                 </select>
                                             </div>
                                             <div>
-                                                <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                                <label htmlFor="contact-orizont-split" className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                                                     Orizont achiziție
                                                 </label>
                                                 <select
+                                                    id="contact-orizont-split"
                                                     value={urgency}
                                                     onChange={(e) => setUrgency(e.target.value)}
                                                     className="w-full appearance-none rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-900 outline-none transition-all focus:ring-1 focus:ring-ea-green-500"
@@ -511,8 +514,9 @@ export function Contact({
 
                             {/* Județ */}
                             <div>
-                                <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Județ</label>
+                                <label htmlFor="contact-judet" className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Județ</label>
                                 <select
+                                    id="contact-judet"
                                     value={county}
                                     onChange={(e) => setCounty(e.target.value)}
                                     onBlur={() => setCountyBlurred(true)}
@@ -559,8 +563,9 @@ export function Contact({
 
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Interes principal</label>
+                                    <label htmlFor="contact-interes" className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Interes principal</label>
                                     <select
+                                        id="contact-interes"
                                         value={interest}
                                         onChange={(e) => setInterest(e.target.value)}
                                         className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all text-sm appearance-none"
@@ -574,8 +579,9 @@ export function Contact({
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Orizont achiziție</label>
+                                    <label htmlFor="contact-orizont" className="block text-[10px] uppercase font-black text-zinc-500 mb-1 tracking-widest">Orizont achiziție</label>
                                     <select
+                                        id="contact-orizont"
                                         value={urgency}
                                         onChange={(e) => setUrgency(e.target.value)}
                                         className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-zinc-900 focus:ring-1 focus:ring-ea-green-500 outline-none transition-all text-sm appearance-none"

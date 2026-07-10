@@ -275,6 +275,7 @@ export function RoiCalculator({
                             min="10"
                             max="3000"
                             step="10"
+                            aria-label="Suprafața fermei în hectare"
                             value={hectares}
                             onChange={(e) => setHectares(Number(e.target.value))}
                             className="w-full h-4 bg-zinc-200 rounded-xl appearance-none cursor-pointer accent-ea-green-600"
