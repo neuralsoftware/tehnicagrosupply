@@ -127,6 +127,8 @@ export function Navbar() {
                         <button
                             onClick={() => setIsOpen(!isOpen)}
                             className="text-zinc-600 hover:text-zinc-900 p-2"
+                            aria-label={isOpen ? 'Închide meniul' : 'Deschide meniul'}
+                            aria-expanded={isOpen}
                         >
                             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>

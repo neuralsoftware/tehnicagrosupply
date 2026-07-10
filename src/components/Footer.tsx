@@ -13,7 +13,7 @@ export function Footer() {
                         <Link href="/" className="text-xl font-black text-white uppercase tracking-wide">
                             Tehnic<span className="text-ea-green-500">Agro</span>
                         </Link>
-                        <p className="text-zinc-500 text-sm leading-relaxed">
+                        <p className="text-zinc-400 text-sm leading-relaxed">
                             Partenerul tău strategic pentru agricultură de precizie și tehnologii No-Till. Eficiență garantată și conformitate deplină cu reglementările APIA 2026.
                         </p>
                     </div>
@@ -21,7 +21,7 @@ export function Footer() {
                     {/* Navigation */}
                     <div className="space-y-6">
                         <h4 className="text-white font-bold uppercase text-xs tracking-widest">Navigare</h4>
-                        <ul className="space-y-4 text-sm text-zinc-500">
+                        <ul className="space-y-4 text-sm text-zinc-400">
                             <li><Link href="/" className="hover:text-ea-green-500 transition-colors">Acasă</Link></li>
                             <li><Link href="/utilaje" className="hover:text-ea-green-500 transition-colors">Utilaje</Link></li>
                             <li><Link href="/piese-schimb" className="hover:text-ea-green-500 transition-colors">Piese de Schimb</Link></li>
@@ -32,7 +32,7 @@ export function Footer() {
                     {/* Legal Links */}
                     <div className="space-y-6">
                         <h4 className="text-white font-bold uppercase text-xs tracking-widest">Legal</h4>
-                        <ul className="space-y-4 text-sm text-zinc-500">
+                        <ul className="space-y-4 text-sm text-zinc-400">
                             <li><Link href="/privacy-policy" className="hover:text-ea-green-500 transition-colors">Politică de Confidențialitate</Link></li>
                             <li><Link href="/politica-cookie" className="hover:text-ea-green-500 transition-colors">Politică de Cookie-uri</Link></li>
                             <li><Link href="/conditii-utilizare" className="hover:text-ea-green-500 transition-colors">Condiții de Utilizare</Link></li>
@@ -47,7 +47,7 @@ export function Footer() {
                     {/* Contact Info */}
                     <div className="space-y-6">
                         <h4 className="text-white font-bold uppercase text-xs tracking-widest">Contact</h4>
-                        <ul className="space-y-4 text-sm text-zinc-500">
+                        <ul className="space-y-4 text-sm text-zinc-400">
                             <li className="flex flex-col">
                                 <span className="text-[10px] uppercase font-bold text-zinc-600">Telefon Vânzări</span>
                                 <a href={`tel:${SITE_CONTACT.phoneTel}`} className="text-white hover:text-ea-green-500 transition-colors">{SITE_CONTACT.phoneDisplay}</a>

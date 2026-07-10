@@ -56,6 +56,7 @@ export function TechSpecsModal({ isOpen, onClose, productName, specs }: TechSpec
                         <button
                             onClick={onClose}
                             className="p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full text-zinc-500 hover:text-zinc-900 transition-colors"
+                            aria-label="Închide fereastra de specificații"
                         >
                             <X className="w-6 h-6" />
                         </button>
