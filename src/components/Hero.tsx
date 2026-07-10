@@ -76,6 +76,8 @@ export function Hero({ refSource }: { refSource?: string }) {
                 alt=""
                 fill
                 priority
+                fetchPriority="high"
+                quality={65}
                 sizes="100vw"
                 className="absolute inset-0 z-0 h-full w-full object-cover object-center"
                 aria-hidden="true"
