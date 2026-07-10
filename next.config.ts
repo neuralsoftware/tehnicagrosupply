@@ -27,8 +27,11 @@ const securityHeaders = [
             "font-src 'self' https://fonts.gstatic.com data:",
             // Imagini: permite tracking pixels (1x1 GIF de la Google/Meta)
             "img-src 'self' data: blob: https://*.supabase.co https://wsrv.nl https://*.public.blob.vercel-storage.com https://www.google.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.facebook.com https://px.ads.linkedin.com https:",
-            // Conexiuni: permite Google Analytics, supabase, wsrv
-            "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://wsrv.nl https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://region1.google-analytics.com https://www.googletagmanager.com",
+            // Conexiuni: permite Google Analytics, supabase, wsrv.
+            // `*.analytics.google.com` e obligatoriu: cu consimțământ acordat, gtag trimite
+            // evenimentele (inclusiv generate_lead) către region1.analytics.google.com —
+            // fără el, conversiile Google Ads erau blocate de CSP (diagnostic 10 iul. 2026).
+            "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://wsrv.nl https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com",
             // Frame-uri: Google recaptcha, DoubleClick, demo-uri video produs
             "frame-src https://bid.g.doubleclick.net https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://*.supabase.co",
             "media-src 'self' https://pub-956963153a8e40c0852ae49d504d4f93.r2.dev",
