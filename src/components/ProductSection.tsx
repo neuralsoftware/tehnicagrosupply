@@ -244,6 +244,7 @@ export function ProductSection({
                                     className="object-cover object-center"
                                     sizes="(max-width: 1152px) 100vw, 1152px"
                                     priority
+                                    fetchPriority="high"
                                     quality={65}
                                     onError={() => setHeroOk(false)}
                                 />
