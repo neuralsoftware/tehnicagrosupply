@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import { MobileStickyCTA } from '@/components/MobileStickyCTA';
 import { SITE_CONTACT } from '@/lib/site-contact';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { CONSENT_BOOTSTRAP_SCRIPT } from '@/lib/consent';
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-KR6928Z45R';
 const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
@@ -111,26 +112,7 @@ export default function RootLayout({
                     }}
                 />
 
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                            window.dataLayer = window.dataLayer || [];
-                            function gtag(){dataLayer.push(arguments);}
-                            window.gtag = gtag;
-                            var tehnicagroConsentGranted = false;
-                            try {
-                                tehnicagroConsentGranted = window.localStorage.getItem('cookie_consent') === 'granted';
-                            } catch (e) {}
-                            gtag('consent', 'default', {
-                                'ad_storage': tehnicagroConsentGranted ? 'granted' : 'denied',
-                                'analytics_storage': tehnicagroConsentGranted ? 'granted' : 'denied',
-                                'ad_user_data': tehnicagroConsentGranted ? 'granted' : 'denied',
-                                'ad_personalization': tehnicagroConsentGranted ? 'granted' : 'denied',
-                                'wait_for_update': 2000
-                            });
-                        `,
-                    }}
-                />
+                <script dangerouslySetInnerHTML={{ __html: CONSENT_BOOTSTRAP_SCRIPT }} />
 
                 <Navbar />
                 {children}

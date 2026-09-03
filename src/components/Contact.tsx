@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { collectLeadAttribution } from '@/lib/lead-attribution';
 import { formatLeadApiError } from '@/lib/lead-api-error';
+import { buildLeadConsent, NOTICE_TEXT, MARKETING_TEXT } from '@/lib/form-consent';
 
 const JUDETE = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brăila',
@@ -44,6 +45,8 @@ export function Contact({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isFetchingRef = useRef(false);
     const [gdprConsent, setGdprConsent] = useState(false);
+    /** Opțional — refuzul nu blochează trimiterea, altfel consimțământul nu ar fi liber. */
+    const [marketingConsent, setMarketingConsent] = useState(false);
     const [statusMessage, setStatusMessage] = useState('');
     /** Eroare afișată inline în formular (înlocuiește alert-urile blocante). */
     const [submitError, setSubmitError] = useState('');
@@ -85,6 +88,7 @@ export function Contact({
                     source: `Formular Contact (Pagina: ${pageTitle})`,
                     productName: productName || interest || undefined,
                     attribution: collectLeadAttribution(),
+                    consent: buildLeadConsent(gdprConsent, marketingConsent),
                 })
             });
             const data = await res.json();
@@ -123,7 +127,8 @@ export function Contact({
                 setInterest('');
                 setUrgency('');
                 setMessage('');
-                
+                setMarketingConsent(false);
+
                 if (typeof window !== 'undefined') {
                     localStorage.setItem('tehnicagro_lead_submitted', 'true');
                 }
@@ -375,19 +380,31 @@ export function Contact({
                                                 aria-describedby={gdprInvalid ? 'err-gdpr-split' : undefined}
                                                 className="mt-1 h-4 w-4 rounded border-zinc-300 bg-zinc-50 text-ea-green-600 focus:ring-ea-green-500"
                                             />
-                                            <label htmlFor="gdpr-contact-split" className="text-[10px] leading-tight text-zinc-400">
-                                                Sunt de acord cu prelucrarea datelor conform{' '}
-                                                <a href="/privacy-policy" target="_blank" className="text-ea-green-500 hover:underline">
-                                                    Politicii de Confidențialitate
+                                            <label htmlFor="gdpr-contact-split" className="text-[10px] leading-tight text-zinc-500">
+                                                {NOTICE_TEXT}{' '}
+                                                <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-ea-green-500 hover:underline">
+                                                    Deschide politica
                                                 </a>
-                                                .
                                             </label>
                                         </div>
                                         {gdprInvalid ? (
                                             <p id="err-gdpr-split" className="text-xs text-red-600" role="alert">
-                                                Bifează acordul GDPR pentru a trimite.
+                                                Bifează confirmarea pentru a trimite formularul.
                                             </p>
                                         ) : null}
+                                        <div className="flex items-start gap-3">
+                                            <input
+                                                type="checkbox"
+                                                id="marketing-contact-split"
+                                                checked={marketingConsent}
+                                                onChange={(e) => setMarketingConsent(e.target.checked)}
+                                                className="mt-1 h-4 w-4 rounded border-zinc-300 bg-zinc-50 text-ea-green-600 focus:ring-ea-green-500"
+                                            />
+                                            <label htmlFor="marketing-contact-split" className="text-[10px] leading-tight text-zinc-500">
+                                                <span className="font-bold uppercase tracking-wide text-zinc-500">Opțional:</span>{' '}
+                                                {MARKETING_TEXT}
+                                            </label>
+                                        </div>
                                         {submitError ? (
                                             <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700" role="alert">
                                                 {submitError}
@@ -608,6 +625,7 @@ export function Contact({
                             </div>
 
                             {/* GDPR */}
+                            {/* Informare obligatorie (temei precontractual) + acord opțional de marketing */}
                             <div className="flex items-start gap-3 mt-2">
                                 <input
                                     type="checkbox"
@@ -620,18 +638,31 @@ export function Contact({
                                     aria-describedby={gdprInvalid ? 'err-gdpr-default' : undefined}
                                     className="mt-1 w-4 h-4 rounded border-zinc-300 bg-zinc-50 text-ea-green-600 focus:ring-ea-green-500"
                                 />
-                                <label htmlFor="gdpr-contact" className="text-[10px] text-zinc-400 leading-tight">
-                                    Sunt de acord cu prelucrarea datelor în scopul primirii ofertei personalizate, conform{' '}
-                                    <a href="/privacy-policy" target="_blank" className="text-ea-green-500 hover:underline">
-                                        Politicii de Confidențialitate
-                                    </a>.
+                                <label htmlFor="gdpr-contact" className="text-[11px] text-zinc-500 leading-snug">
+                                    {NOTICE_TEXT}{' '}
+                                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-ea-green-500 hover:underline">
+                                        Deschide politica
+                                    </a>
                                 </label>
                             </div>
                             {gdprInvalid ? (
                                 <p id="err-gdpr-default" className="text-xs text-red-600" role="alert">
-                                    Bifează acordul GDPR pentru a trimite.
+                                    Bifează confirmarea pentru a trimite formularul.
                                 </p>
                             ) : null}
+                            <div className="flex items-start gap-3 mt-2">
+                                <input
+                                    type="checkbox"
+                                    id="marketing-contact"
+                                    checked={marketingConsent}
+                                    onChange={(e) => setMarketingConsent(e.target.checked)}
+                                    className="mt-1 w-4 h-4 rounded border-zinc-300 bg-zinc-50 text-ea-green-600 focus:ring-ea-green-500"
+                                />
+                                <label htmlFor="marketing-contact" className="text-[11px] text-zinc-500 leading-snug">
+                                    <span className="font-bold uppercase tracking-wide text-zinc-500">Opțional:</span>{' '}
+                                    {MARKETING_TEXT}
+                                </label>
+                            </div>
                             {submitError ? (
                                 <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700" role="alert">
                                     {submitError}

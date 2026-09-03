@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { ArrowRight, BookOpen, BadgeCheck, ExternalLink } from 'lucide-react';
 import { getActiveProgramsForCategory } from '@/data/funding-programs';
 import { resolveProductDemoVideo } from '@/lib/product-demo-video';
+import { ConsentGatedVideo } from '@/components/ConsentGatedVideo';
 
 /**
  * ISR în loc de force-dynamic: pagina e servită din cache și regenerată la max. 5 minute.
@@ -158,12 +159,9 @@ export default async function ProductPage({ params }: PageProps) {
                                 <source src={demoVideo.src} type={demoVideo.mimeType} />
                             </video>
                         ) : (
-                            <iframe
+                            <ConsentGatedVideo
                                 src={demoVideo.src}
                                 className="w-full h-full"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                                referrerPolicy="strict-origin-when-cross-origin"
                                 title={`Demo ${product.name}`}
                             />
                         )}

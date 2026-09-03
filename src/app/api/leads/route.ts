@@ -4,6 +4,7 @@ import { simpleRateLimit } from '@/lib/leads';
 import { isAdminAuth } from '@/lib/admin-auth';
 import { z } from 'zod';
 import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
+import { logLeadConsent } from '@/lib/gdpr-consent-log';
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 
 const leadSchema = z.object({
@@ -31,6 +32,21 @@ const leadSchema = z.object({
     productName: z.string().max(200).optional(),
     cif: z.string().max(32, 'CUI/CIF prea lung').optional().default(''),
     attribution: z.record(z.string(), z.string().optional()).optional().default({}),
+    /**
+     * Dovada consimțământului (GDPR art. 7 alin. 1). Opțională în schemă ca să nu rupem
+     * integrările vechi, dar formularele site-ului o trimit întotdeauna; lipsa ei se vede
+     * în logurile serverului.
+     */
+    consent: z
+        .object({
+            policyVersion: z.string().max(32),
+            noticeAcknowledged: z.boolean(),
+            noticeText: z.string().max(2000),
+            marketingGranted: z.boolean(),
+            marketingText: z.string().max(2000),
+            givenAt: z.string().max(40),
+        })
+        .optional(),
 });
 
 /**
@@ -199,6 +215,7 @@ export async function POST(request: Request) {
             `Hectare: ${leadData.hectares ?? 0}`,
             `Culturi: ${(leadData.crops || []).join(', ') || '-'}`,
             `Urgență: ${leadData.urgency || '-'}`,
+            `Acord marketing: ${validatedData.consent ? (validatedData.consent.marketingGranted ? 'DA' : 'NU') : 'nedeclarat'}`,
             `Subvenție estimată (RON): ${leadData.subsidyIncome ?? 0}`,
             `Economie combustibil estimată (RON): ${leadData.fuelSavings ?? 0}`,
             `Beneficiu total estimat (RON): ${leadData.totalBenefit ?? 0}`,
@@ -335,6 +352,29 @@ export async function POST(request: Request) {
         if (leadTableRes.error) {
             console.error('CRM leads insert:', leadTableRes.error);
             return NextResponse.json(jsonFromPostgrestError(leadTableRes.error), { status: 500 });
+        }
+
+        // Dovada consimțământului se scrie după ce avem identificatorii, ca să poată fi
+        // regăsită atât după client, cât și după lead.
+        if (validatedData.consent) {
+            await logLeadConsent(
+                crm,
+                validatedData.consent,
+                {
+                    clientId,
+                    leadId: crmLeadPayload.id,
+                    email: leadData.email,
+                    phone: leadData.phone,
+                },
+                {
+                    ip,
+                    userAgent: request.headers.get('user-agent') || '',
+                    source: leadData.source,
+                    attribution: validatedData.attribution,
+                }
+            );
+        } else {
+            console.warn('[api/leads] Lead primit fără dovadă de consimțământ:', leadData.source);
         }
 
         const clientIntId = toClientIntegerId(clientId);

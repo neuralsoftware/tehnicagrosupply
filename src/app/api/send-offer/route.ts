@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { isAdminAuth } from '@/lib/admin-auth';
+import { emailLegalFooterHtml } from '@/lib/email-legal-footer';
 
 export async function POST(request: Request) {
     try {
@@ -56,6 +57,9 @@ export async function POST(request: Request) {
                             </div>
                         </div>
                     </div>
+                    ${emailLegalFooterHtml({
+                        reason: 'Ai primit acest email pentru că ne-ai cerut o ofertă prin site sau prin telefon.',
+                    })}
                 </div>
             `,
         };

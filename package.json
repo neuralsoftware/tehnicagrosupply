@@ -11,7 +11,8 @@
     "map-db": "npx tsx scripts/generate-db-map.ts",
     "sync-site-folders": "npx tsx scripts/sync-site-folders.ts",
     "migrate-video-r2": "npx tsx scripts/migrate-video-to-r2.ts",
-    "upload-home-videos": "npx tsx scripts/upload-home-showcase-videos.ts"
+    "upload-home-videos": "npx tsx scripts/upload-home-showcase-videos.ts",
+    "export-gdpr": "npx tsx scripts/export-gdpr-registru.ts"
   },
   "dependencies": {
     "@next/third-parties": "16.2.1",

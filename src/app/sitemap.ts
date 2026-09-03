@@ -23,6 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         '/conditii-utilizare',
         '/privacy-policy',
         '/politica-cookie',
+        '/drepturile-mele',
     ];
 
     const staticEntries: MetadataRoute.Sitemap = staticPaths.map((path) => ({
