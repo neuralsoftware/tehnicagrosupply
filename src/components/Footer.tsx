@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { SITE_CONTACT } from '@/lib/site-contact';
+import { CONSENT_OPEN_EVENT } from '@/lib/consent';
 
 export function Footer() {
     return (
@@ -36,9 +37,10 @@ export function Footer() {
                             <li><Link href="/privacy-policy" className="hover:text-ea-green-500 transition-colors">Politică de Confidențialitate</Link></li>
                             <li><Link href="/politica-cookie" className="hover:text-ea-green-500 transition-colors">Politică de Cookie-uri</Link></li>
                             <li><Link href="/conditii-utilizare" className="hover:text-ea-green-500 transition-colors">Condiții de Utilizare</Link></li>
+                            <li><Link href="/drepturile-mele" className="hover:text-ea-green-500 transition-colors">Drepturile mele (GDPR)</Link></li>
                             <li>
-                                <button onClick={() => window.dispatchEvent(new Event('openCookieSettings'))} className="hover:text-ea-green-500 transition-colors text-left">
-                                    Setări Cookie
+                                <button onClick={() => window.dispatchEvent(new Event(CONSENT_OPEN_EVENT))} className="hover:text-ea-green-500 transition-colors text-left">
+                                    Setări cookie-uri
                                 </button>
                             </li>
                         </ul>
@@ -68,9 +70,19 @@ export function Footer() {
                     </div>
                 </div>
 
-                <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-zinc-700 uppercase font-bold tracking-widest">
-                    <p>© {new Date().getFullYear()} TehnicAgro Supply. Toate drepturile rezervate.</p>
-                    <p>Dezvoltat sub standarde de conformitate legală 100%.</p>
+                <div className="pt-8 border-t border-zinc-900 space-y-4">
+                    {/* Date de identificare — obligatorii permanent și direct accesibile (Legea 365/2002 art. 5) */}
+                    <p className="text-xs text-zinc-500 leading-relaxed">
+                        <span className="text-zinc-400 font-semibold">{SITE_CONTACT.legalName}</span>
+                        {' · '}CUI {SITE_CONTACT.cui}
+                        {' · '}Reg. Com. {SITE_CONTACT.regCom}
+                        <br />
+                        Sediu social: {SITE_CONTACT.addressFull}
+                    </p>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 text-[10px] text-zinc-700 uppercase font-bold tracking-widest">
+                        <p>© {new Date().getFullYear()} TehnicAgro Supply. Toate drepturile rezervate.</p>
+                        <p>Operator de date cu caracter personal</p>
+                    </div>
                 </div>
             </div>
         </footer>

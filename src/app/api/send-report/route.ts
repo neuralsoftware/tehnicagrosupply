@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { simpleRateLimit } from '@/lib/leads';
 import { getSupabaseCrmAdmin } from '@/lib/supabaseCrmAdmin';
+import { emailLegalFooterHtml } from '@/lib/email-legal-footer';
 
 /** Fără emoji — CRM-ul poate afișa greșit caracterele speciale în titluri sarcini */
 function crmSafePlainText(text: string): string {
@@ -140,10 +141,9 @@ export async function POST(request: Request) {
                             </div>
                         </div>
 
-                        <div class="footer">
-                            <p>&copy; 2026 TehnicAgro Supply - Smart Efficiency Partner.</p>
-                            <p>Această comunicare este un răspuns la solicitarea dvs. de audit tehnic.</p>
-                        </div>
+                        ${emailLegalFooterHtml({
+                            reason: 'Ai primit acest email pentru că ai cerut raportul de audit prin calculatorul de pe tehnicagrosupply.ro.',
+                        })}
                     </div>
                 </body>
                 </html>

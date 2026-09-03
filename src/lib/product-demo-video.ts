@@ -22,6 +22,9 @@ function getDirectVideoMimeType(raw: string): string | null {
     return null;
 }
 
+/** youtube-nocookie.com nu scrie nimic pe dispozitiv până la redarea efectivă. */
+const YT_EMBED_HOST = 'https://www.youtube-nocookie.com/embed/';
+
 function getYouTubeEmbedUrl(raw: string): string | null {
     try {
         const url = new URL(raw);
@@ -29,24 +32,27 @@ function getYouTubeEmbedUrl(raw: string): string | null {
         if (host === 'youtube.com' || host === 'm.youtube.com') {
             if (url.pathname === '/watch') {
                 const id = url.searchParams.get('v');
-                return id ? `https://www.youtube.com/embed/${id}` : null;
+                return id ? `${YT_EMBED_HOST}${id}` : null;
             }
             if (url.pathname.startsWith('/shorts/')) {
                 const id = url.pathname.split('/').filter(Boolean)[1];
-                return id ? `https://www.youtube.com/embed/${id}` : null;
+                return id ? `${YT_EMBED_HOST}${id}` : null;
             }
-            if (url.pathname.startsWith('/embed/')) return raw;
+            if (url.pathname.startsWith('/embed/')) {
+                const id = url.pathname.split('/').filter(Boolean)[1];
+                return id ? `${YT_EMBED_HOST}${id}${url.search}` : null;
+            }
         }
         if (host === 'youtu.be') {
             const id = url.pathname.split('/').filter(Boolean)[0];
-            return id ? `https://www.youtube.com/embed/${id}` : null;
+            return id ? `${YT_EMBED_HOST}${id}` : null;
         }
     } catch {
         /* fallback below */
     }
 
     if (raw.includes('youtube.com') || raw.includes('youtu.be')) {
-        return raw.replace('watch?v=', 'embed/');
+        return raw.replace('watch?v=', 'embed/').replace('www.youtube.com', 'www.youtube-nocookie.com');
     }
     return null;
 }

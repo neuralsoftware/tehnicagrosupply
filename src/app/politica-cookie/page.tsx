@@ -1,60 +1,156 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import { SITE_CONTACT } from '@/lib/site-contact';
+import { FORM_CONSENT_VERSION } from '@/lib/form-consent';
+import { COOKIE_CATEGORIES } from '@/data/gdpr-cookies';
+import { CookieSettingsButton } from '@/components/CookieSettingsButton';
 
-export const metadata = {
-  title: 'Politica de utilizare a Cookie-urilor | TEHNICAGRO SUPPLY',
-  description: 'Află cum folosim cookie-urile pentru a-ți îmbunătăți experiența pe site-ul nostru.',
+export const metadata: Metadata = {
+    title: 'Politica de utilizare a Cookie-urilor | TEHNICAGRO SUPPLY',
+    description:
+        'Lista completă a cookie-urilor folosite pe tehnicagrosupply.ro: nume, furnizor, scop și durată, plus cum îți schimbi alegerea oricând.',
+    alternates: { canonical: 'https://tehnicagrosupply.ro/politica-cookie' },
 };
 
+function SectionTitle({ children }: { children: React.ReactNode }) {
+    return (
+        <h2 className="mt-12 mb-4 border-b border-slate-200 pb-2 text-2xl font-bold text-emerald-700">{children}</h2>
+    );
+}
+
 export default function CookiePolicy() {
-  return (
-    <div className="min-h-screen bg-slate-50 py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto bg-white p-8 md:p-12 shadow-sm rounded-2xl border border-slate-100">
-        <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-8 uppercase tracking-tight">Politica de utilizare a Cookie-urilor</h1>
-        
-        <div className="prose prose-slate prose-emerald max-w-none">
-          <p className="lead text-lg text-slate-600 mb-6">
-            Această politică explică modul în care <strong>TEHNICAGRO SUPPLY S.R.L.</strong> utilizează cookie-urile și tehnologiile similare pe acest site web.
-          </p>
+    return (
+        <div className="min-h-screen bg-slate-50 px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-3xl rounded-2xl border border-slate-100 bg-white p-8 shadow-sm md:p-12">
+                <h1 className="mb-2 text-3xl font-black uppercase tracking-tight text-slate-900 md:text-4xl">
+                    Politica de utilizare a Cookie-urilor
+                </h1>
+                <p className="mb-8 text-sm text-slate-500">
+                    Versiunea {FORM_CONSENT_VERSION} · în vigoare de la 3 septembrie 2026
+                </p>
 
-          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">1. Ce sunt cookie-urile?</h2>
-          <p className="text-slate-600 mb-4">
-            Cookie-urile sunt fișiere text mici care sunt stocate pe dispozitivul dumneavoastră (computer, tabletă, telefon) atunci când vizitați un site web. Ele sunt utilizate pe scară largă pentru a face site-urile să funcționeze sau să funcționeze mai eficient, precum și pentru a oferi informații proprietarilor site-ului.
-          </p>
+                <p className="mb-6 text-lg text-slate-600">
+                    Mai jos găsești tot ce salvează acest site pe dispozitivul tău: ce anume, cine îl pune acolo, la
+                    ce folosește și cât rămâne. Nimic din ce nu e strict necesar nu pornește înainte să apeși tu.
+                </p>
 
-          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">2. Ce tipuri de cookie-uri folosim?</h2>
-          <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
-            <li><strong>Cookie-uri strict necesare:</strong> Acestea sunt esențiale pentru funcționarea site-ului și nu pot fi oprite în sistemele noastre. De obicei, sunt setate doar ca răspuns la acțiunile pe care le faceți, cum ar fi setarea preferințelor de confidențialitate (cookie-ul <code>cookie_consent</code>).</li>
-            <li><strong>Cookie-uri de analiză (Google Analytics):</strong> Ne permit să numărăm vizitele și sursele de trafic, astfel încât să putem măsura și îmbunătăți performanța site-ului nostru. Acestea colectează informații în mod agregat și anonim. Acestea sunt activate doar dacă apăsați butonul &quot;Accept Toate&quot;.</li>
-            <li><strong>Cookie-uri de marketing:</strong> Pot fi setate prin intermediul site-ului nostru de către partenerii noștri de publicitate pentru a vă construi un profil al intereselor și a vă afișa reclame relevante pe alte site-uri.</li>
-          </ul>
+                <SectionTitle>1. Ce sunt, pe scurt</SectionTitle>
+                <p className="mb-4 text-slate-600">
+                    Un cookie e un fișier text mic pe care un site îl lasă în browserul tău ca să te „recunoască” la
+                    următoarea pagină. Browserele mai au și alte spații de stocare, numite localStorage și
+                    sessionStorage, care fac cam același lucru. Legea le tratează la fel, așa că le-am trecut pe
+                    toate în tabelele de mai jos — nu doar cookie-urile propriu-zise.
+                </p>
 
-          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">3. Cum puteți controla cookie-urile?</h2>
-          <p className="text-slate-600 mb-4">
-            Aveți dreptul să decideți dacă acceptați sau respingeți cookie-urile (cu excepția celor strict necesare). Puteți face acest lucru prin intermediul bannerului de cookie-uri care apare la prima vizită.
-          </p>
-          <p className="text-slate-600 mb-4">
-            De asemenea, vă puteți seta sau modifica controalele browserului web pentru a accepta sau refuza cookie-urile. Dacă alegeți să respingeți cookie-urile, puteți utiliza în continuare site-ul nostru, deși accesul la anumite funcționalități ar putea fi restricționat.
-          </p>
+                <SectionTitle>2. Ce te întrebăm și când</SectionTitle>
+                <p className="mb-4 text-slate-600">
+                    La prima vizită îți apare un banner cu trei butoane de aceeași mărime:{' '}
+                    <strong>„Acceptă toate”</strong>, <strong>„Refuz”</strong> și{' '}
+                    <strong>„Personalizează”</strong>. Refuzul e la fel de ușor ca acceptul — un singur click, fără
+                    meniuri ascunse. Până când alegi, pe dispozitivul tău nu ajunge nimic în afară de strictul
+                    necesar.
+                </p>
+                <p className="mb-4 text-slate-600">
+                    Alegerea ta rămâne valabilă <strong>6 luni</strong>, apoi te întrebăm din nou. Dacă browserul tău
+                    trimite semnalul de confidențialitate <em>Global Privacy Control</em>, îl respectăm automat ca
+                    refuz și nici nu îți mai afișăm bannerul.
+                </p>
 
-          <h2 className="text-2xl font-bold text-emerald-600 mt-10 mb-4 border-b border-slate-100 pb-2">4. Contact</h2>
-          <p className="text-slate-600 mb-4">
-            Dacă aveți întrebări despre utilizarea cookie-urilor, ne puteți contacta la:
-          </p>
-          <div className="bg-slate-50 p-6 rounded-lg border border-slate-100 mt-4 text-sm text-slate-700">
-            <strong>TEHNICAGRO SUPPLY S.R.L.</strong><br/>
-            Adresa: Sos. Tulcei 69 A Ap. BIR. 1, Sat Lumina, Jud. Constanta, Cod 907175<br/>
-            CUI: RO52736574 | Reg. Com.: J2025080370001<br/>
-            Email: <a href="mailto:tehnicagro.supply@gmail.com" className="text-emerald-600 hover:underline">tehnicagro.supply@gmail.com</a>
-          </div>
-          
-          <div className="mt-12 pt-8 border-t border-slate-100 flex items-center justify-between">
-            <Link href="/" className="text-emerald-600 font-medium hover:underline">
-              &larr; Înapoi la pagina principală
-            </Link>
-            <span className="text-sm font-bold text-slate-400">Ultima actualizare: 20 Martie 2026</span>
-          </div>
+                <div className="mb-4 rounded-lg border border-emerald-100 bg-emerald-50 p-5">
+                    <p className="mb-3 text-sm font-semibold text-slate-800">
+                        Vrei să schimbi alegerea chiar acum?
+                    </p>
+                    <CookieSettingsButton />
+                    <p className="mt-3 text-xs text-slate-600">
+                        Același buton îl găsești permanent în subsolul fiecărei pagini, sub numele „Setări
+                        cookie-uri”. Retragerea acordului e la fel de simplă ca acordarea lui.
+                    </p>
+                </div>
+
+                <SectionTitle>3. Lista completă</SectionTitle>
+                {COOKIE_CATEGORIES.map((cat) => (
+                    <div key={cat.key} className="mb-10">
+                        <h3 className="mb-2 text-lg font-bold text-slate-900">{cat.title}</h3>
+                        <p className="mb-4 text-sm text-slate-600">{cat.summary}</p>
+                        <div className="overflow-x-auto">
+                            <table className="w-full min-w-[40rem] border-collapse text-left text-sm">
+                                <thead>
+                                    <tr className="border-b-2 border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                                        <th className="py-2 pr-4 font-bold">Nume</th>
+                                        <th className="py-2 pr-4 font-bold">Furnizor</th>
+                                        <th className="py-2 pr-4 font-bold">Tip</th>
+                                        <th className="py-2 pr-4 font-bold">La ce folosește</th>
+                                        <th className="py-2 font-bold">Durată</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {cat.entries.map((e) => (
+                                        <tr key={e.name} className="border-b border-slate-100 align-top">
+                                            <td className="py-3 pr-4 font-mono text-xs font-medium text-slate-800">
+                                                {e.name}
+                                            </td>
+                                            <td className="py-3 pr-4 text-slate-600">{e.provider}</td>
+                                            <td className="py-3 pr-4 text-slate-500">{e.kind}</td>
+                                            <td className="py-3 pr-4 text-slate-600">{e.purpose}</td>
+                                            <td className="py-3 font-medium text-slate-700">{e.duration}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                ))}
+
+                <SectionTitle>4. Ce înseamnă „date anonime” aici</SectionTitle>
+                <p className="mb-4 text-slate-600">
+                    Ca să fim exacți: datele din cookie-urile de analiză și marketing{' '}
+                    <strong>nu sunt anonime</strong>. Sunt pseudonimizate — nu conțin numele tău, dar conțin
+                    identificatori care te pot distinge de alt vizitator. De aceea sunt tratate ca date cu caracter
+                    personal și de aceea îți cerem acordul înainte să le folosim.
+                </p>
+
+                <SectionTitle>5. Unde ajung datele</SectionTitle>
+                <p className="mb-4 text-slate-600">
+                    Cookie-urile de analiză și marketing trimit date către Google, Meta și Microsoft, companii cu
+                    prelucrare inclusiv în Statele Unite. Transferurile se fac în baza clauzelor contractuale
+                    standard aprobate de Comisia Europeană și a Cadrului transatlantic de confidențialitate a
+                    datelor. Dacă refuzi aceste categorii, transferurile nu au loc deloc. Detalii complete despre
+                    fiecare furnizor sunt în{' '}
+                    <Link href="/privacy-policy" className="text-emerald-600 hover:underline">
+                        Politica de confidențialitate
+                    </Link>
+                    .
+                </p>
+
+                <SectionTitle>6. Ce se întâmplă dacă retragi acordul</SectionTitle>
+                <p className="mb-4 text-slate-600">
+                    Din momentul retragerii nu mai pornim scripturile respective. Cele deja încărcate în pagina
+                    deschisă rămân active până reîncarci pagina — la următoarea încărcare dispar complet.
+                    Cookie-urile deja plasate le poți șterge oricând din setările browserului, de obicei din
+                    secțiunea „Confidențialitate și securitate”.
+                </p>
+
+                <SectionTitle>7. Contact</SectionTitle>
+                <div className="mb-4 rounded-lg border border-slate-100 bg-slate-50 p-6 text-sm text-slate-700">
+                    <strong>{SITE_CONTACT.legalName}</strong>
+                    <br />
+                    {SITE_CONTACT.addressFull}
+                    <br />
+                    CUI: {SITE_CONTACT.cui} · Reg. Com.: {SITE_CONTACT.regCom}
+                    <br />
+                    Email:{' '}
+                    <a href={`mailto:${SITE_CONTACT.email}`} className="text-emerald-600 hover:underline">
+                        {SITE_CONTACT.email}
+                    </a>
+                </div>
+
+                <div className="mt-12 flex items-center justify-between border-t border-slate-100 pt-8">
+                    <Link href="/" className="font-medium text-emerald-600 hover:underline">
+                        &larr; Înapoi la pagina principală
+                    </Link>
+                    <span className="text-sm font-bold text-slate-400">Versiunea {FORM_CONSENT_VERSION}</span>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

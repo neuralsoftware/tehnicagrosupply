@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Calculator, Banknote, Droplets, CheckCircle2, TrendingUp, Clock, AlertCircle, MapPin, FileText, Phone, Scale } from 'lucide-react';
 import { collectLeadAttribution } from '@/lib/lead-attribution';
 import { formatLeadApiError } from '@/lib/lead-api-error';
+import { buildLeadConsent, NOTICE_TEXT, MARKETING_TEXT } from '@/lib/form-consent';
 
 const COUNTIES = [
     'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani', 'Brașov', 'Brăila', 'București',
@@ -46,6 +47,8 @@ export function RoiCalculator({
     const [selectedCrops, setSelectedCrops] = useState<string[]>([]);
     const [urgency, setUrgency] = useState('');
     const [gdprConsent, setGdprConsent] = useState(false);
+    /** Opțional — refuzul nu blochează primirea raportului. */
+    const [marketingConsent, setMarketingConsent] = useState(false);
 
     // Constants
     const SUBSIDY_EUR = 56.28;
@@ -91,6 +94,7 @@ export function RoiCalculator({
             source: 'ROI Calculator',
             cif: cif.trim(),
             attribution: collectLeadAttribution(),
+            consent: buildLeadConsent(gdprConsent, marketingConsent),
         };
 
         try {
@@ -168,6 +172,7 @@ export function RoiCalculator({
         setFormError(null);
         setLeadId(null);
         setCallRequested(false);
+        setMarketingConsent(false);
         setContact('');
         setPhone('');
         setEmail('');
@@ -480,21 +485,37 @@ export function RoiCalculator({
                                                 </div>
                                             </details>
 
-                                            <div className="flex items-start gap-3 mb-6 bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-                                                <input
-                                                    type="checkbox"
-                                                    id="gdpr-audit"
-                                                    required
-                                                    checked={gdprConsent}
-                                                    onChange={(e) => setGdprConsent(e.target.checked)}
-                                                    className="mt-1 w-4 h-4 rounded border-zinc-300 bg-white text-ea-green-600 focus:ring-ea-green-500 cursor-pointer"
-                                                />
-                                                <label htmlFor="gdpr-audit" className="text-[11px] text-zinc-400 leading-snug cursor-pointer">
-                                                    Sunt de acord cu prelucrarea datelor conform{' '}
-                                                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-ea-green-500 hover:underline font-bold">
-                                                        Politicii de Confidențialitate
-                                                    </a>.
-                                                </label>
+                                            {/* Informare obligatorie (temei precontractual) + acord opțional de marketing */}
+                                            <div className="mb-6 space-y-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+                                                <div className="flex items-start gap-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="gdpr-audit"
+                                                        required
+                                                        checked={gdprConsent}
+                                                        onChange={(e) => setGdprConsent(e.target.checked)}
+                                                        className="mt-1 w-4 h-4 rounded border-zinc-300 bg-white text-ea-green-600 focus:ring-ea-green-500 cursor-pointer"
+                                                    />
+                                                    <label htmlFor="gdpr-audit" className="text-[11px] text-zinc-500 leading-snug cursor-pointer">
+                                                        {NOTICE_TEXT}{' '}
+                                                        <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-ea-green-500 hover:underline font-bold">
+                                                            Deschide politica
+                                                        </a>
+                                                    </label>
+                                                </div>
+                                                <div className="flex items-start gap-3 border-t border-zinc-200 pt-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="marketing-audit"
+                                                        checked={marketingConsent}
+                                                        onChange={(e) => setMarketingConsent(e.target.checked)}
+                                                        className="mt-1 w-4 h-4 rounded border-zinc-300 bg-white text-ea-green-600 focus:ring-ea-green-500 cursor-pointer"
+                                                    />
+                                                    <label htmlFor="marketing-audit" className="text-[11px] text-zinc-500 leading-snug cursor-pointer">
+                                                        <span className="font-bold uppercase tracking-wide">Opțional:</span>{' '}
+                                                        {MARKETING_TEXT}
+                                                    </label>
+                                                </div>
                                             </div>
 
                                             <button
