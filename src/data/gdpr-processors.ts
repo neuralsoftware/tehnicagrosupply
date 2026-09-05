@@ -27,7 +27,12 @@ export type Processor = {
     /** Temeiul transferului, dacă datele ies din Spațiul Economic European. */
     transferBasis: string | null;
     dpaUrl: string;
-    /** Ce trebuie făcut concret ca acordul să fie în vigoare. */
+    /**
+     * `automat` — acordul e deja în vigoare prin simpla folosire a serviciului;
+     * `de_confirmat` — cineva trebuie să apese explicit accept în contul furnizorului.
+     */
+    acceptance: 'automat' | 'de_confirmat';
+    /** De ce e automat, sau ce anume trebuie apăsat. Citat din contract acolo unde e cazul. */
     dpaAction: string;
     /** Activ doar dacă vizitatorul acceptă categoria respectivă de cookie-uri. */
     consentGated: boolean;
@@ -45,7 +50,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Regiune de execuție în Uniunea Europeană; societatea-mamă în SUA',
         transferBasis: 'Clauze contractuale standard (SCC)',
         dpaUrl: 'https://vercel.com/legal/dpa',
-        dpaAction: 'Se acceptă din Dashboard → Settings → Legal → Data Processing Addendum',
+        acceptance: 'automat',
+        dpaAction: 'În vigoare automat: contractul spune „By entering into the Agreement, Data Exporter is deemed to have signed these Standard Contractual Clauses”. Nu există buton de acceptat.',
         consentGated: false,
         archive: 'vercel-dpa.html',
     },
@@ -58,7 +64,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Stockholm, Suedia (eu-north-1) — în Uniunea Europeană',
         transferBasis: null,
         dpaUrl: 'https://supabase.com/legal/customer-resources/data-processing-addendum',
-        dpaAction: 'Se acceptă din Dashboard → Organization → Legal Documents',
+        acceptance: 'automat',
+        dpaAction: 'În vigoare automat: DPA-ul „forms part of the Supabase Terms of Service”, iar „acceptance of the Agreement shall have the same effect as signing the SCCs”.',
         consentGated: false,
         archive: 'supabase-dpa.html',
     },
@@ -71,7 +78,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Rețea globală, cu preferință pentru noduri europene',
         transferBasis: 'Clauze contractuale standard (SCC)',
         dpaUrl: 'https://www.cloudflare.com/cloudflare-customer-dpa/',
-        dpaAction: 'Inclus automat în Termenii de utilizare; se descarcă pentru arhivă',
+        acceptance: 'automat',
+        dpaAction: 'În vigoare automat: DPA-ul „forms part of the Main Agreement” și e „deemed executed upon execution of the DPA”.',
         consentGated: false,
         archive: 'cloudflare-dpa.html',
     },
@@ -84,7 +92,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Uniunea Europeană și SUA',
         transferBasis: 'EU–US Data Privacy Framework + clauze contractuale standard',
         dpaUrl: 'https://business.safety.google/adsprocessorterms/',
-        dpaAction: 'Se acceptă din Google Analytics → Admin → Account Settings → Data Processing Terms',
+        acceptance: 'automat',
+        dpaAction: 'În vigoare automat: firma e stabilită în România, deci în SEE. Google cere acceptare explicită doar clienților din afara SEE. Opțional, în Admin → Account details poți completa contactul de notificare.',
         consentGated: true,
         archive: 'google-ads-processor-terms.html',
     },
@@ -97,7 +106,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Uniunea Europeană și SUA',
         transferBasis: 'EU–US Data Privacy Framework + clauze contractuale standard',
         dpaUrl: 'https://clarity.microsoft.com/terms',
-        dpaAction: 'Inclus în Microsoft Products and Services DPA, acceptat la crearea contului',
+        acceptance: 'automat',
+        dpaAction: 'În vigoare automat: inclus în Microsoft Products and Services DPA, acceptat odată cu crearea contului.',
         consentGated: true,
         archive: 'microsoft-clarity-terms.html',
     },
@@ -110,7 +120,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Uniunea Europeană și SUA',
         transferBasis: 'EU–US Data Privacy Framework + clauze contractuale standard',
         dpaUrl: 'https://business.safety.google/adsprocessorterms/',
-        dpaAction: 'Se acceptă din Google Ads → Tools → Preferences → Data Processing Terms',
+        acceptance: 'automat',
+        dpaAction: 'În vigoare automat: firma e stabilită în SEE. Acceptarea explicită din Account Settings e cerută doar clienților din afara SEE, Marii Britanii sau Elveției.',
         consentGated: true,
         archive: 'google-ads-processor-terms.html',
     },
@@ -123,7 +134,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Uniunea Europeană și SUA',
         transferBasis: 'EU–US Data Privacy Framework + clauze contractuale standard',
         dpaUrl: 'https://www.facebook.com/legal/terms/dataprocessing',
-        dpaAction: 'Inclus automat în Condițiile pentru instrumentele de business Meta',
+        acceptance: 'automat',
+        dpaAction: 'În vigoare automat: inclus în Condițiile pentru instrumentele de business Meta, acceptate la configurarea pixelului.',
         consentGated: true,
         archive: 'meta-data-processing.html',
     },
@@ -136,7 +148,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Uniunea Europeană și SUA',
         transferBasis: 'EU–US Data Privacy Framework + clauze contractuale standard',
         dpaUrl: 'https://business.safety.google/adsprocessorterms/',
-        dpaAction: 'Clipurile rulează pe youtube-nocookie.com și pornesc doar cu acordul vizitatorului',
+        acceptance: 'automat',
+        dpaAction: 'Acoperit de acordul Google. Clipurile rulează pe youtube-nocookie.com și pornesc doar cu acordul vizitatorului.',
         consentGated: true,
         archive: 'google-ads-processor-terms.html',
     },
@@ -149,7 +162,8 @@ export const PROCESSORS: Processor[] = [
         location: 'Uniunea Europeană și SUA',
         transferBasis: 'EU–US Data Privacy Framework + clauze contractuale standard',
         dpaUrl: 'https://cloud.google.com/terms/data-processing-addendum/',
-        dpaAction: 'Se acceptă din Admin Console → Account → Legal and compliance',
+        acceptance: 'automat',
+        dpaAction: 'În vigoare automat: Cloud Data Processing Addendum „is incorporated into the Agreement(s) between Google and Customer”.',
         consentGated: false,
         archive: 'google-cloud-workspace-dpa.html',
     },

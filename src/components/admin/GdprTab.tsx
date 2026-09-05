@@ -145,14 +145,16 @@ export function GdprTab({ adminAuth }: { adminAuth: string }) {
                         <FileText className="h-4 w-4" /> Contracte de prelucrare (art. 28)
                     </h2>
                     <span className="text-xs text-zinc-500">
-                        {semnate} din {PROCESSORS.length} confirmate
+                        {PROCESSORS.length} acorduri în vigoare · {semnate} verificate de tine
                     </span>
                 </div>
                 <p className="max-w-3xl text-xs leading-relaxed text-zinc-500">
-                    Fiecare furnizor care atinge date personale are nevoie de un acord de prelucrare. Documentele
-                    sunt deja arhivate în proiect, la <code className="text-zinc-400">docs/gdpr/dpa/</code>.
-                    Acceptarea propriu-zisă se face din contul fiecărui furnizor — este o acțiune juridică pe care
-                    trebuie să o faci tu, cu contul tău. Bifează aici după ce ai apăsat accept la furnizor.
+                    Fiecare furnizor care atinge date personale are nevoie de un acord de prelucrare. La toți cei de
+                    mai jos acordul este <strong className="text-zinc-300">deja în vigoare automat</strong>, prin
+                    simpla folosire a serviciului — textul fiecărui contract o spune explicit, iar firma fiind
+                    stabilită în România intră sub regimul european implicit. Nu ai nimic de acceptat. Butonul de
+                    mai jos e doar pentru evidența ta: marchează că ai citit documentul, cu dată, ca să ai ce arăta
+                    la un control. Copiile sunt arhivate la <code className="text-zinc-400">docs/gdpr/dpa/</code>.
                 </p>
 
                 <div className="space-y-2">
@@ -172,23 +174,27 @@ export function GdprTab({ adminAuth }: { adminAuth: string }) {
                                         <span className="rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
                                             {PROCESSOR_CATEGORY_LABEL[p.category]}
                                         </span>
-                                        {done ? (
+                                        {p.acceptance === 'automat' ? (
                                             <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-ea-green-400">
-                                                <CheckCircle2 className="h-3 w-3" />
-                                                confirmat
-                                                {st?.accepted_at
-                                                    ? ` · ${new Date(st.accepted_at).toLocaleDateString('ro-RO')}`
-                                                    : ''}
+                                                <CheckCircle2 className="h-3 w-3" /> în vigoare automat
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-400">
-                                                <AlertTriangle className="h-3 w-3" /> de confirmat
+                                                <AlertTriangle className="h-3 w-3" /> de acceptat în cont
                                             </span>
                                         )}
+                                        {done ? (
+                                            <span className="text-[11px] text-zinc-500">
+                                                verificat
+                                                {st?.accepted_at
+                                                    ? ` ${new Date(st.accepted_at).toLocaleDateString('ro-RO')}`
+                                                    : ''}
+                                            </span>
+                                        ) : null}
                                     </div>
                                     <p className="text-xs text-zinc-400">{p.entity}</p>
                                     <p className="text-xs text-zinc-500">
-                                        <span className="font-semibold text-zinc-400">De făcut:</span> {p.dpaAction}
+                                        <span className="font-semibold text-zinc-400">Cum se aplică:</span> {p.dpaAction}
                                     </p>
                                     <p className="text-[11px] text-zinc-600">
                                         Date: {p.dataTypes} · Locație: {p.location}
@@ -216,8 +222,10 @@ export function GdprTab({ adminAuth }: { adminAuth: string }) {
                                         {saving === p.name
                                             ? 'Se salvează…'
                                             : done
-                                              ? 'Anulează confirmarea'
-                                              : 'Am acceptat acordul'}
+                                              ? 'Șterge marcajul'
+                                              : p.acceptance === 'automat'
+                                                ? 'Am citit documentul'
+                                                : 'Am acceptat acordul'}
                                     </button>
                                 </div>
                             </div>
